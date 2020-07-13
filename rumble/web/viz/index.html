@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>viz</title>
+</head>
+<body>
+<center>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.480.0.min.js"></script>
+<script type="text/javascript" src="localviz.js"></script>
+<script type="text/javascript" src="lambda.js"></script>
+<table>
+<tr>
+  <td><div><canvas style="display: block" id="canvas" /></div></td>
+  <td valign="top">
+    <h3 id="entrant_heading"></h3>
+    <h3 id="tag_heading"></h3>
+    <h3 id="problem_heading"></h3>
+    <h3 id="runtime_heading"></h3>
+    <h3 id="score_heading"></h3>
+    <div id="main_section" valign="top"></div>
+    <div>Execution speed: <text id="speed_text"></text></div>
+    <br />
+    <table border="0">
+      <tr><td>r</td><td>Prepare/Reset</td></tr>
+      <tr><td>Space (s)</td><td>Start/Pause execution</td></tr>
+      <tr><td>Right (d)</td><td>Increase speed</td></tr>
+      <tr><td>Left (a)</td><td>Decrease speed</td></tr>
+    </table>
+  </td>
+</tr>
+</table>
+<script>
+  'beforeRender' in window && beforeRender();
+  render();
+  'afterRender' in window && afterRender();
+</script>
+</center>
+</body>
+</html>

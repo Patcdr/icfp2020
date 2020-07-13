@@ -1,0 +1,17 @@
+{
+  "name": "grader",
+  "version": "1.0.0",
+  "description": "icfp bootleg grader",
+  "main": "grader.js",
+  "dependencies": {
+    "js-beautify": "^1.10.0",
+    "jsdom": "^15.1.1",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "UNLICENSED"
+}
