@@ -29,6 +29,7 @@ jobs:
             ECR_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/thecat/rumble
             IMAGE_TAG: ${{ github.sha }}
         run: |
+          docker pull $ECR_REPOSITORY:latest
           docker build -f rumble/docker/Dockerfile -t $ECR_REPOSITORY --build-arg GIT_TAG=$IMAGE_TAG --cache-from $ECR_REPOSITORY:latest .
           docker tag $ECR_REPOSITORY $ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REPOSITORY

@@ -253,12 +253,12 @@ resource "aws_cloudwatch_event_rule" "every-minute" {
     schedule_expression = "rate(1 minute)"
 }
 
-resource "aws_cloudwatch_event_target" "coin-every-minute" {
-    rule = aws_cloudwatch_event_rule.every-minute.name
-    target_id = "rumble"
-    input = jsonencode(map("action", "coin"))
-    arn = aws_lambda_function.rumble-function.arn
-}
+# resource "aws_cloudwatch_event_target" "coin-every-minute" {
+#     rule = aws_cloudwatch_event_rule.every-minute.name
+#     target_id = "rumble"
+#     input = jsonencode(map("action", "coin"))
+#     arn = aws_lambda_function.rumble-function.arn
+# }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_rumble" {
     statement_id = "AllowExecutionFromCloudWatch"
