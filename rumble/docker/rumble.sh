@@ -4,7 +4,7 @@
 
 # Pull down the input content from the given URL
 ENTRANT=${1:-Submission}
-INPUT_URL=${2:-https://www.rumbletoon.com/problems/smoke/prob-001.desc}
+INPUT_URL=${2:-https://www.rumbletoon.com/problems/smoke/smoke.json}
 GROUP=$(echo $INPUT_URL | sed 's#^.*/\(.*\)/.*$#\1#')
 PROBLEM=$(echo $INPUT_URL | sed 's#.*/##')
 GIT_TAG_SHORT=$(echo $GIT_TAG | head -c 7)

@@ -111,7 +111,7 @@ resource "aws_batch_job_definition" "rumble-job-latest" {
       aws_dynamodb_table.rumble-job-table
     ]
     parameters = {
-      entrants = "eyex.Eyes.example",
+      entrants = "Submission",
       inputFile = "https://www.rumbletoon.com/problems/smoke.json"
     }
     timeout {

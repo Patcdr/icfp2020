@@ -48,7 +48,7 @@ class Header extends React.Component {
         tags: [],
         tag: 'latest',
         entrants: [],
-        entrant: 'eyes.Eyes.noop',
+        entrant: 'Submission',
       }
     }
 
