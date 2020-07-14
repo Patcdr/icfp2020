@@ -42,7 +42,6 @@ jobs:
         uses: actions/setup-node@v1
   
       - name: Build website
-        uses: actions/npm
         run: |
           cd rumble/web
           yarn install
@@ -51,5 +50,5 @@ jobs:
       - name: Deploy static site to S3 bucket
         run: aws s3 sync rumble/web/out s3://www.rumbletoon.com/
 
-    #   - name: Rumble
-    #     run: for i in rumble/docker/entrants/*; do aws lambda invoke --function-name rumble --payload '{\"entrants\": [\"'${i##*/}'\"], \"group\": \"smoke\", \"tag\": \"'${{ github.sha }}'\"}' log; done;
+      - name: Rumble
+        run: for i in rumble/docker/entrants/*; do aws lambda invoke --function-name rumble --payload '{\"entrants\": [\"'${i##*/}'\"], \"group\": \"smoke\", \"tag\": \"'${{ github.sha }}'\"}' log; done;
