@@ -53,14 +53,15 @@ class Header extends React.Component {
     }
 
     async componentDidMount() {
-      let entrants = await s3List('entrants/');
-      let problems = await s3List('problems/');
+      let entrants = (await s3List('entrants/')).filter(Boolean);
+      let problems = (await s3List('problems/')).filter(Boolean);
       let groups = Object.keys(problems
                          .filter((p) => p.indexOf('/') >=0 )
                          .map((p) => p.split('/')[0]).reduce((a, v) => {
                             a[v] = 1; return a;
-                         }, {}));
-      let tags = await ecrList();
+                         }, {})).filter(Boolean);
+      let tags = (await ecrList()).filter(Boolean);
+
       this.setState({
           entrants,
           entrant: entrants[0],
