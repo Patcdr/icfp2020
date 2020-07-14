@@ -17,14 +17,6 @@ RUN ./build.sh
 FROM mcr.microsoft.com/dotnet/core/runtime:3.1
 WORKDIR /solution
 
-# Define arguments
-ARG GIT_TAG=latest
-ENV GIT_TAG=$GIT_TAG
-ARG AWS_ACCESS_KEY_ID=AKIAIZLSW3KBVM2S74LA
-ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY=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
-ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-
 # Install some extra packages for the rumbler
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
   && apt-get -y install nodejs
@@ -45,6 +37,14 @@ COPY --from=build-env /solution/build ./build
 
 # Copy the runs script
 COPY run.sh ./
+
+# Setup environment
+ARG GIT_TAG=latest
+ENV GIT_TAG=$GIT_TAG
+ARG AWS_ACCESS_KEY_ID=DEFAULT
+ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY=DEFAULT
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 # RUN find *
 ENTRYPOINT ["./rumble.sh"]
