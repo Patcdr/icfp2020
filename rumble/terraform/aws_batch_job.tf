@@ -112,7 +112,7 @@ resource "aws_batch_job_definition" "rumble-job-latest" {
     ]
     parameters = {
       entrants = "eyex.Eyes.example",
-      inputFile = "https://www.rumbletoon.com/problems/smoke/circle.json"
+      inputFile = "https://www.rumbletoon.com/problems/smoke.json"
     }
     timeout {
       attempt_duration_seconds = 600
@@ -126,7 +126,7 @@ resource "aws_batch_job_definition" "rumble-job-latest" {
     "environment": [
       {"name": "AWS_REGION", "value": "${var.region}"},
       {"name": "DYNAMO_TABLE", "value": "${aws_dynamodb_table.rumble-job-table.id}"},
-      {"name": "S3_LOGS_BUCKET", "value": "{aws_s3_bucket.logs-bucket.id}"}
+      {"name": "S3_LOGS_BUCKET", "value": "${aws_s3_bucket.logs-bucket.id}"}
     ],
     "command": [
       "Ref::entrants",
