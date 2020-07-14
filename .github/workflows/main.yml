@@ -27,7 +27,7 @@ jobs:
         env:
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
             ECR_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/thecat/rumble
-            IMAGE_TAG: ${GITHUB_SHA:7}
+            IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -f rumble/docker/Dockerfile -t $ECR_REPOSITORY --build-arg GIT_TAG=$IMAGE_TAG --cache-from $ECR_REPOSITORY:latest .
           docker tag $ECR_REPOSITORY $ECR_REPOSITORY:$IMAGE_TAG
@@ -39,7 +39,7 @@ jobs:
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
 
       - name: Rumble
-        run: "for i in rumble/docker/entrants/*; do aws lambda invoke --function-name rumble --payload '{\"entrants\": [\"'${i##*/}'\"], \"group\": \"smoke\", \"tag\": \"'${GITHUB_SHA:7}'\"}' log; done;"
+        run: "for i in rumble/docker/entrants/*; do aws lambda invoke --function-name rumble --payload '{\"entrants\": [\"'${i##*/}'\"], \"group\": \"smoke\", \"tag\": \"'${{ github.sha }}'\"}' log; done;"
 
     deploy-web:
       runs-on: ubuntu-latest
