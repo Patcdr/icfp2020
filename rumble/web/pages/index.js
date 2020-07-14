@@ -23,10 +23,12 @@ export default class RumbleToon extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <Header {...this.props}/>
-        <Leaderboard {...this.props}/>
-        <Recent {...this.props}/>
+      <div className="background">
+        <div className="container">
+          <Header {...this.props}/>
+          <Leaderboard {...this.props}/>
+          <Recent {...this.props}/>
+        </div>
       </div>
     )
   }

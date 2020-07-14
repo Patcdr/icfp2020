@@ -15,24 +15,12 @@ $white: rgba(254, 254, 254, 1)
 body
   font-family: $main-font
 
-.container::before
-  background: url('/static/background.jpg') no-repeat center center fixed
+.background
+  background: url('/static/background.png') no-repeat center center fixed
   background-size: cover
-  content: ""
-  display: block
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%
-  height: 100%
-  z-index: -2
-  opacity: 0.4
 
 // Leaderboard
 .container
-  width: 100%
-  height: 100%
-  margin: 40px auto
 
 .alltime
   text-align: right
@@ -64,6 +52,7 @@ body
 .rumbleheader
   width: 100%
   padding-bottom: 20px
+  padding-top: 20px
   & .row
     background-color: $maincolor
     padding: 20px 10px
