@@ -5,7 +5,7 @@ on:
       branches: [ master ]
 
 jobs:
-    build:
+    deploy-docker:
       runs-on: ubuntu-latest
   
       steps:
@@ -29,7 +29,7 @@ jobs:
             ECR_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/thecat/rumble
             IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -f rumble/docker/Dockerfile -t $ECR_REPOSITORY --build-arg GIT_TAG=$IMAGE_TAG --cache-from $ECR_REPOSITORY:latest.
+          docker build -f rumble/docker/Dockerfile -t $ECR_REPOSITORY --build-arg GIT_TAG=$IMAGE_TAG --cache-from $ECR_REPOSITORY:latest .
           docker tag $ECR_REPOSITORY $ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REPOSITORY
           docker push $ECR_REPOSITORY:$IMAGE_TAG
@@ -37,7 +37,15 @@ jobs:
       - name: Logout of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
+
+      - name: Rumble
+        run: "for i in rumble/docker/entrants/*; do aws lambda invoke --function-name rumble --payload '{\"entrants\": [\"'${i##*/}'\"], \"group\": \"smoke\", \"tag\": \"'${{ github.sha }}'\"}' log; done;"
+
+    deploy-web:
+      runs-on: ubuntu-latest
     
+      steps:
+
       - name: Use Node.js Latest
         uses: actions/setup-node@v1
   
@@ -49,6 +57,3 @@ jobs:
 
       - name: Deploy static site to S3 bucket
         run: aws s3 sync rumble/web/out s3://www.rumbletoon.com/
-
-      - name: Rumble
-        run: "for i in rumble/docker/entrants/*; do aws lambda invoke --function-name rumble --payload '{\"entrants\": [\"'${i##*/}'\"], \"group\": \"smoke\", \"tag\": \"'${{ github.sha }}'\"}' log; done;"
