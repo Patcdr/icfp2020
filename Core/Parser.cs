@@ -1,42 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using static Core.Library;
-using System.Linq;
 
 namespace Core
 {
     public class Parser
     {
-        public static Dictionary<string, Value> Parse(List<string> input)
+        public static Dictionary<string, Node> Parse(List<string> input)
         {
             Dictionary<string, Node> symbols = new Dictionary<string, Node>();
             foreach (string line in input)
             {
-                string[] tokens = line.Split(" ");
-                string symbol = tokens[0];
+                // Is this how we're supposed to do this?  Cast it? :(
+                IEnumerator<string> tokens = (IEnumerator<string>)line.Split(" ").GetEnumerator();
+                string symbol = tokens.Current;
+                tokens.MoveNext();
 
-                if (tokens[1] != "=")
+                if (tokens.Current != "=")
                 {
                     throw new Exception("Line doesn't have an equals where we'd want.");
                 }
+                tokens.MoveNext();
 
-                // Recursive helper function
-
-                for (int i = 2; i < tokens.Length; i++)
-                {
-                    switch(tokens[i])
-                    {
-                        case "ap":
-                            break;
-                        default:
-                            throw new Exception("Got an unexpected token.");
-                    }
-                }
+                symbols.Add(symbol, ParseTree(tokens));
             }
 
             // Need to evaluate dictionary before returning.
-            return null;
+            return symbols;
+        }
+
+        private static Node ParseTree(IEnumerator<string> tokens)
+        {
+            string currentToken = tokens.Current;
+            tokens.MoveNext();
+            switch (currentToken)
+            {
+                case "ap":
+                    return new Apply(ParseTree(tokens), ParseTree(tokens));
+                case "add":
+                    return Add;
+                case "b":
+                    return BCombo;
+                case "c":
+                    return CCombo;
+                case "car":
+                    return Car;
+                case "cdr":
+                    return Cdr;
+                case "cons":
+                    return Cons;
+                case "div":
+                    return Divide;
+                case "eq":
+                    return EqualVal;
+                case "i":
+                    return Identity;
+                case "isnil":
+                    return IsNil;
+                case "lt":
+                    return LessThan;
+                case "mul":
+                    return Mult;
+                case "neg":
+                    return Negate;
+                case "nil":
+                    return Nil;
+                case "s":
+                    return SCombo;
+                case "t":
+                    return TrueVal;
+                case "f":
+                    return FalseVal;
+                case "inc":
+                    return Increment;
+                case "dec":
+                    return Decrement;
+                case "pwr2":
+                    return Power2;
+                case "if0":
+                    return IfZero;
+                case "vec":
+                    return Vec;
+                default:
+                    if (currentToken.StartsWith(":") || currentToken == "galaxy")
+                    {
+                        return new SymbolNode(currentToken);
+                    }
+
+                    throw new Exception("Got a token we don't recognize.");
+            }
         }
     }
 }
