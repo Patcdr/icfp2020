@@ -6,5 +6,9 @@ namespace Core
 {
     public abstract class Node
     {
+        public virtual Value Evaluate()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

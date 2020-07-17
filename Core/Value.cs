@@ -22,6 +22,10 @@ namespace Core
         public static readonly Value SCombo = new SClass();
         public static readonly Value BCombo = new BClass();
         public static readonly Value CCombo = new CClass();
+        public static readonly Value Cons = new ConsClass();
+        public static readonly Value Vec = new ConsClass();
+        public static readonly Value Car = new CarClass();
+        public static readonly Value Cdr = new CdrClass();
     }
 
     public abstract class Value : Node
@@ -34,6 +38,11 @@ namespace Core
         public virtual long AsNumber()
         {
             throw new NotImplementedException();
+        }
+
+        public override Value Evaluate()
+        {
+            return this;
         }
     }
 
@@ -371,6 +380,62 @@ namespace Core
         public override Value Invoke(Value val3)
         {
             return val1.Invoke(val2.Invoke(val3));
+        }
+    }
+
+    public class ConsClass : Value
+    {
+        public override Value Invoke(Value val1)
+        {
+            return new ConsIntermediate1(val1);
+        }
+    }
+
+    public class ConsIntermediate1 : Value
+    {
+        private readonly Value val1;
+
+        public ConsIntermediate1(Value val1)
+        {
+            this.val1 = val1;
+        }
+
+        public override Value Invoke(Value val2)
+        {
+            return new ConsIntermediate2(val1, val2);
+        }
+    }
+
+    public class ConsIntermediate2 : Value
+    {
+        private readonly Value val1;
+        private readonly Value val2;
+
+        public ConsIntermediate2(Value val1, Value val2)
+        {
+            this.val1 = val1;
+            this.val2 = val2;
+        }
+
+        public override Value Invoke(Value val3)
+        {
+            return val3.Invoke(val1).Invoke(val2);
+        }
+    }
+
+    public class CarClass : Value
+    {
+        public override Value Invoke(Value val)
+        {
+            return val.Invoke(Library.TrueVal);
+        }
+    }
+
+    public class CdrClass : Value
+    {
+        public override Value Invoke(Value val)
+        {
+            return val.Invoke(Library.FalseVal);
         }
     }
 }
