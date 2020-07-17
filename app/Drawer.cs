@@ -5,26 +5,37 @@ using System.Threading.Tasks;
 
 namespace app
 {
+    // Probably going to have to redefine these
+    using Point = IList<int>;
+    using PointsList = IList<IList<int>>;
+    using MultiPointsList = IList<IList<IList<int>>>;
+
     class Drawer
     {
         private const int WIDTH = 17;
         private const int HEIGHT = 13;
 
-        // Expects a list of points of the form { x1, y1, x2, y2, ... }
-        public static void Draw(int[] points)
+        public static IList<object> MultipleDraw(MultiPointsList pointsList)
         {
-            if (points.Length % 2 != 0)
+            var result = new List<object>();
+
+            foreach(PointsList points in pointsList)
             {
-                throw new ArgumentException("Expected pairs of coordinates");
+                result.Add(Draw(points));
             }
 
+            return result;
+        }
+
+        public static object Draw(PointsList points)
+        {
             // Convert the list of points to a grid
             bool[,] grid = new bool[WIDTH, HEIGHT];
 
-            for (int i = 0; i < points.Length; i += 2)
+            foreach (Point point in points)
             {
-                int x = points[i];
-                int y = points[i + 1];
+                int x = point[0];
+                int y = point[1];
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
@@ -51,15 +62,10 @@ namespace app
             }
 
             Console.WriteLine("└──────────────────────────────────┘");
+
+            // Not sure what to return, but the spec has Draw
+            // returning the resulting pictures somehow.
+            return null;
         }
-
-        public static async Task<int> xMain(string[] args)
-        {
-            int[] points = { 1, 1, 2, 2, 0, 5 };
-            Draw(points);
-
-            return 0;
-        }
-
     }
 }
