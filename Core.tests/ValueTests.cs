@@ -236,5 +236,139 @@ namespace Core.tests
             val = Cons.Invoke(new Number(1)).Invoke(Nil);
             Assert.AreEqual(FalseVal, isNil.Invoke(val));
         }
+
+        [Test]
+        public void AddClassTests()
+        {
+            var add = new AddClass();
+
+            Assert.Catch<NotImplementedException>(() => add.AsNumber());
+            Assert.AreEqual(add, add.Evaluate(null));
+
+            Value val = null;
+            Assert.Catch<NullReferenceException>(() => add.Invoke(val));
+
+            val = new Number(123);
+            Value val2 = new Number(234);
+            
+            var result = add.Invoke(val).Invoke(val2);
+            Assert.AreEqual(357, result.AsNumber());
+            
+            result = add.Invoke(val2).Invoke(val);
+            Assert.AreEqual(357, result.AsNumber());
+
+            val2 = Nil;
+            Assert.Catch<NotImplementedException>(() => add.Invoke(val).Invoke(val2));
+
+            val = Identity;
+            Assert.Catch<NotImplementedException>(() => add.Invoke(val));
+        }
+
+        [Test]
+        public void MultClassTests()
+        {
+            var mult = new MultClass();
+
+            Assert.Catch<NotImplementedException>(() => mult.AsNumber());
+            Assert.AreEqual(mult, mult.Evaluate(null));
+
+            Value val = null;
+            Assert.Catch<NullReferenceException>(() => mult.Invoke(val));
+
+            val = new Number(123);
+            Value val2 = new Number(234);
+
+            var result = mult.Invoke(val).Invoke(val2);
+            Assert.AreEqual(28782, result.AsNumber());
+
+            result = mult.Invoke(val2).Invoke(val);
+            Assert.AreEqual(28782, result.AsNumber());
+
+            val2 = Nil;
+            Assert.Catch<NotImplementedException>(() => mult.Invoke(val).Invoke(val2));
+
+            val = Identity;
+            Assert.Catch<NotImplementedException>(() => mult.Invoke(val));
+        }
+
+        [Test]
+        public void DivideClassTests()
+        {
+            var div = new DivideClass();
+
+            Assert.Catch<NotImplementedException>(() => div.AsNumber());
+            Assert.AreEqual(div, div.Evaluate(null));
+
+            Value val = null;
+            Assert.Catch<NullReferenceException>(() => div.Invoke(val));
+
+            val = new Number(123);
+            Value val2 = new Number(234);
+
+            var result = div.Invoke(val).Invoke(val2);
+            Assert.AreEqual(0, result.AsNumber());
+
+            result = div.Invoke(val2).Invoke(val);
+            Assert.AreEqual(1, result.AsNumber());
+
+            val2 = Nil;
+            Assert.Catch<NotImplementedException>(() => div.Invoke(val).Invoke(val2));
+
+            val = Identity;
+            Assert.Catch<NotImplementedException>(() => div.Invoke(val));
+        }
+
+        [Test]
+        public void EqualsClassTests()
+        {
+            var eq = new EqualsClass();
+
+            Assert.Catch<NotImplementedException>(() => eq.AsNumber());
+            Assert.AreEqual(eq, eq.Evaluate(null));
+
+            Value val = null;
+            Assert.Catch<NullReferenceException>(() => eq.Invoke(val));
+
+            val = new Number(123);
+            Value val2 = new Number(234);
+            Assert.AreEqual(FalseVal, eq.Invoke(val).Invoke(val2));
+            Assert.AreEqual(FalseVal, eq.Invoke(val2).Invoke(val));
+
+            val2 = new Number(123);
+            Assert.AreEqual(TrueVal, eq.Invoke(val).Invoke(val2));
+            Assert.AreEqual(TrueVal, eq.Invoke(val2).Invoke(val));
+
+            val2 = Nil;
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(val).Invoke(val2));
+
+            val = Identity;
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(val));
+        }
+
+        public void LessThanClassTests()
+        {
+            var lt = new LessThanClass();
+
+            Assert.Catch<NotImplementedException>(() => lt.AsNumber());
+            Assert.AreEqual(lt, lt.Evaluate(null));
+
+            Value val = null;
+            Assert.Catch<NullReferenceException>(() => lt.Invoke(val));
+
+            val = new Number(123);
+            Value val2 = new Number(234);
+            Assert.AreEqual(TrueVal, lt.Invoke(val).Invoke(val2));
+            Assert.AreEqual(FalseVal, lt.Invoke(val2).Invoke(val));
+
+            val2 = new Number(123);
+            Assert.AreEqual(FalseVal, lt.Invoke(val).Invoke(val2));
+            Assert.AreEqual(FalseVal, lt.Invoke(val2).Invoke(val));
+
+            val2 = Nil;
+            Assert.Catch<NotImplementedException>(() => lt.Invoke(val).Invoke(val2));
+
+            val = Identity;
+            Assert.Catch<NotImplementedException>(() => lt.Invoke(val));
+        }
     }
 }
