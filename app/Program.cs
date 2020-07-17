@@ -8,7 +8,7 @@ namespace app
 {
     class Program
     {
-        public static async Task<int> xMain(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -28,8 +28,8 @@ namespace app
             }
 
             using var httpClient = new HttpClient { BaseAddress = serverUri };
-            var requestContent = new StringContent(playerKey, Encoding.UTF8, MediaTypeNames.Text.Plain);
-            using var response = await httpClient.PostAsync("", requestContent);
+            var requestContent = new StringContent("010", Encoding.UTF8, MediaTypeNames.Text.Plain);
+            using var response = await httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent);
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Unexpected server response: {response}");

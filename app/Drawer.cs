@@ -53,7 +53,7 @@ namespace app
             Console.WriteLine("└──────────────────────────────────┘");
         }
 
-        public static async Task<int> Main(string[] args)
+        public static async Task<int> xMain(string[] args)
         {
             int[] points = { 1, 1, 2, 2, 0, 5 };
             Draw(points);
