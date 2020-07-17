@@ -48,7 +48,7 @@ namespace Core
 
     public class Number : Value
     {
-        private long n;
+        private readonly long n;
 
         public Number(long n)
         {
@@ -63,7 +63,7 @@ namespace Core
 
     public class ConstantFunction : Value
     {
-        private Value val;
+        private readonly Value val;
 
         public ConstantFunction(Value val)
         {
