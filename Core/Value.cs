@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Core
 {
@@ -40,7 +41,7 @@ namespace Core
             throw new NotImplementedException();
         }
 
-        public override Value Evaluate()
+        public override Value Evaluate(Dictionary<string, Node> environment)
         {
             return this;
         }

@@ -15,9 +15,9 @@ namespace Core
             this.node2 = node2;
         }
 
-        public override Value Evaluate()
+        public override Value Evaluate(Dictionary<string, Node> environment)
         {
-            return node1.Evaluate().Invoke(node2.Evaluate());
+            return node1.Evaluate(environment).Invoke(node2.Evaluate(environment));
         }
     }
 }
