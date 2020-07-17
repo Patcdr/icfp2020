@@ -59,5 +59,13 @@ namespace app
             var answer = NumberFunctions.Mod(problem);
             Assert.AreEqual(solution, answer);
         }
+
+        [TestCase(new int [] {0}, "1101000")]
+        [TestCase(new int [] {1, 76517}, "110110000111011111100001001010101110010100")]
+        public void ListModTest(int[] problem, string solution)
+        {
+            var answer = NumberFunctions.Mod(problem);
+            Assert.AreEqual(solution, answer);
+        }
     }
 }

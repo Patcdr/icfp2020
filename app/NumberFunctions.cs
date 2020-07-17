@@ -56,6 +56,18 @@ namespace app
             return RecDem(new BitStream(input));
         }
 
+        public static string Mod(int[] input)
+        {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < input.Length; i++)
+            {
+                builder.Append("11");
+                builder.Append(Mod(input[i]));
+            }
+            builder.Append("00");
+            return builder.ToString();
+        }
+
         public static string Mod(int input)
         {
             // Special case to make parsing easier

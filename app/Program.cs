@@ -8,11 +8,15 @@ namespace app
 {
     class Program
     {
+        public static HttpClient httpClient;
+        public static string serverUrl;
+        public static string playerKey;
+
         public static async Task<int> Main(string[] args)
         {
             // Default to the test server
-            string serverUrl = "https://icfpc2020-api.testkontur.ru";
-            string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
+            serverUrl = "https://icfpc2020-api.testkontur.ru";
+            playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
             if (args.Length == 2) {
                 serverUrl = args[0];
@@ -27,21 +31,30 @@ namespace app
                 return 1;
             }
 
-            using var httpClient = new HttpClient { BaseAddress = serverUri };
-            var requestContent = new StringContent("010", Encoding.UTF8, MediaTypeNames.Text.Plain);
+            httpClient = new HttpClient { BaseAddress = serverUri };
+
+            var content = await Send(new int[] {0});
+
+            // Needed for the rumbletron
+            Console.Error.WriteLine($"SCORE: 1000");
+
+            return 0;
+        }
+
+        public static async Task<string> Send(int[] statement) {
+            var signal = NumberFunctions.Mod(statement);
+            var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
             using var response = await httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent);
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Unexpected server response: {response}");
-                return 2;
+                return "";
             }
 
-            var responseString = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Server response: {responseString}");
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Server response: {content}");
 
-            Console.Error.WriteLine($"SCORE: 1000");
-
-            return 0;
+            return content;
         }
 
     }
