@@ -12,7 +12,7 @@ namespace Core
         public static readonly NegateClass Negate = new NegateClass();
         public static readonly Power2Class Power2 = new Power2Class();
         public static readonly IdentityClass Identity = new IdentityClass();
-        public static readonly Value Nil = new ConstantFunction(TrueVal);
+        public static readonly Value Nil = new NilClass();
         public static readonly Value IsNil = new IsNilClass();
         public static readonly Value Add = new AddClass();
         public static readonly Value Mult = new MultClass();
@@ -60,6 +60,12 @@ namespace Core
         {
             return n;
         }
+
+        public override string ToString()
+        {
+            return n.ToString();
+        }
+
     }
 
     public class ConstantFunction : Value
@@ -75,6 +81,11 @@ namespace Core
         {
             return val;
         }
+
+        public override string ToString()
+        {
+            return "I(" + val + ")";
+        }
     }
 
     public class TrueClass : Value
@@ -83,6 +94,11 @@ namespace Core
         {
             return new ConstantFunction(val);
         }
+
+        public override string ToString()
+        {
+            return "True";
+        }
     }
 
     public class FalseClass : Value
@@ -90,6 +106,24 @@ namespace Core
         public override Value Invoke(Value _)
         {
             return Library.Identity;
+        }
+
+        public override string ToString()
+        {
+            return "False";
+        }
+    }
+
+    public class NilClass : Value
+    {
+        public override Value Invoke(Value val)
+        {
+            return Library.Identity;
+        }
+
+        public override string ToString()
+        {
+            return "Nil";
         }
     }
 
@@ -139,7 +173,7 @@ namespace Core
     public class IsNilClass : Value
     {
         private static readonly Value EvaluationFunTime = new ConstantFunction(new ConstantFunction(Library.FalseVal));
-        
+
         /// <summary>
         /// Here there be dragons. (if not nil or cons)
         /// </summary>
@@ -421,6 +455,11 @@ namespace Core
         public override Value Invoke(Value val3)
         {
             return val3.Invoke(val1).Invoke(val2);
+        }
+
+        public override string ToString()
+        {
+            return " (" + val1 + " , " + val2 + ") ";
         }
     }
 

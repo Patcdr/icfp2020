@@ -53,7 +53,8 @@ namespace app
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Server response: {content}");
+            var answer = NumberFunctions.Dem(content);
+            Console.WriteLine($"Server response: {answer}");
 
             return content;
         }
