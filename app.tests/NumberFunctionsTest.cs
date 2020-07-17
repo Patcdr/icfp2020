@@ -1,3 +1,4 @@
+using Core;
 using NUnit.Framework;
 
 namespace app
@@ -25,7 +26,21 @@ namespace app
         public void DemTest(string problem, int solution)
         {
             var answer = NumberFunctions.Dem(problem);
-            Assert.AreEqual(solution, answer);
+            Assert.AreEqual(solution, answer.AsNumber());
+        }
+
+        [Test]
+        public void DemTest2()
+        {
+            var answer = NumberFunctions.Dem("00");
+            Assert.AreEqual(answer, Library.Nil);
+
+            answer = NumberFunctions.Dem("110110000100");
+            Assert.That(answer, Is.TypeOf<ConsIntermediate2>());
+            ConsIntermediate2 cons = (ConsIntermediate2)answer;
+            Assert.AreEqual(1L, cons.Invoke(Library.TrueVal).AsNumber());
+            Assert.AreEqual(Library.Nil, cons.Invoke(Library.FalseVal));
+
         }
 
         [TestCase(0, "010")]

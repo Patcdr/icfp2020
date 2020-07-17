@@ -1,35 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Core;
+using static Core.Library;
 
 namespace app
 {
     // Please feel free to move these functions somewhere else!
     public class NumberFunctions
     {
-        public static int Dem(string input)
+
+        public class BitStream
         {
-            // Special case to make parsing easier.
-            if (input == "010")
+            private string bits;
+            private int dex;
+
+            public BitStream(string bits)
             {
-                return 0;
+                this.bits = bits;
+                this.dex = 0;
             }
 
-            bool isPositive = input[0] == '0';
-            int index = 2;
-            while (input[index] == '1')
+            public string Read(int len)
             {
-                index++;
+                string ret = this.bits.Substring(this.dex, len);
+                this.dex += len;
+                return ret;
             }
+        }
 
-            if (isPositive)
+        public static Value RecDem(BitStream stream)
+        {
+            string type = stream.Read(2);
+            switch (type)
             {
-                return Convert.ToInt32(input.Substring(index), 2);
+                case "00":
+                    return Nil;
+                case "11":
+                    return new ConsIntermediate2(RecDem(stream), RecDem(stream));
+                default:
+                    long sign = type[0] == '0' ? 1L : -1L;
+                    int size = 0;
+                    while (stream.Read(1) == "1")
+                        size += 1;
+                    if (size == 0)
+                        return new Number(0L * sign);
+                    long ret = Convert.ToInt64(stream.Read(size * 4), 2);
+                    return new Number(ret * sign);
+
             }
-            else
-            {
-                return -1 * Convert.ToInt32(input.Substring(index), 2);
-            }
+        }
+
+        public static Value Dem(string input)
+        {
+            return RecDem(new BitStream(input));
         }
 
         public static string Mod(int input)
