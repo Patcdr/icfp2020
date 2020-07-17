@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Core;
+using System;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Core;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace app
 {
@@ -15,6 +19,9 @@ namespace app
 
         public static async Task<int> Main(string[] args)
         {
+            // Hacky hack!
+            //EvaluateGalaxy();
+
             // Default to the test server
             serverUrl = "https://icfpc2020-api.testkontur.ru";
             playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
@@ -59,5 +66,15 @@ namespace app
             return content;
         }
 
+        // Hack: eventually this will want to move somewhere else!
+        public static Value EvaluateGalaxy()
+        {
+            // Hack: load up Galaxy.txt
+            //string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
+            List<string> testLines = new List<string> { ":example = ap ap ap s isnil :example nil" };
+            Dictionary<string, Node> environment = Parser.Parse(testLines);
+            Value stuff = environment[":example"].Evaluate(environment);
+            return stuff;
+        }
     }
 }

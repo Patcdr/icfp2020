@@ -31,9 +31,15 @@ namespace Core
 
     public abstract class Value : Node
     {
-        public virtual Value Invoke(Value val)
+        private static readonly Dictionary<string, Node> EMPTY_ENV = new Dictionary<string, Node>();
+        public virtual Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             throw new NotImplementedException();
+        }
+
+        public Value Invoke(Node val)
+        {
+            return Invoke(val, EMPTY_ENV);
         }
 
         public virtual long AsNumber()
@@ -70,16 +76,23 @@ namespace Core
 
     public class ConstantFunction : Value
     {
-        private readonly Value val;
+        private readonly Node val;
 
-        public ConstantFunction(Value val)
+        public ConstantFunction(Node val)
         {
             this.val = val;
         }
 
-        public override Value Invoke(Value _)
+        private Value evaluateCache = null;
+
+        public override Value Invoke(Node _, Dictionary<string, Node> environment)
         {
-            return val;
+            if (evaluateCache == null)
+            {
+                evaluateCache = val.Evaluate(environment);
+            }
+
+            return evaluateCache;
         }
 
         public override string ToString()
@@ -90,7 +103,7 @@ namespace Core
 
     public class TrueClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return new ConstantFunction(val);
         }
@@ -103,7 +116,7 @@ namespace Core
 
     public class FalseClass : Value
     {
-        public override Value Invoke(Value _)
+        public override Value Invoke(Node _, Dictionary<string, Node> environment)
         {
             return Library.Identity;
         }
@@ -116,7 +129,7 @@ namespace Core
 
     public class NilClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return Library.Identity;
         }
@@ -129,25 +142,25 @@ namespace Core
 
     public class IncrementClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(val.AsNumber() + 1);
+            return new Number(val.Evaluate(environment).AsNumber() + 1);
         }
     }
 
     public class DecrementClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(val.AsNumber() - 1);
+            return new Number(val.Evaluate(environment).AsNumber() - 1);
         }
     }
 
     public class NegateClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(-val.AsNumber());
+            return new Number(-val.Evaluate(environment).AsNumber());
         }
     }
 
@@ -156,17 +169,17 @@ namespace Core
         /// <summary>
         /// There is an assumption that val is an int
         /// </summary>
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(1L << (int)val.AsNumber());
+            return new Number(1L << (int)val.Evaluate(environment).AsNumber());
         }
     }
 
     public class IdentityClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return val;
+            return val.Evaluate(environment);
         }
     }
 
@@ -177,17 +190,17 @@ namespace Core
         /// <summary>
         /// Here there be dragons. (if not nil or cons)
         /// </summary>
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return val.Invoke(EvaluationFunTime);
+            return val.Evaluate(environment).Invoke(EvaluationFunTime, environment);
         }
     }
 
     public class AddClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new AddConstant(val.AsNumber());
+            return new AddConstant(val.Evaluate(environment).AsNumber());
         }
     }
 
@@ -200,17 +213,17 @@ namespace Core
             this.n = n;
         }
 
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(n + val.AsNumber());
+            return new Number(n + val.Evaluate(environment).AsNumber());
         }
     }
 
     public class MultClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new MultConstant(val.AsNumber());
+            return new MultConstant(val.Evaluate(environment).AsNumber());
         }
     }
 
@@ -223,17 +236,17 @@ namespace Core
             this.n = n;
         }
 
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(n * val.AsNumber());
+            return new Number(n * val.Evaluate(environment).AsNumber());
         }
     }
 
     public class DivideClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new DivideConstant(val.AsNumber());
+            return new DivideConstant(val.Evaluate(environment).AsNumber());
         }
     }
 
@@ -246,17 +259,17 @@ namespace Core
             this.n = n;
         }
 
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(n / val.AsNumber());
+            return new Number(n / val.Evaluate(environment).AsNumber());
         }
     }
 
     public class EqualsClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new EqualsConstant(val.AsNumber());
+            return new EqualsConstant(val.Evaluate(environment).AsNumber());
         }
     }
 
@@ -269,17 +282,17 @@ namespace Core
             this.n = n;
         }
 
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return n == val.AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
+            return n == val.Evaluate(environment).AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
         }
     }
 
     public class LessThanClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new LessThanConstant(val.AsNumber());
+            return new LessThanConstant(val.Evaluate(environment).AsNumber());
         }
     }
 
@@ -292,15 +305,15 @@ namespace Core
             this.n = n;
         }
 
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return n < val.AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
+            return n < val.Evaluate(environment).AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
         }
     }
 
     public class SClass : Value
     {
-        public override Value Invoke(Value val1)
+        public override Value Invoke(Node val1, Dictionary<string, Node> environment)
         {
             return new SIntermediate1(val1);
         }
@@ -308,14 +321,14 @@ namespace Core
 
     public class SIntermediate1 : Value
     {
-        private readonly Value val1;
+        private readonly Node val1;
 
-        public SIntermediate1(Value val1)
+        public SIntermediate1(Node val1)
         {
             this.val1 = val1;
         }
 
-        public override Value Invoke(Value val2)
+        public override Value Invoke(Node val2, Dictionary<string, Node> environment)
         {
             return new SIntermediate2(val1, val2);
         }
@@ -323,24 +336,26 @@ namespace Core
 
     public class SIntermediate2 : Value
     {
-        private readonly Value val1;
-        private readonly Value val2;
+        private readonly Node val1;
+        private readonly Node val2;
 
-        public SIntermediate2(Value val1, Value val2)
+        public SIntermediate2(Node val1, Node val2)
         {
             this.val1 = val1;
             this.val2 = val2;
         }
 
-        public override Value Invoke(Value val3)
+        // ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
+        public override Value Invoke(Node val3, Dictionary<string, Node> environment)
         {
-            return val1.Invoke(val3).Invoke(val2.Invoke(val3));
+            Value application1 = val1.Evaluate(environment).Invoke(val3, environment);
+            return application1.Invoke(new Apply(val2, val3), environment);
         }
     }
 
     public class CClass : Value
     {
-        public override Value Invoke(Value val1)
+        public override Value Invoke(Node val1, Dictionary<string, Node> environment)
         {
             return new CIntermediate1(val1);
         }
@@ -348,14 +363,14 @@ namespace Core
 
     public class CIntermediate1 : Value
     {
-        private readonly Value val1;
+        private readonly Node val1;
 
-        public CIntermediate1(Value val1)
+        public CIntermediate1(Node val1)
         {
             this.val1 = val1;
         }
 
-        public override Value Invoke(Value val2)
+        public override Value Invoke(Node val2, Dictionary<string, Node> environment)
         {
             return new CIntermediate2(val1, val2);
         }
@@ -363,24 +378,25 @@ namespace Core
 
     public class CIntermediate2 : Value
     {
-        private readonly Value val1;
-        private readonly Value val2;
+        private readonly Node val1;
+        private readonly Node val2;
 
-        public CIntermediate2(Value val1, Value val2)
+        public CIntermediate2(Node val1, Node val2)
         {
             this.val1 = val1;
             this.val2 = val2;
         }
 
-        public override Value Invoke(Value val3)
+        public override Value Invoke(Node val3, Dictionary<string, Node> environment)
         {
-            return val1.Invoke(val3).Invoke(val2);
+            Value application1 = val1.Evaluate(environment).Invoke(val3, environment);
+            return application1.Invoke(val2, environment);
         }
     }
 
     public class BClass : Value
     {
-        public override Value Invoke(Value val1)
+        public override Value Invoke(Node val1, Dictionary<string, Node> environment)
         {
             return new BIntermediate1(val1);
         }
@@ -388,14 +404,14 @@ namespace Core
 
     public class BIntermediate1 : Value
     {
-        private readonly Value val1;
+        private readonly Node val1;
 
-        public BIntermediate1(Value val1)
+        public BIntermediate1(Node val1)
         {
             this.val1 = val1;
         }
 
-        public override Value Invoke(Value val2)
+        public override Value Invoke(Node val2, Dictionary<string, Node> environment)
         {
             return new BIntermediate2(val1, val2);
         }
@@ -403,24 +419,24 @@ namespace Core
 
     public class BIntermediate2 : Value
     {
-        private readonly Value val1;
-        private readonly Value val2;
+        private readonly Node val1;
+        private readonly Node val2;
 
-        public BIntermediate2(Value val1, Value val2)
+        public BIntermediate2(Node val1, Node val2)
         {
             this.val1 = val1;
             this.val2 = val2;
         }
 
-        public override Value Invoke(Value val3)
+        public override Value Invoke(Node val3, Dictionary<string, Node> environment)
         {
-            return val1.Invoke(val2.Invoke(val3));
+            return val1.Evaluate(environment).Invoke(new Apply(val2, val3), environment);
         }
     }
 
     public class ConsClass : Value
     {
-        public override Value Invoke(Value val1)
+        public override Value Invoke(Node val1, Dictionary<string, Node> environment)
         {
             return new ConsIntermediate1(val1);
         }
@@ -428,14 +444,14 @@ namespace Core
 
     public class ConsIntermediate1 : Value
     {
-        private readonly Value val1;
+        private readonly Node val1;
 
-        public ConsIntermediate1(Value val1)
+        public ConsIntermediate1(Node val1)
         {
             this.val1 = val1;
         }
 
-        public override Value Invoke(Value val2)
+        public override Value Invoke(Node val2, Dictionary<string, Node> environment)
         {
             return new ConsIntermediate2(val1, val2);
         }
@@ -443,18 +459,19 @@ namespace Core
 
     public class ConsIntermediate2 : Value
     {
-        private readonly Value val1;
-        private readonly Value val2;
+        private readonly Node val1;
+        private readonly Node val2;
 
-        public ConsIntermediate2(Value val1, Value val2)
+        public ConsIntermediate2(Node val1, Node val2)
         {
             this.val1 = val1;
             this.val2 = val2;
         }
 
-        public override Value Invoke(Value val3)
+        public override Value Invoke(Node val3, Dictionary<string, Node> environment)
         {
-            return val3.Invoke(val1).Invoke(val2);
+            Value application1 = val3.Evaluate(environment).Invoke(val1, environment);
+            return application1.Invoke(val2, environment);
         }
 
         public override string ToString()
@@ -465,17 +482,17 @@ namespace Core
 
     public class CarClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return val.Invoke(Library.TrueVal);
+            return val.Evaluate(environment).Invoke(Library.TrueVal, environment);
         }
     }
 
     public class CdrClass : Value
     {
-        public override Value Invoke(Value val)
+        public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return val.Invoke(Library.FalseVal);
+            return val.Evaluate(environment).Invoke(Library.FalseVal, environment);
         }
     }
 }

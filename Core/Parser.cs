@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using static Core.Library;
+using System.Linq;
 
 namespace Core
 {
@@ -12,7 +13,8 @@ namespace Core
             foreach (string line in input)
             {
                 // Is this how we're supposed to do this?  Cast it? :(
-                IEnumerator<string> tokens = (IEnumerator<string>)line.Split(" ").GetEnumerator();
+                IEnumerator<string> tokens = line.Split(" ").AsEnumerable().GetEnumerator();
+                tokens.MoveNext();
                 string symbol = tokens.Current;
                 tokens.MoveNext();
 
@@ -84,6 +86,11 @@ namespace Core
                     if (currentToken.StartsWith(":") || currentToken == "galaxy")
                     {
                         return new SymbolNode(currentToken);
+                    }
+
+                    if (long.TryParse(currentToken, out long number))
+                    {
+                        return new Number(number);
                     }
 
                     throw new Exception("Got a token we don't recognize.");
