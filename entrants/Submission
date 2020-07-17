@@ -1,1 +1,1 @@
-./run.sh $INPUT_URL $ENTRANT
+./run.sh
