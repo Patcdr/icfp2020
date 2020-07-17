@@ -25,7 +25,6 @@ namespace Core
                 symbols.Add(symbol, ParseTree(tokens));
             }
 
-            // Need to evaluate dictionary before returning.
             return symbols;
         }
 
