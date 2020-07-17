@@ -10,7 +10,7 @@ ap f x	Apply f(x)
 ap inc N -> N`		Increment
 ap dec N -> N`		Decrement
 ap neg N -> -N  	Negate
-ap pwr2 N -> N^2 	Power2
+ap pwr2 N -> 2^N 	Power2
 ap i N -> N				Identity
 ap nil X -> t			Nil
 ap isnil X -> t/f Is Nil
