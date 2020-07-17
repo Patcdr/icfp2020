@@ -56,16 +56,17 @@ namespace app
         [TestCase(-256, "101110000100000000")]
         public void ModTest(int problem, string solution)
         {
-            var answer = NumberFunctions.Mod(problem);
+            var answer = NumberFunctions.Mod(new Number(problem));
             Assert.AreEqual(solution, answer);
         }
 
-        [TestCase(new int [] {0}, "1101000")]
-        [TestCase(new int [] {1, 76517}, "110110000111011111100001001010101110010100")]
-        public void ListModTest(int[] problem, string solution)
+
+        [TestCase("110110000100")]
+        public void RoundTripTest(string problem)
         {
-            var answer = NumberFunctions.Mod(problem);
-            Assert.AreEqual(solution, answer);
+            var answer = NumberFunctions.Mod(NumberFunctions.Dem(problem));
+            Assert.AreEqual(problem, answer);
         }
+
     }
 }

@@ -56,55 +56,33 @@ namespace app
             return RecDem(new BitStream(input));
         }
 
-        public static string Mod(int[] input)
+        public static string RecMod(Value val)
         {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < input.Length; i++)
+            if (val == Nil)
+                return "00";
+            else if(val is Number)
             {
-                builder.Append("11");
-                builder.Append(Mod(input[i]));
+                long ret = val.AsNumber();
+                if (ret == 0) return "010";
+
+                string str = Convert.ToString(ret, 2);
+                int l_mod = (str.Length % 4);
+                if (l_mod > 0)
+                {
+                    str = str.PadLeft(str.Length + 4 - l_mod, '0');
+                }
+                return str;
             }
-            builder.Append("00");
-            return builder.ToString();
+            else if (val is ConsIntermediate2)
+            {
+                return RecMod(val.Invoke(TrueVal)) + RecMod(val.Invoke(FalseVal));
+            }
+            throw new Exception("WTF is this shit");
         }
 
-        public static string Mod(int input)
+        public static string Mod(Value input)
         {
-            // Special case to make parsing easier
-            if (input == 0)
-            {
-                return "010";
-            }
-
-            StringBuilder builder = new StringBuilder();
-
-            // Sign
-            if (input >= 0)
-            {
-                builder.Append("01");
-            }
-            else
-            {
-                builder.Append("10");
-            }
-
-            // Number of bits
-            string binaryString = Convert.ToString(Math.Abs(input), 2);
-            int bitsNeeded = (binaryString.Length + 3) / 4;
-            for (int i = 0; i < bitsNeeded; i++)
-            {
-                builder.Append("1");
-            }
-            builder.Append("0");
-
-            // Actual number
-            for (int i = 0; i < bitsNeeded * 4 - binaryString.Length; i++)
-            {
-                builder.Append("0");
-            }
-
-            builder.Append(binaryString);
-            return builder.ToString();
+            return RecMod(input);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using Core;
 
 namespace app
 {
@@ -33,7 +34,7 @@ namespace app
 
             httpClient = new HttpClient { BaseAddress = serverUri };
 
-            var content = await Send(new int[] {0});
+            var content = await Send(new ConsIntermediate2(new Number(1), Library.Nil));
 
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");
@@ -41,7 +42,7 @@ namespace app
             return 0;
         }
 
-        public static async Task<string> Send(int[] statement) {
+        public static async Task<string> Send(Value statement) {
             var signal = NumberFunctions.Mod(statement);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
             using var response = await httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent);
