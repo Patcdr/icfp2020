@@ -40,8 +40,9 @@ namespace app
                 return "010";
             }
 
-            // Sign
             StringBuilder builder = new StringBuilder();
+
+            // Sign
             if (input >= 0)
             {
                 builder.Append("01");
@@ -52,7 +53,7 @@ namespace app
             }
 
             // Number of bits
-            string binaryString = Convert.ToString(input, 2);
+            string binaryString = Convert.ToString(Math.Abs(input), 2);
             int bitsNeeded = (binaryString.Length + 3) / 4;
             for (int i = 0; i < bitsNeeded; i++)
             {
@@ -70,5 +71,4 @@ namespace app
             return builder.ToString();
         }
     }
-}
 }
