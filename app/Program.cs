@@ -8,7 +8,7 @@ namespace app
 {
     class Program
     {
-        public static async Task<int> Main(string[] args)
+        public static async Task<int> xMain(string[] args)
         {
             var serverUrl = args[0];
             var playerKey = args[1];
