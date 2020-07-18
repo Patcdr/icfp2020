@@ -41,14 +41,19 @@ namespace Core
 
         public static Value EvaluateFully(Value curr, Dictionary<string, Node> env)
         {
-            if (curr.IsNumber() || ToBool(IsNil.Invoke(curr, env)))
+            if (curr.IsNumber() || curr == Nil)
             {
                 return curr;
             }
 
-            Value car = EvaluateFully(curr.Invoke(TrueVal, env), env);
-            Value cdr = EvaluateFully(curr.Invoke(FalseVal, env), env);
-            return new ConsIntermediate2(car, cdr);
+            if (curr is ConsIntermediate2)
+            {
+                Value car = EvaluateFully(curr.Invoke(TrueVal, env), env);
+                Value cdr = EvaluateFully(curr.Invoke(FalseVal, env), env);
+                return new ConsIntermediate2(car, cdr);
+            }
+
+            throw new Exception("Not a number, nil, or Cons cell");
         }
     }
 }
