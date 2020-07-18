@@ -23,14 +23,14 @@ namespace Core
         /// <param name="state">The protocol-dependent state</param>
         /// <param name="point">The (x, y) point to input</param>
         /// <returns>A Response containing the protocol's result</returns>
-        Response call(object state, Value point);
+        Response call(Value state, Value point);
 
         public class Response
         {
             // A flag that when 0, terminates interact and causes it to draw all Data
-            public int Flag { get; set; }
+            public long Flag { get; set; }
 
-            public object NewState { get; set; }
+            public Value NewState { get; set; }
 
             // A vector of vector of vectors, where the most inner vector are tuples
             // representing points. In other words, a list of lists of points.

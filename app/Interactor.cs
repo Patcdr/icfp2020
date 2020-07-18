@@ -18,7 +18,7 @@ namespace app
 
         // TODO: it is unclear whether Send will return more than a single point, but all
         // examples show that Interact takes a point as its last argument.
-        public static async Task<Result> Interact(IProtocol protocol, object state, Value point)
+        public static async Task<Result> Interact(IProtocol protocol, Value state, Value point)
         {
 
             var response = protocol.call(state, point);
