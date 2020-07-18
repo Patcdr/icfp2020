@@ -472,6 +472,11 @@ namespace Core
         {
             return new SIntermediate2(val1, val2);
         }
+
+        public override string ToString()
+        {
+            return $"(ap s {val1})";
+        }
     }
 
     public class SIntermediate2 : Value
@@ -490,6 +495,11 @@ namespace Core
         {
             Value application1 = val1.Evaluate(environment).Invoke(val3, environment);
             return application1.Invoke(new Apply(val2, val3), environment);
+        }
+
+        public override string ToString()
+        {
+            return $"(ap (ap s {val1}) {val2})";
         }
     }
 
@@ -519,6 +529,11 @@ namespace Core
         {
             return new CIntermediate2(val1, val2);
         }
+
+        public override string ToString()
+        {
+            return $"(ap c {val1})";
+        }
     }
 
     public class CIntermediate2 : Value
@@ -536,6 +551,11 @@ namespace Core
         {
             Value application1 = val1.Evaluate(environment).Invoke(val3, environment);
             return application1.Invoke(val2, environment);
+        }
+
+        public override string ToString()
+        {
+            return $"(ap (ap c {val1}) {val2})";
         }
     }
 
@@ -565,6 +585,11 @@ namespace Core
         {
             return new BIntermediate2(val1, val2);
         }
+
+        public override string ToString()
+        {
+            return $"(ap b {val1})";
+        }
     }
 
     public class BIntermediate2 : Value
@@ -581,6 +606,11 @@ namespace Core
         public override Value Invoke(Node val3, Dictionary<string, Node> environment)
         {
             return val1.Evaluate(environment).Invoke(new Apply(val2, val3), environment);
+        }
+
+        public override string ToString()
+        {
+            return $"(ap (ap b {val1}) {val2})";
         }
     }
 
