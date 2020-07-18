@@ -37,7 +37,7 @@ namespace Squigglr
             }
         }
 
-        GraphicsInterface graphicsSingleton = new TempGraphics();
+        GraphicsInterface gInterface;
 
         public MainWindow()
         {
@@ -45,6 +45,9 @@ namespace Squigglr
             canvas.Background = new SolidColorBrush(Colors.Black);
             canvas.Width = window.Width;
             canvas.Height = window.Height;
+
+            gInterface = new TempGraphics();
+            RenderFrame(gInterface.AdvanceState(new IntPoint(0, 0)));
         }
 
         public void RenderFrame(Dictionary<IntPoint, byte> frame)
@@ -78,7 +81,7 @@ namespace Squigglr
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IntPoint p = UnScaleIt(e.GetPosition(canvas));
-            RenderFrame(graphicsSingleton.AdvanceState(p));
+            RenderFrame(gInterface.AdvanceState(p));
         }
 
         public IntPoint ScaleIt(IntPoint p)
