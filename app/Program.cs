@@ -70,10 +70,10 @@ namespace app
         public static Value EvaluateGalaxy()
         {
             // Hack: load up Galaxy.txt
-            //string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
-            List<string> testLines = new List<string> { ":example = ap ap ap s isnil :example nil" };
-            Dictionary<string, Node> environment = Parser.Parse(testLines);
-            Value stuff = environment[":example"].Evaluate(environment);
+            string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
+            //List<string> testLines = new List<string> { ":example = ap ap ap s isnil :example nil" };
+            Dictionary<string, Node> environment = Parser.Parse(lines.ToList());
+            Value stuff = environment["galaxy"].Evaluate(environment);
             return stuff;
         }
     }
