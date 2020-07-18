@@ -34,7 +34,7 @@ namespace app
             }
             else
             {
-                // This is the way it is defined. If we need to we can convert
+                // This is the way it is defined. If we need to we can
                 // convert this from tail recursion to a loop.
                 return await Interact(protocol, newState, await Send(response.Data));
             }

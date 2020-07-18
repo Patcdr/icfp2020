@@ -19,24 +19,12 @@ namespace app
 
         public static async Task<int> Main(string[] args)
         {
-            // Hacky hack!
-            //EvaluateGalaxy();
-
-            //IProtocol protocol = new GalaxyProtocol();
-            //IProtocol protocol = new StatelessDrawProtocol();
-            //IProtocol protocol = new StatefulDrawProtocol();
-            //Interactor.Result result = await Interactor.Interact(protocol);
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(2), new Number(3)));
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(1), new Number(2)));
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(3), new Number(2)));
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
-            return 0;
-
             // Default to the test server
             serverUrl = "https://icfpc2020-api.testkontur.ru";
             playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
-            if (args.Length == 2) {
+            if (args.Length == 2)
+            {
                 serverUrl = args[0];
                 playerKey = args[1];
             }
@@ -50,6 +38,31 @@ namespace app
             }
 
             httpClient = new HttpClient { BaseAddress = serverUri };
+
+            // Hacky hack!
+            //EvaluateGalaxy();
+
+            IProtocol protocol = new GalaxyProtocol();
+            //IProtocol protocol = new StatelessDrawProtocol();
+            //IProtocol protocol = new StatefulDrawProtocol();
+
+            Interactor.Result result = await Interactor.Interact(protocol);
+
+            for (int y = 0; y < 13; y++)
+            {
+                for (int x = 0; x < 17; x++)
+                {
+                    Console.WriteLine($"({x}, {y})");
+                    result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(x), new Number(y)));
+                }
+            }
+            
+            //Interactor.Result result = await Interactor.Interact(protocol);
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(3), new Number(2)));
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
+            return 0;
 
             var content = await Send(new ConsIntermediate2(new Number(1), Library.Nil));
 

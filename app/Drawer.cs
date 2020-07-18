@@ -41,6 +41,9 @@ namespace app
                 result.Add(DrawCons(points));
             }
 
+            Console.WriteLine("────────────────────────────────────");
+            Console.WriteLine("────────────────────────────────────");
+
             return result;
         }
 
@@ -51,8 +54,8 @@ namespace app
 
             foreach (Point point in points)
             {
-                long x = point.Item1;
-                long y = point.Item2;
+                long x = point.Item1 + 8;
+                long y = point.Item2 + 8;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
