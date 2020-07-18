@@ -23,36 +23,15 @@ namespace Squigglr
     /// </summary>
     public partial class MainWindow : Window
     {
-        public double SCALE = 10;
-        
-        public class TempGraphics : GraphicsInterface
-        {
-            private Dictionary<IntPoint, byte> frame { get; set; } = new Dictionary<IntPoint, byte>();
-
-            public Dictionary<IntPoint, byte> AdvanceState(IntPoint p)
-            {
-                if (frame.ContainsKey(p)) frame.Remove(p);
-                else frame.Add(p, 255);
-
-                return frame;
-            }
-        }
-
         GraphicsInterface gInterface;
-        private double RealWidth;
-        private double RealHeight;
-        private int PanShiftWidth = 0;
-        private int PanShiftHeight = 0;
         private Dictionary<IntPoint, byte> currentFrame;
-
-        private Rectangle MouseHover;
+        private readonly Rectangle MouseHover;
 
         public MainWindow()
         {
             InitializeComponent();
             canvas.Background = new SolidColorBrush(Colors.Black);
-            RealWidth = window.Width;
-            RealHeight = window.Height;
+            Scaler.ResizeWindow(window.DesiredSize);
 
             MouseHover = CreateRectangle(new IntPoint(0, 0), 255);
             MouseHover.Fill = new SolidColorBrush(Colors.Green);
@@ -89,14 +68,12 @@ namespace Squigglr
         {
             var c = Color.FromRgb(color, color, color);
 
-            var r = new Rectangle()
-            {
-                Width = SCALE,
-                Height = SCALE,
-                Fill = new SolidColorBrush(c)
-            };
+            var r = new Rectangle();
 
-            Point drawingPoint = ScaleIt(p);
+            Scaler.ResizeRectangle(r);
+            r.Fill = new SolidColorBrush(c);
+            
+            Point drawingPoint = Scaler.Convert(p);
             Canvas.SetLeft(r, drawingPoint.X);
             Canvas.SetTop(r, drawingPoint.Y);
 
@@ -105,26 +82,13 @@ namespace Squigglr
 
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            IntPoint p = UnScaleIt(e.GetPosition(canvas));
+            IntPoint p = Scaler.Convert(e.GetPosition(canvas));
             RenderFrame(GetFrame(p));
-        }
-
-        public Point ScaleIt(IntPoint p)
-        {
-            return new Point(p.X * SCALE + RealWidth / 2 - SCALE/2 + PanShiftWidth * SCALE,
-                             p.Y * SCALE + RealHeight / 2 - SCALE/2 + PanShiftHeight * SCALE);
-        }
-
-        public IntPoint UnScaleIt(Point p)
-        {
-            return new IntPoint((int)Math.Round((p.X - RealWidth / 2 - PanShiftWidth * SCALE) / SCALE),
-                                (int)Math.Round((p.Y - RealHeight / 2 - PanShiftHeight * SCALE) / SCALE));
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            RealWidth = e.NewSize.Width;
-            RealHeight = e.NewSize.Height;
+            Scaler.ResizeWindow(e.NewSize);
             RenderFrame(currentFrame);
         }
 
@@ -132,33 +96,25 @@ namespace Squigglr
         {
             switch(e.Key)
             {
-                case Key.Down: PanShiftHeight--; RenderFrame(currentFrame); break;
-                case Key.Up: PanShiftHeight++; RenderFrame(currentFrame); break;
-                case Key.Left: PanShiftWidth++; RenderFrame(currentFrame); break;
-                case Key.Right: PanShiftWidth--; RenderFrame(currentFrame); break;
+                case Key.Down: Scaler.ShiftView(vertical: false); RenderFrame(currentFrame); break;
+                case Key.Up: Scaler.ShiftView(vertical: true); RenderFrame(currentFrame); break;
+                case Key.Left: Scaler.ShiftView(horizontal: true); RenderFrame(currentFrame); break;
+                case Key.Right: Scaler.ShiftView(horizontal: false); RenderFrame(currentFrame); break;
             }
         }
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            IntPoint p = UnScaleIt(e.GetPosition(canvas));
-            Point p2 = ScaleIt(p);
+            IntPoint p = Scaler.Convert(e.GetPosition(canvas));
+            Point p2 = Scaler.Convert(p);
             Canvas.SetLeft(MouseHover, p2.X);
             Canvas.SetTop(MouseHover, p2.Y);
         }
        
         private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            SCALE += e.Delta > 0 ? 0.5 : -0.5;
-
-            if (SCALE < 0.2)
-            {
-                SCALE = 0.2;
-            }
-
-            MouseHover.Width = SCALE;
-            MouseHover.Height = SCALE;
-
+            Scaler.Zoom(e.Delta > 0);
+            Scaler.ResizeRectangle(MouseHover);
             RenderFrame(currentFrame);
         }
     }
