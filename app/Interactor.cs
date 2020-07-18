@@ -10,32 +10,24 @@ namespace app
     class Interactor
     {
 
-        public static void Interact(IProtocol protocol)
+        public static Result Interact(IProtocol protocol)
         {
-            // Start the protocol passing nil as the initial state and(0, 0) as the initial point.
-            object state = null;
-            object vector = new List<int> { 0, 0 };
-
-            // Then iterate the protocol passing new points along with states obtained from the previous execution.
-            do
-            {
-                Result result = Interact(protocol, state, vector);
-                state = result.NewState;
-                // TODO: what is the new vector???
-
-                // TODO: when do we stop???
-            } while (true);
+            // Start the protocol passing nil as the initial state and (0, 0) as the initial point
+            return Interact(protocol, null, new List<int> { 0, 0 });
         }
 
-        public static Result Interact(IProtocol protocol, object state, object vector)
+        // TODO: it is unclear whether Send will return more than a single point, but all
+        // examples show that Interact takes a point as its last argument.
+        public static Result Interact(IProtocol protocol, object state, IList<int> point)
         {
-            var response = protocol.call(state, vector);
+            var response = protocol.call(state, point);
+            var newState = Modem(response.NewState);
 
             if (response.Flag == 0)
             {
                 return new Result()
                 {
-                    NewState = Modem(response.NewState),
+                    NewState = newState,
                     MultiDrawResult = Drawer.MultipleDraw(response.Data),
                 };
             }
@@ -43,18 +35,18 @@ namespace app
             {
                 // This is the way it is defined. If we need to we can convert
                 // convert this from tail recursion to a loop.
-                return Interact(protocol, Modem(response.NewState), Send(response.Data));
+                return Interact(protocol, newState, Send(response.Data));
             }
         }
 
         // ap modem x0 = ap dem ap mod x0
-        private static object Modem(object state)
+        private static T Modem<T>(T state)
         {
             // What does modem do??? It looks like a noop...does it have side effects?
             return state;
         }
 
-        private static object Send(IList<IList<IList<int>>> data)
+        private static IList<int> Send<T>(T data)
         {
             // TODO: replace this function with the real version
             return null;
