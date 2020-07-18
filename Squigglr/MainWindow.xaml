@@ -13,6 +13,8 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top" Background="Black">
                 <Button Content="Help" x:Name="HelpButton" Click="HelpButton_Click" />
+                <Button Content="Save" x:Name="SaveButton" Click="SaveButton_Click" />
+                <Button Content="Load" x:Name="LoadButton" Click="LoadButton_Click" />
                 <Button Content="Calibrate" x:Name="CalibrateButton" Click="CalibrateButton_Click" />
             </Menu>
             <Canvas 

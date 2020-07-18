@@ -146,6 +146,17 @@ namespace Squigglr
                             "Z = Undo\n");
         }
 
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            gInterface.SaveClicks();
+        }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            currentFrame = gInterface.LoadClicks();
+            RenderFrame(currentFrame);
+        }
+
         private void CalibrateButton_Click(object sender, RoutedEventArgs e)
         {
             GetFrame(new IntPoint(0, 0));

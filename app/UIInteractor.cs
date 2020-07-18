@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.Linq;
 using static Core.Library;
 using Core;
 using static app.Interactor;
+using System.IO;
 
 namespace app
 {
@@ -42,6 +44,26 @@ namespace app
             var result = history.Pop();
             state = result.state;
             return AdvanceState(result.p);
+        }
+
+        public void SaveClicks()
+        {
+            string str = string.Join(Environment.NewLine, history.Select(x => $"{x.p.X},{x.p.Y}").Reverse().Skip(1));
+            File.WriteAllText("SavedClicks", str);
+        }
+
+        public Dictionary<Point, byte> LoadClicks()
+        {
+            string[] lines = File.ReadAllText("SavedClicks").Split(Environment.NewLine);
+            Dictionary<Point, byte> result = null;
+
+            foreach (var line in lines)
+            {
+                string[] pts = line.Split(',');
+                result = AdvanceState(new Point(int.Parse(pts[0]), int.Parse(pts[1])));
+            }
+
+            return result;
         }
 
         public Dictionary<Point, byte> CreateFrame(IList<DrawFrame> frames)

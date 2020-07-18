@@ -9,7 +9,7 @@ namespace Core
     {
         public Dictionary<Point, byte> AdvanceState(Point p);
         public Dictionary<Point, byte> UndoState(int n = 1);
-        //public void SaveStates();
-        //public void LoadStates();
+        public void SaveClicks();
+        public Dictionary<Point, byte> LoadClicks();
     }
 }
