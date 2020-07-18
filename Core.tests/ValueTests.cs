@@ -17,11 +17,11 @@ namespace Core.tests
             var n = new Number(0);
             Assert.AreEqual(0, n.AsNumber());
             Assert.AreEqual(n, n.Evaluate(null));
-            Assert.Catch<NotImplementedException>(() => n.Invoke(null));
+            Assert.Catch<NotImplementedException>(() => n.Invoke(null, Value.EMPTY_ENV));
 
             n = new Number(long.MinValue);
             Assert.AreEqual(long.MinValue, n.AsNumber());
-            
+
             n = new Number(long.MaxValue);
             Assert.AreEqual(long.MaxValue, n.AsNumber());
         }
@@ -33,44 +33,44 @@ namespace Core.tests
             var cf = new ConstantFunction(inner);
             Assert.Catch<NotImplementedException>(() => cf.AsNumber());
             Assert.AreEqual(cf, cf.Evaluate(null));
-            Assert.AreEqual(inner, cf.Invoke(null));
+            Assert.AreEqual(inner, cf.Invoke(null, Value.EMPTY_ENV));
 
             inner = new Number(123);
             cf = new ConstantFunction(inner);
-            Assert.AreEqual(inner, cf.Invoke(null));
+            Assert.AreEqual(inner, cf.Invoke(null, Value.EMPTY_ENV));
 
             inner = Nil;
             cf = new ConstantFunction(inner);
-            Assert.AreEqual(inner, cf.Invoke(null));
+            Assert.AreEqual(inner, cf.Invoke(null, Value.EMPTY_ENV));
 
             inner = Identity;
             cf = new ConstantFunction(inner);
-            Assert.AreEqual(inner, cf.Invoke(null));
+            Assert.AreEqual(inner, cf.Invoke(null, Value.EMPTY_ENV));
         }
 
         [Test]
         public void TrueClassTests()
         {
             var t = new TrueClass();
-            
+
             Assert.Catch<NotImplementedException>(() => t.AsNumber());
             Assert.AreEqual(t, t.Evaluate(null));
 
             Value val = null;
-            var result = t.Invoke(val);
-            Assert.AreEqual(val, result.Invoke(null));
+            var result = t.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(val, result.Invoke(null, Value.EMPTY_ENV));
 
             val = new Number(123);
-            result = t.Invoke(val);
-            Assert.AreEqual(val, result.Invoke(null));
+            result = t.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(val, result.Invoke(null, Value.EMPTY_ENV));
 
             val = Nil;
-            result = t.Invoke(val);
-            Assert.AreEqual(val, result.Invoke(null));
+            result = t.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(val, result.Invoke(null, Value.EMPTY_ENV));
 
             val = Identity;
-            result = t.Invoke(val);
-            Assert.AreEqual(val, result.Invoke(null));
+            result = t.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(val, result.Invoke(null, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -82,20 +82,20 @@ namespace Core.tests
             Assert.AreEqual(f, f.Evaluate(null));
 
             Value val = null;
-            var result = f.Invoke(val);
-            Assert.AreEqual(null, result.Invoke(null));
+            var result = f.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
 
             val = new Number(123);
-            result = f.Invoke(val);
-            Assert.AreEqual(null, result.Invoke(null));
+            result = f.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
 
             val = Nil;
-            result = f.Invoke(val);
-            Assert.AreEqual(null, result.Invoke(null));
+            result = f.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
 
             val = Identity;
-            result = f.Invoke(val);
-            Assert.AreEqual(null, result.Invoke(null));
+            result = f.Invoke(val, Value.EMPTY_ENV);
+            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -107,17 +107,17 @@ namespace Core.tests
             Assert.AreEqual(inc, inc.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => inc.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => inc.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
-            var result = inc.Invoke(val);
+            var result = inc.Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(124, result.AsNumber());
 
             val = Nil;
-            Assert.Catch<NotImplementedException>(() => inc.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => inc.Invoke(val, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => inc.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => inc.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -129,17 +129,17 @@ namespace Core.tests
             Assert.AreEqual(dec, dec.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => dec.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => dec.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
-            var result = dec.Invoke(val);
+            var result = dec.Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(122, result.AsNumber());
 
             val = Nil;
-            Assert.Catch<NotImplementedException>(() => dec.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => dec.Invoke(val, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => dec.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => dec.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -151,17 +151,17 @@ namespace Core.tests
             Assert.AreEqual(neg, neg.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => neg.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => neg.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
-            var result = neg.Invoke(val);
+            var result = neg.Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(-123, result.AsNumber());
 
             val = Nil;
-            Assert.Catch<NotImplementedException>(() => neg.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => neg.Invoke(val, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => neg.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => neg.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -173,17 +173,17 @@ namespace Core.tests
             Assert.AreEqual(p2, p2.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => p2.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => p2.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(12);
-            var result = p2.Invoke(val);
+            var result = p2.Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(4096, result.AsNumber());
 
             val = Nil;
-            Assert.Catch<NotImplementedException>(() => p2.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => p2.Invoke(val, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => p2.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => p2.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -195,17 +195,17 @@ namespace Core.tests
             Assert.AreEqual(id, id.Evaluate(null));
 
             Value val = null;
-            Assert.AreEqual(null, id.Invoke(null));
+            Assert.AreEqual(null, id.Invoke(null, Value.EMPTY_ENV));
 
             val = new Number(123);
-            var result = id.Invoke(val);
+            var result = id.Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(123, result.AsNumber());
 
             val = Nil;
-            Assert.AreEqual(val, id.Invoke(val));
+            Assert.AreEqual(val, id.Invoke(val, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.AreEqual(val, id.Invoke(val));
+            Assert.AreEqual(val, id.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -217,24 +217,24 @@ namespace Core.tests
             Assert.AreEqual(isNil, isNil.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => isNil.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => isNil.Invoke(val, Value.EMPTY_ENV));
 
             /*
              * Does not function correctly for Values other than Nil/Cons
             val = new Number(123);
-            var result = isNil.Invoke(val);
+            var result = isNil.Invoke(val, Value.EMPTY_ENV);
             Assert.IsInstanceOf<FalseClass>(result);
-            
+
             val = Identity;
-            var result = isNil.Invoke(val);
+            var result = isNil.Invoke(val, Value.EMPTY_ENV);
             Assert.IsInstanceOf<FalseClass>(result);
             */
 
             val = Nil;
-            Assert.AreEqual(TrueVal, isNil.Invoke(val));
+            Assert.AreEqual(TrueVal, isNil.Invoke(val, Value.EMPTY_ENV));
 
-            val = Cons.Invoke(new Number(1)).Invoke(Nil);
-            Assert.AreEqual(FalseVal, isNil.Invoke(val));
+            val = Cons.Invoke(new Number(1), Value.EMPTY_ENV).Invoke(Nil, Value.EMPTY_ENV);
+            Assert.AreEqual(FalseVal, isNil.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -246,22 +246,22 @@ namespace Core.tests
             Assert.AreEqual(add, add.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => add.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => add.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
             Value val2 = new Number(234);
-            
-            var result = add.Invoke(val).Invoke(val2);
+
+            var result = add.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV);
             Assert.AreEqual(357, result.AsNumber());
-            
-            result = add.Invoke(val2).Invoke(val);
+
+            result = add.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(357, result.AsNumber());
 
             val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => add.Invoke(val).Invoke(val2));
+            Assert.Catch<NotImplementedException>(() => add.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => add.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => add.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -273,22 +273,22 @@ namespace Core.tests
             Assert.AreEqual(mult, mult.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => mult.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => mult.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
             Value val2 = new Number(234);
 
-            var result = mult.Invoke(val).Invoke(val2);
+            var result = mult.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV);
             Assert.AreEqual(28782, result.AsNumber());
 
-            result = mult.Invoke(val2).Invoke(val);
+            result = mult.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(28782, result.AsNumber());
 
             val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => mult.Invoke(val).Invoke(val2));
+            Assert.Catch<NotImplementedException>(() => mult.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => mult.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => mult.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -300,22 +300,22 @@ namespace Core.tests
             Assert.AreEqual(div, div.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => div.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => div.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
             Value val2 = new Number(234);
 
-            var result = div.Invoke(val).Invoke(val2);
+            var result = div.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV);
             Assert.AreEqual(0, result.AsNumber());
 
-            result = div.Invoke(val2).Invoke(val);
+            result = div.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(1, result.AsNumber());
 
             val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => div.Invoke(val).Invoke(val2));
+            Assert.Catch<NotImplementedException>(() => div.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => div.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => div.Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -327,22 +327,22 @@ namespace Core.tests
             Assert.AreEqual(eq, eq.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => eq.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => eq.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
             Value val2 = new Number(234);
-            Assert.AreEqual(FalseVal, eq.Invoke(val).Invoke(val2));
-            Assert.AreEqual(FalseVal, eq.Invoke(val2).Invoke(val));
+            Assert.AreEqual(FalseVal, eq.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.AreEqual(FalseVal, eq.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
 
             val2 = new Number(123);
-            Assert.AreEqual(TrueVal, eq.Invoke(val).Invoke(val2));
-            Assert.AreEqual(TrueVal, eq.Invoke(val2).Invoke(val));
+            Assert.AreEqual(TrueVal, eq.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.AreEqual(TrueVal, eq.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
 
             val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => eq.Invoke(val).Invoke(val2));
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => eq.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(val, Value.EMPTY_ENV));
         }
 
         public void LessThanClassTests()
@@ -353,22 +353,22 @@ namespace Core.tests
             Assert.AreEqual(lt, lt.Evaluate(null));
 
             Value val = null;
-            Assert.Catch<NullReferenceException>(() => lt.Invoke(val));
+            Assert.Catch<NullReferenceException>(() => lt.Invoke(val, Value.EMPTY_ENV));
 
             val = new Number(123);
             Value val2 = new Number(234);
-            Assert.AreEqual(TrueVal, lt.Invoke(val).Invoke(val2));
-            Assert.AreEqual(FalseVal, lt.Invoke(val2).Invoke(val));
+            Assert.AreEqual(TrueVal, lt.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.AreEqual(FalseVal, lt.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
 
             val2 = new Number(123);
-            Assert.AreEqual(FalseVal, lt.Invoke(val).Invoke(val2));
-            Assert.AreEqual(FalseVal, lt.Invoke(val2).Invoke(val));
+            Assert.AreEqual(FalseVal, lt.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.AreEqual(FalseVal, lt.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
 
             val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => lt.Invoke(val).Invoke(val2));
+            Assert.Catch<NotImplementedException>(() => lt.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => lt.Invoke(val));
+            Assert.Catch<NotImplementedException>(() => lt.Invoke(val, Value.EMPTY_ENV));
         }
     }
 }

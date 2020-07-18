@@ -39,8 +39,8 @@ namespace app
             answer = NumberFunctions.Dem("110110000100");
             Assert.That(answer, Is.TypeOf<ConsIntermediate2>());
             ConsIntermediate2 cons = (ConsIntermediate2)answer;
-            Assert.AreEqual(1L, cons.Invoke(Library.TrueVal).AsNumber());
-            Assert.AreEqual(Library.Nil, cons.Invoke(Library.FalseVal));
+            Assert.AreEqual(1L, cons.Invoke(Library.TrueVal, Value.EMPTY_ENV).AsNumber());
+            Assert.AreEqual(Library.Nil, cons.Invoke(Library.FalseVal, Value.EMPTY_ENV));
 
         }
 

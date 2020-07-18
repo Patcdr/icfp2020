@@ -31,7 +31,7 @@ namespace Core
 
     public abstract class Value : Node
     {
-        private static readonly Dictionary<string, Node> EMPTY_ENV = new Dictionary<string, Node>();
+        public static readonly Dictionary<string, Node> EMPTY_ENV = new Dictionary<string, Node>();
         public virtual Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             throw new NotImplementedException();
