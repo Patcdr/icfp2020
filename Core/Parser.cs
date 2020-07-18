@@ -22,9 +22,13 @@ namespace Core
                 {
                     throw new Exception("Line doesn't have an equals where we'd want.");
                 }
-                tokens.MoveNext();
 
                 symbols.Add(symbol, ParseTree(tokens));
+
+                if (tokens.MoveNext())
+                {
+                    throw new Exception("There are unused tokens");
+                }
             }
 
             return symbols;
@@ -32,8 +36,8 @@ namespace Core
 
         private static Node ParseTree(IEnumerator<string> tokens)
         {
-            string currentToken = tokens.Current;
             tokens.MoveNext();
+            string currentToken = tokens.Current;
             switch (currentToken)
             {
                 case "ap":
