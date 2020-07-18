@@ -1,5 +1,6 @@
 using Core;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace app
 {
@@ -56,7 +57,7 @@ namespace app
         [TestCase(-256, "101110000100000000")]
         public void ModTest(int problem, string solution)
         {
-            var answer = NumberFunctions.Mod(new Number(problem));
+            var answer = NumberFunctions.Mod(new Number(problem), new Dictionary<string, Node>());
             Assert.AreEqual(solution, answer);
         }
 
@@ -64,7 +65,7 @@ namespace app
         [TestCase("110110000100")]
         public void RoundTripTest(string problem)
         {
-            var answer = NumberFunctions.Mod(NumberFunctions.Dem(problem));
+            var answer = NumberFunctions.Mod(NumberFunctions.Dem(problem), new Dictionary<string, Node>());
             Assert.AreEqual(problem, answer);
         }
 

@@ -56,7 +56,7 @@ namespace app
             return RecDem(new BitStream(input));
         }
 
-        public static string RecMod(Value val)
+        public static string RecMod(Value val, Dictionary<string, Node> environment)
         {
             if (val == Nil)
                 return "00";
@@ -64,6 +64,12 @@ namespace app
             {
                 long ret = val.AsNumber();
                 if (ret == 0) return "010";
+                var prefix = "01";
+                if (ret < 0)
+                {
+                    prefix = "10";
+                    ret = -ret;
+                }
 
                 string str = Convert.ToString(ret, 2);
                 int l_mod = (str.Length % 4);
@@ -71,18 +77,19 @@ namespace app
                 {
                     str = str.PadLeft(str.Length + 4 - l_mod, '0');
                 }
-                return str;
+                var l = "0".PadLeft((str.Length / 4) + 1, '1');
+                return prefix + l + str;
             }
             else if (val is ConsIntermediate2)
             {
-                return RecMod(val.Invoke(TrueVal)) + RecMod(val.Invoke(FalseVal));
+                return "11" + RecMod(val.Invoke(TrueVal, environment), environment) + RecMod(val.Invoke(FalseVal, environment), environment);
             }
             throw new Exception("WTF is this shit");
         }
 
-        public static string Mod(Value input)
+        public static string Mod(Value input, Dictionary<string, Node> environment)
         {
-            return RecMod(input);
+            return RecMod(input, environment);
         }
     }
 }
