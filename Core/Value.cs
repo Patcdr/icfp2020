@@ -96,7 +96,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "I(" + val + ")";
+            return "(ap i " + val + ")";
         }
     }
 
@@ -130,7 +130,7 @@ namespace Core
     {
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return Library.Identity;
+            return Library.TrueVal;
         }
 
         public override string ToString()
@@ -174,7 +174,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "-";
+            return "neg";
         }
     }
 
@@ -190,7 +190,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "pow2";
+            return "pwr2";
         }
     }
 
@@ -229,7 +229,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "+";
+            return "add";
         }
     }
 
@@ -257,7 +257,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "*";
+            return "mul";
         }
     }
 
@@ -285,7 +285,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "/";
+            return "div";
         }
     }
 
@@ -313,7 +313,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "=";
+            return "eq";
         }
     }
 
@@ -341,7 +341,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "<";
+            return "lt";
         }
     }
 
@@ -369,7 +369,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "S";
+            return "s";
         }
     }
 
@@ -416,7 +416,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "C";
+            return "c";
         }
     }
 
@@ -462,7 +462,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "B";
+            return "b";
         }
     }
 
