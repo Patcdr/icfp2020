@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using app;
 using Core;
 using IntPoint = System.Drawing.Point;
 
@@ -46,7 +47,13 @@ namespace Squigglr
             canvas.Width = window.Width;
             canvas.Height = window.Height;
 
-            gInterface = new TempGraphics();
+            // Default to the test server
+            string serverUrl = "https://icfpc2020-api.testkontur.ru";
+            string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
+
+            Sender sender = new Sender(serverUrl, playerKey);
+            Interactor interactor = new Interactor(sender);
+            gInterface = new UIInteractor(interactor);
             RenderFrame(gInterface.AdvanceState(new IntPoint(0, 0)));
         }
 
