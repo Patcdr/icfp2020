@@ -1,19 +1,35 @@
-﻿using System;
+﻿using Core;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace app
 {
     // Probably going to have to redefine these
-    using Point = IList<int>;
-    using PointsList = IList<IList<int>>;
+    using Point = Tuple<long, long>;
+    using PointsList = IList<Tuple<long, long>>;
     using MultiPointsList = IList<IList<IList<int>>>;
 
     class Drawer
     {
         private const int WIDTH = 17;
         private const int HEIGHT = 13;
+
+        public static void DrawCons(Value head)
+        {
+            PointsList l = new List<Point>();
+            while (head != Library.Nil)
+            { 
+                var car = head.Invoke(Library.TrueVal, null);
+                var x = car.Invoke(Library.TrueVal, null).AsNumber();
+                var y = car.Invoke(Library.FalseVal, null).AsNumber();
+                l.Add(new Point(x, y));
+                head = head.Invoke(Library.FalseVal, null);
+            }
+            Draw(l);
+        }
 
         public static IList<object> MultipleDraw(MultiPointsList pointsList)
         {
@@ -34,8 +50,8 @@ namespace app
 
             foreach (Point point in points)
             {
-                int x = point[0];
-                int y = point[1];
+                long x = point.Item1;
+                long y = point.Item2;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
