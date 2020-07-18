@@ -37,10 +37,11 @@ namespace Core
             throw new NotImplementedException();
         }
 
+        /*
         public Value Invoke(Node val)
         {
             return Invoke(val, EMPTY_ENV);
-        }
+        }*/
 
         public virtual long AsNumber()
         {

@@ -8,6 +8,7 @@ using Core;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using static Core.Library;
 
 namespace app
 {
@@ -73,7 +74,9 @@ namespace app
             string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
             //List<string> testLines = new List<string> { ":example = ap ap ap s isnil :example nil" };
             Dictionary<string, Node> environment = Parser.Parse(lines.ToList());
-            Value stuff = environment["galaxy"].Evaluate(environment);
+            Value stuff = environment["almost"].Evaluate(environment);
+            var moreStuff = UtilityFunctions.EvaluatePointList(
+                stuff.Invoke(FalseVal, environment).Invoke(TrueVal, environment), environment);
             return stuff;
         }
     }
