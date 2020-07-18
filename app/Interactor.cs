@@ -34,7 +34,7 @@ namespace app
                 var drawFrames = UtilityFunctions.MultipleDraw(response.Data);
 
                 // TODO: maybe remove this once the squiggleizer is done?
-                ConsoleDrawer.MultipleDraw(drawFrames);
+                //ConsoleDrawer.MultipleDraw(drawFrames);
 
                 return new Result()
                 {
