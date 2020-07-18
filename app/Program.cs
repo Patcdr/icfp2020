@@ -3,7 +3,6 @@ using System;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -69,7 +68,7 @@ namespace app
                 var point = points[i];
                 Console.WriteLine(point.ToString());
 
-                result = await Interactor.Interact(protocol, next, point);
+                result = Interactor.Interact(protocol, next, point);
             }
 return 0;
             for (int y = -10; y < 10; y++)
@@ -77,18 +76,18 @@ return 0;
                 for (int x = -10; x < 10; x++)
                 {
                     Console.WriteLine($"({x}, {y})");
-                    await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
+                    Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
                 }
             }
 
-            //Interactor.Result result = await Interactor.Interact(protocol);
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(3), new Number(2)));
-            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
+            //Interactor.Result result = Interactor.Interact(protocol);
+            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
+            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
+            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(3), new Number(2)));
+            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
             return 0;
 
-            //var content = await Send(new ConsIntermediate2(new Number(1), Library.Nil));
+            //var content = Send(new ConsIntermediate2(new Number(1), Library.Nil));
 
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");

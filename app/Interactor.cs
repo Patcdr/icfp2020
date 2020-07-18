@@ -3,22 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace app
 {
     public class Interactor
     {
 
-        public static async Task<Result> Interact(IProtocol protocol)
+        public static Result Interact(IProtocol protocol)
         {
             // Start the protocol passing nil as the initial state and (0, 0) as the initial point
-            return await Interact(protocol, new NilClass(), new ConsIntermediate2(new Number(0), new Number(0)));
+            return Interact(protocol, new NilClass(), new ConsIntermediate2(new Number(0), new Number(0)));
         }
 
         // TODO: it is unclear whether Send will return more than a single point, but all
         // examples show that Interact takes a point as its last argument.
-        public static async Task<Result> Interact(IProtocol protocol, Value state, Value point)
+        public static Result Interact(IProtocol protocol, Value state, Value point)
         {
 
             var response = protocol.call(state, point);
