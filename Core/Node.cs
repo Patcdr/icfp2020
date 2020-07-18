@@ -25,5 +25,10 @@ namespace Core
         {
             return environment[symbol].Evaluate(environment);
         }
+
+        public override string ToString()
+        {
+            return symbol;
+        }
     }
 }

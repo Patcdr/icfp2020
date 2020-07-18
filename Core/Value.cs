@@ -71,7 +71,6 @@ namespace Core
         {
             return n.ToString();
         }
-
     }
 
     public class ConstantFunction : Value
@@ -110,7 +109,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "True";
+            return "t";
         }
     }
 
@@ -123,7 +122,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "False";
+            return "f";
         }
     }
 
@@ -136,7 +135,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "Nil";
+            return "nil";
         }
     }
 
@@ -146,6 +145,11 @@ namespace Core
         {
             return new Number(val.Evaluate(environment).AsNumber() + 1);
         }
+
+        public override string ToString()
+        {
+            return "inc";
+        }
     }
 
     public class DecrementClass : Value
@@ -154,6 +158,11 @@ namespace Core
         {
             return new Number(val.Evaluate(environment).AsNumber() - 1);
         }
+
+        public override string ToString()
+        {
+            return "dec";
+        }
     }
 
     public class NegateClass : Value
@@ -161,6 +170,11 @@ namespace Core
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return new Number(-val.Evaluate(environment).AsNumber());
+        }
+
+        public override string ToString()
+        {
+            return "-";
         }
     }
 
@@ -172,6 +186,11 @@ namespace Core
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return new Number(1L << (int)val.Evaluate(environment).AsNumber());
+        }
+
+        public override string ToString()
+        {
+            return "pow2";
         }
     }
 
@@ -194,6 +213,11 @@ namespace Core
         {
             return val.Evaluate(environment).Invoke(EvaluationFunTime, environment);
         }
+
+        public override string ToString()
+        {
+            return "isnil";
+        }
     }
 
     public class AddClass : Value
@@ -201,6 +225,11 @@ namespace Core
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return new AddConstant(val.Evaluate(environment).AsNumber());
+        }
+
+        public override string ToString()
+        {
+            return "+";
         }
     }
 
@@ -225,6 +254,11 @@ namespace Core
         {
             return new MultConstant(val.Evaluate(environment).AsNumber());
         }
+
+        public override string ToString()
+        {
+            return "*";
+        }
     }
 
     public class MultConstant : Value
@@ -247,6 +281,11 @@ namespace Core
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return new DivideConstant(val.Evaluate(environment).AsNumber());
+        }
+
+        public override string ToString()
+        {
+            return "/";
         }
     }
 
@@ -271,6 +310,11 @@ namespace Core
         {
             return new EqualsConstant(val.Evaluate(environment).AsNumber());
         }
+
+        public override string ToString()
+        {
+            return "=";
+        }
     }
 
     public class EqualsConstant : Value
@@ -294,6 +338,11 @@ namespace Core
         {
             return new LessThanConstant(val.Evaluate(environment).AsNumber());
         }
+
+        public override string ToString()
+        {
+            return "<";
+        }
     }
 
     public class LessThanConstant : Value
@@ -316,6 +365,11 @@ namespace Core
         public override Value Invoke(Node val1, Dictionary<string, Node> environment)
         {
             return new SIntermediate1(val1);
+        }
+
+        public override string ToString()
+        {
+            return "S";
         }
     }
 
@@ -359,6 +413,11 @@ namespace Core
         {
             return new CIntermediate1(val1);
         }
+
+        public override string ToString()
+        {
+            return "C";
+        }
     }
 
     public class CIntermediate1 : Value
@@ -399,6 +458,11 @@ namespace Core
         public override Value Invoke(Node val1, Dictionary<string, Node> environment)
         {
             return new BIntermediate1(val1);
+        }
+
+        public override string ToString()
+        {
+            return "B";
         }
     }
 
@@ -486,6 +550,11 @@ namespace Core
         {
             return val.Evaluate(environment).Invoke(Library.TrueVal, environment);
         }
+
+        public override string ToString()
+        {
+            return "car";
+        }
     }
 
     public class CdrClass : Value
@@ -493,6 +562,11 @@ namespace Core
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
             return val.Evaluate(environment).Invoke(Library.FalseVal, environment);
+        }
+
+        public override string ToString()
+        {
+            return "cdr";
         }
     }
 }

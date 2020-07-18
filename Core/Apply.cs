@@ -19,5 +19,10 @@ namespace Core
         {
             return node1.Evaluate(environment).Invoke(node2, environment);
         }
+
+        public override string ToString()
+        {
+            return " (ap " + node1 + " " + node2 + ") ";
+        }
     }
 }
