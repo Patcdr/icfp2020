@@ -50,6 +50,7 @@ namespace app
 
         private static Value Send(Value data)
         {
+            Console.WriteLine($"Sending: {data}");
             var content = Program.Send(data);
             return NumberFunctions.Dem(content);
         }

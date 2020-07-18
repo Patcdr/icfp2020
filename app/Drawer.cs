@@ -13,8 +13,8 @@ namespace app
 
     class Drawer
     {
-        private const int WIDTH = 17;
-        private const int HEIGHT = 13;
+        private const int WIDTH = 30;
+        private const int HEIGHT = 30;
 
         public static object DrawCons(Value head)
         {
@@ -54,8 +54,8 @@ namespace app
 
             foreach (Point point in points)
             {
-                long x = point.Item1 + 8;
-                long y = point.Item2 + 8;
+                long x = point.Item1 + 10;
+                long y = point.Item2 + 10;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
@@ -66,22 +66,31 @@ namespace app
             }
 
             // Draw the grid
-            Console.WriteLine("┌──────────────────────────────────┐");
+            Console.Write("   ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                Console.Write($"{x:00} ");
+            }
+            Console.WriteLine("   ");
 
             for (int y = 0; y < HEIGHT; y++)
             {
-                Console.Write("│");
+                Console.Write($"{y:00} ");
 
                 for (int x = 0; x < WIDTH; x++)
                 {
-
-                    Console.Write(grid[x, y] ? "██" : "  ");
+                    Console.Write(grid[x, y] ? "███" : "   ");
                 }
 
-                Console.WriteLine("│");
+                Console.WriteLine($"{y:00} ");
             }
 
-            Console.WriteLine("└──────────────────────────────────┘");
+            Console.Write("   ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                Console.Write($"{x:00} ");
+            }
+            Console.WriteLine("   ");
 
             // Not sure what to return, but the spec has Draw
             // returning the resulting pictures somehow.

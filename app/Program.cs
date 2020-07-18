@@ -44,19 +44,43 @@ namespace app
 
             IProtocol protocol = new GalaxyProtocol();
             //IProtocol protocol = new StatelessDrawProtocol();
-            //IProtocol protocol = new StatefulDrawProtocol();
+            // IProtocol protocol = new StatefulDrawProtocol();
 
-            Interactor.Result result = await Interactor.Interact(protocol);
-
-            for (int y = 0; y < 13; y++)
+            var points = new ConsIntermediate2 [] {
+                new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 0 nil
+                new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 1 nil
+                new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 2 nil
+                new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 3 nil
+                new ConsIntermediate2(new Number(0), new Number(0)),  // multidraw
+                new ConsIntermediate2(new Number(0), new Number(0)),  // nil ? ? ?
+                new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 0,0
+                new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 8,4
+                new ConsIntermediate2(new Number(8), new Number(4)),  // cross @ 8,4
+                new ConsIntermediate2(new Number(2), new Number(-8)),  // cross @ 8,4
+                new ConsIntermediate2(new Number(-8), new Number(2))  // cross @ 8,4
+                // new ConsIntermediate2(new Number(-8), new Number(4)), // c
+                // new ConsIntermediate2(new Number(10), new Number(2))  // //
+            };
+            Interactor.Result result = null;
+            for (int i = 0; i < points.Length; i++)
             {
-                for (int x = 0; x < 17; x++)
+                var next = result == null ? Nil : result.NewState;
+
+                var point = points[i];
+                Console.WriteLine(point.ToString());
+
+                result = await Interactor.Interact(protocol, next, point);
+            }
+return 0;
+            for (int y = -10; y < 10; y++)
+            {
+                for (int x = -10; x < 10; x++)
                 {
                     Console.WriteLine($"({x}, {y})");
-                    result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(x), new Number(y)));
+                    await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
                 }
             }
-            
+
             //Interactor.Result result = await Interactor.Interact(protocol);
             //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
             //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
