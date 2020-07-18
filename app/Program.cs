@@ -51,7 +51,7 @@ namespace app
         }
 
         public static async Task<string> Send(Value statement) {
-            var signal = NumberFunctions.Mod(statement);
+            var signal = NumberFunctions.Mod(statement, null);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
             using var response = await httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent);
             if (!response.IsSuccessStatusCode)
