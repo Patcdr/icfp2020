@@ -109,8 +109,8 @@ namespace app
             // line.Append("   ");
             // lines.Add(line.ToString());
 
-            // System.IO.File.WriteAllLines($"grid{index}.txt", lines);
-            // index += 1;
+            System.IO.File.WriteAllLines($"grid{index}.txt", lines);
+            index += 1;
 
             foreach (var l in lines) Console.WriteLine(l);
             Console.WriteLine("======================================");
