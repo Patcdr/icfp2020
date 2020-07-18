@@ -46,8 +46,8 @@ namespace app
 
         public Dictionary<Point, byte> CreateFrame(IList<DrawFrame> frames)
         {
-            byte maxBrightness = 255;
-            byte minBrightness = 64;
+            byte maxBrightness = 128;
+            byte minBrightness = 16;
             double scale = (maxBrightness - minBrightness) / (double) frames.Count;
 
             Dictionary<Point, byte> result = new Dictionary<Point, byte>();
@@ -55,6 +55,11 @@ namespace app
             for (int i = 0; i < frames.Count; i++)
             {
                 byte currentBrightness = (byte)(maxBrightness - scale * i);
+                if (i == 0)
+                {
+                    currentBrightness = 255;
+                }
+
                 foreach (var point in frames[i].Points)
                 {
                     if (!result.ContainsKey(point))
