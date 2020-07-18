@@ -96,16 +96,13 @@ namespace app
                 var max_y = y_count.OrderByDescending(i => i.Value).First().Key;
                 var max_x = x_count.OrderByDescending(i => i.Value).First().Key;
                 Console.WriteLine($"{max_x}, {max_y} {result.Flag}");
+                if (max_x == last_x && max_y == last_y) Drawer.drawing = true;
                 result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(max_x), new Number(max_y)));
                 if (max_x == last_x && max_y == last_y) break;
                 last_x = max_x;
                 last_y = max_y;
             }
 
-            Drawer.drawing = true;
-            result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
-            result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
-            result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));

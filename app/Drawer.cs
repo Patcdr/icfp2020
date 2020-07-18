@@ -13,8 +13,8 @@ namespace app
 
     class Drawer
     {
-        private const int X_OFFSET = 150;
-        private const int Y_OFFSET = 60;
+        private const int X_OFFSET = 200;
+        private const int Y_OFFSET = 125;
         private const int WIDTH = X_OFFSET * 2;
         private const int HEIGHT = Y_OFFSET * 2;
         public static bool drawing = false;
