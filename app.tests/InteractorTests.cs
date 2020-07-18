@@ -58,30 +58,5 @@ namespace app.tests
             Assert.AreEqual(point.ToString(), response.Data.Invoke(TrueVal, Value.EMPTY_ENV).Invoke(TrueVal, Value.EMPTY_ENV).ToString());
 
         }
-
-        [Test]
-        public void StatefulInteractorDrawTest()
-        {
-            var points = new ConsIntermediate2 [] {
-                new ConsIntermediate2(new Number(0), new Number(0)),
-                new ConsIntermediate2(new Number(2), new Number(3)),
-                new ConsIntermediate2(new Number(1), new Number(2)),
-                new ConsIntermediate2(new Number(3), new Number(2)),
-                new ConsIntermediate2(new Number(4), new Number(0))
-            };
-
-            var protocol = new StatefulDrawProtocol();
-            var point = new ConsIntermediate2(new Number(0), new Number(0));
-
-            var result = Interactor.Interact(protocol);
-            Assert.AreEqual(1, result.MultiDrawResult.Count);
-
-            for (int i = 1; i < points.Length; i++)
-            {
-                result = Interactor.Interact(protocol, result.NewState, points[i]);
-                Assert.AreEqual(1, result.MultiDrawResult.Count);
-                Assert.AreEqual(points[i].ToString(), result.NewState.ToString().Substring(2, 9));
-            }
-        }
     }
 }
