@@ -149,6 +149,7 @@ namespace Squigglr
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             gInterface.SaveClicks();
+            MessageBox.Show("Saved");
         }
 
         private void LoadButton_Click(object sender, RoutedEventArgs e)
