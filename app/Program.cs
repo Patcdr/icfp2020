@@ -139,6 +139,8 @@ namespace app
         }
 
         public static string Send(Value statement) {
+            Console.WriteLine($"Sending: {statement}");
+
             var signal = NumberFunctions.Mod(statement, null);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
             using var response = httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent).Result;
