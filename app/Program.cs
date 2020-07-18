@@ -54,10 +54,12 @@ namespace app
                 new ConsIntermediate2(new Number(0), new Number(0)),  // nil ? ? ?
                 new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 0,0
                 new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 8,4
-                new ConsIntermediate2(new Number(8), new Number(4)),  // cross @ 8,4
-                new ConsIntermediate2(new Number(2), new Number(-8)),  // cross @ 8,4
-                new ConsIntermediate2(new Number(-8), new Number(2))  // cross @ 8,4
-                // new ConsIntermediate2(new Number(-8), new Number(4)), // c
+                new ConsIntermediate2(new Number(8), new Number(4)),  // cross @ 2,-8
+                new ConsIntermediate2(new Number(2), new Number(-8)),  // decross @ 3,6
+                new ConsIntermediate2(new Number(3), new Number(6)),  // de cross @ 0, -14
+                new ConsIntermediate2(new Number(0), new Number(-14)), // de cross @ -4, 10
+                new ConsIntermediate2(new Number(-4), new Number(10)), // de cross @ 9, -3
+                new ConsIntermediate2(new Number(9), new Number(-3)), // de cross @ -4, 10
                 // new ConsIntermediate2(new Number(10), new Number(2))  // //
             };
             Interactor.Result result = null;

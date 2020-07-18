@@ -13,8 +13,8 @@ namespace app
 
     class Drawer
     {
-        private const int WIDTH = 30;
-        private const int HEIGHT = 30;
+        private const int WIDTH = 50;
+        private const int HEIGHT = 50;
 
         public static object DrawCons(Value head)
         {
@@ -54,8 +54,8 @@ namespace app
 
             foreach (Point point in points)
             {
-                long x = point.Item1 + 10;
-                long y = point.Item2 + 10;
+                long x = point.Item1 + 30;
+                long y = point.Item2 + 30;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
