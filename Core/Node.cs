@@ -15,6 +15,7 @@ namespace Core
     public class SymbolNode : Node
     {
         private string symbol;
+        private Value evaluateCache = null;
 
         public SymbolNode(string symbol)
         {
@@ -23,7 +24,12 @@ namespace Core
 
         public override Value Evaluate(Dictionary<string, Node> environment)
         {
-            return environment[symbol].Evaluate(environment);
+            if (evaluateCache == null)
+            {
+                evaluateCache = environment[symbol].Evaluate(environment);
+            }
+
+            return evaluateCache;
         }
 
         public override string ToString()
