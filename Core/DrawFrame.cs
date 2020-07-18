@@ -1,44 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace Core
 {
-    using Point = Tuple<long, long>;
-
     public class DrawFrame
     {
         public IList<Point> Points { get; }
-        public long MinX { get; }
-        public long MaxX { get; }
-        public long MinY { get; }
-        public long MaxY { get; }
-        public long CenterX { get { return (MinX + MaxX) / 2; } }
-        public long CenterY { get { return (MinY + MaxY) / 2; } }
+        public int MinX { get; }
+        public int MaxX { get; }
+        public int MinY { get; }
+        public int MaxY { get; }
+        public int CenterX { get { return (MinX + MaxX) / 2; } }
+        public int CenterY { get { return (MinY + MaxY) / 2; } }
+
+        public DrawFrame(Value consList)
+            : this(ConsListToPoints(consList))
+        {
+        }
 
         public DrawFrame(IEnumerable<Point> points)
         {
             Points = new List<Point>(points).AsReadOnly();
 
             // Figure out the bounds
-            MinX = long.MaxValue;
-            MaxX = long.MinValue;
-            MinY = long.MaxValue;
-            MaxY = long.MinValue;
+            MinX = int.MaxValue;
+            MaxX = int.MinValue;
+            MinY = int.MaxValue;
+            MaxY = int.MinValue;
 
             foreach (Point p in Points)
             {
-                long x = p.Item1;
-                long y = p.Item2;
-
-                MinX = Math.Min(MinX, x);
-                MaxX = Math.Max(MaxX, x);
-                MinY = Math.Min(MinY, y);
-                MaxY = Math.Max(MaxY, y);
+                MinX = Math.Min(MinX, p.X);
+                MaxX = Math.Max(MaxX, p.X);
+                MinY = Math.Min(MinY, p.Y);
+                MaxY = Math.Max(MaxY, p.Y);
             }
         }
 
-        private DrawFrame(List<Point> points, long minX, long maxX, long minY, long maxY)
+        private DrawFrame(List<Point> points, int minX, int maxX, int minY, int maxY)
         {
             Points = points.AsReadOnly();
             MinX = minX;
@@ -59,6 +60,16 @@ namespace Core
                 Math.Max(MaxX, other.MaxX),
                 Math.Min(MinY, other.MinY),
                 Math.Max(MaxY, other.MaxY));
+        }
+
+        private static IEnumerable<Point> ConsListToPoints(Value consList)
+        {
+            foreach (Value point in UtilityFunctions.ListAsEnumerable(consList, null))
+            {
+                int x = (int)point.Invoke(Library.TrueVal, null).AsNumber();
+                int y = (int)point.Invoke(Library.FalseVal, null).AsNumber();
+                yield return new Point(x, y);
+            }
         }
     }
 }

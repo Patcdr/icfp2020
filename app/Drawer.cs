@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace app
 {
-    // Probably going to have to redefine these
-    using Point = Tuple<long, long>;
-    using PointsList = IList<Tuple<long, long>>;
-
     class Drawer
     {
         private const int X_OFFSET = 200;
@@ -25,16 +21,9 @@ namespace app
         {
             if (!Drawer.drawing)
                 return null;
-            PointsList points = new List<Point>();
+            
 
-            foreach (Value point in UtilityFunctions.ListAsEnumerable(head, null))
-            {
-                var x = point.Invoke(Library.TrueVal, null).AsNumber();
-                var y = point.Invoke(Library.FalseVal, null).AsNumber();
-                points.Add(new Point(x, y));
-            }
-
-            return Draw(points);
+            return Draw(new DrawFrame(head));
         }
 
         public static IList<bool[,]> MultipleDraw(Value head)
@@ -53,19 +42,19 @@ namespace app
             return result;
         }
 
-        public static bool[,] Draw(PointsList points)
+        public static bool[,] Draw(DrawFrame drawFrame)
         {
             // Convert the list of points to a grid
             bool[,] grid = new bool[WIDTH, HEIGHT];
 
-            foreach (Point point in points)
+            foreach (System.Drawing.Point point in drawFrame.Points)
             {
-                long x = point.Item1 + X_OFFSET;
-                long y = point.Item2 + Y_OFFSET;
+                int x = point.X + X_OFFSET;
+                int y = point.Y + Y_OFFSET;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
-                    throw new ArgumentException($"Coordinate out of bounds: ({point.Item1}, {point.Item2}) -> ({x}, {y})");
+                    throw new ArgumentException($"Coordinate out of bounds: ({point.X}, {point.Y}) -> ({x}, {y})");
                 }
 
                 grid[x, y] = true;
