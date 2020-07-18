@@ -18,7 +18,7 @@ namespace app
         public Result Interact(IProtocol protocol)
         {
             // Start the protocol passing nil as the initial state and (0, 0) as the initial point
-            return Interact(protocol, new NilClass(), new ConsIntermediate2(new Number(0), new Number(0)));
+            return Interact(protocol, Library.Nil, new ConsIntermediate2(new Number(0), new Number(0)));
         }
 
         // TODO: it is unclear whether Send will return more than a single point, but all

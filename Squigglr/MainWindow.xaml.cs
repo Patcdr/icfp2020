@@ -46,6 +46,39 @@ namespace Squigglr
             Interactor interactor = new Interactor(sender);
             gInterface = new UIInteractor(interactor);
             RenderFrame(GetFrame(new IntPoint(0, 0)));
+
+            // Fast forward
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(8, 4));
+            GetFrame(new IntPoint(2, -8));
+            GetFrame(new IntPoint(3, 6));
+            GetFrame(new IntPoint(0, -14));
+            GetFrame(new IntPoint(-4, 10));
+            GetFrame(new IntPoint(9, -3));
+            GetFrame(new IntPoint(-4, 10));
+            GetFrame(new IntPoint(1, 4));
+            GetFrame(new IntPoint(-3, 20));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            RenderFrame(currentFrame);
         }
 
         public Dictionary<IntPoint, byte> GetFrame(IntPoint p)
@@ -85,7 +118,7 @@ namespace Squigglr
 
             Scaler.ResizeRectangle(r);
             r.Fill = new SolidColorBrush(c);
-            
+
             Point drawingPoint = Scaler.Convert(p);
             Canvas.SetLeft(r, drawingPoint.X);
             Canvas.SetTop(r, drawingPoint.Y);
@@ -120,6 +153,7 @@ namespace Squigglr
                 case Key.Left: Scaler.ShiftView(horizontal: true); RenderFrame(currentFrame); break;
                 case Key.Right: Scaler.ShiftView(horizontal: false); RenderFrame(currentFrame); break;
                 case Key.Z: currentFrame = gInterface.UndoState(); RenderFrame(currentFrame); break;
+                case Key.N: currentFrame = gInterface.StartGame(); RenderFrame(currentFrame); break;
             }
         }
 
@@ -130,7 +164,7 @@ namespace Squigglr
             Canvas.SetLeft(MouseHover, p2.X);
             Canvas.SetTop(MouseHover, p2.Y);
         }
-       
+
         private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             Scaler.Zoom(e.Delta > 0);
@@ -140,7 +174,7 @@ namespace Squigglr
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Click = Send Point\n" + 
+            MessageBox.Show("Click = Send Point\n" +
                             "Scroll = Zoom\n" +
                             "Arrow Keys = Pan\n" +
                             "Z = Undo\n");

@@ -58,6 +58,15 @@ namespace Core
         {
             return this;
         }
+
+        public virtual Value Car()
+        {
+            return Invoke(Library.TrueVal, EMPTY_ENV);
+        }
+        public virtual Value Cdr()
+        {
+            return Invoke(Library.FalseVal, EMPTY_ENV);
+        }
     }
 
     public class Number : Value

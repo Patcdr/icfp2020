@@ -15,6 +15,7 @@ namespace app
         private readonly IProtocol protocol;
         private readonly Interactor interactor;
         private Value state;
+        private Result result;
         private readonly Stack<(Value state, Point p)> history = new Stack<(Value, Point)>();
 
         public UIInteractor(Interactor interactor)
@@ -27,10 +28,31 @@ namespace app
         public Dictionary<Point, byte> AdvanceState(Point p)
         {
             history.Push((state, p));
-            Result result = interactor.Interact(
+            result = interactor.Interact(
                 protocol, state, new ConsIntermediate2(new Number(p.X), new Number(p.Y)));
             state = result.NewState;
+
             return CreateFrame(result.MultiDrawResult);
+        }
+
+        public Dictionary<Point, byte> StartGame()
+        {
+            return SetPage(5, 9, 36, 0);
+        }
+
+        public Dictionary<Point, byte> SetPage(int page, int subpage, int x, int y)
+        {
+            state = new ConsIntermediate2(
+                new Number(page),
+                new ConsIntermediate2(
+                    state.Cdr().Car(),
+                    new ConsIntermediate2(
+                        new Number(subpage),
+                        state.Cdr().Cdr().Cdr()
+                    )
+                )
+            );
+            return AdvanceState(new Point(x, y));
         }
 
         public Dictionary<Point, byte> UndoState(int n = 1)
@@ -41,9 +63,9 @@ namespace app
                 n--;
             }
 
-            var result = history.Pop();
-            state = result.state;
-            return AdvanceState(result.p);
+            var last = history.Pop();
+            state = last.state;
+            return AdvanceState(last.p);
         }
 
         public void SaveClicks(string filename = null)
@@ -72,7 +94,7 @@ namespace app
             byte minBrightness = 16;
             double scale = (maxBrightness - minBrightness) / (double) frames.Count;
 
-            Dictionary<Point, byte> result = new Dictionary<Point, byte>();
+            Dictionary<Point, byte> frame = new Dictionary<Point, byte>();
 
             for (int i = 0; i < frames.Count; i++)
             {
@@ -84,14 +106,14 @@ namespace app
 
                 foreach (var point in frames[i].Points)
                 {
-                    if (!result.ContainsKey(point))
+                    if (!frame.ContainsKey(point))
                     {
-                        result.Add(point, currentBrightness);
+                        frame.Add(point, currentBrightness);
                     }
                 }
             }
 
-            return result;
+            return frame;
         }
     }
 }
