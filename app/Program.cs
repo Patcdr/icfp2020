@@ -67,12 +67,7 @@ namespace app
 
             httpClient = new HttpClient { BaseAddress = serverUri };
 
-            // Hacky hack!
-            //EvaluateGalaxy();
-
             IProtocol protocol = new GalaxyProtocol();
-            //IProtocol protocol = new StatelessDrawProtocol();
-            // IProtocol protocol = new StatefulDrawProtocol();
 
             var points = new ConsIntermediate2 [] {
                 new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 0 nil
@@ -96,7 +91,6 @@ namespace app
                 Console.WriteLine(point.ToString());
 
                 result = Interactor.Interact(protocol, next, point);
-                // Brute(protocol, result.NewState);
             }
 
             long last_x = -10000;
@@ -142,25 +136,6 @@ namespace app
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
 
-            return 0;
-            for (int y = -10; y < 10; y++)
-            {
-                for (int x = -10; x < 10; x++)
-                {
-                    Console.WriteLine($"({x}, {y})");
-                    Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
-                }
-            }
-
-            //Interactor.Result result = Interactor.Interact(protocol);
-            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
-            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(-1), new Number(-3)));
-            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(3), new Number(2)));
-            //result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
-            return 0;
-
-            //var content = Send(new ConsIntermediate2(new Number(1), Library.Nil));
-
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");
 
@@ -186,16 +161,5 @@ namespace app
             return content;
         }
 
-        // Hack: eventually this will want to move somewhere else!
-        public static Value EvaluateGalaxy()
-        {
-            // Hack: load up Galaxy.txt
-            string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
-            //List<string> testLines = new List<string> { ":example = ap ap ap s isnil :example nil" };
-            Dictionary<string, Node> env = Parser.Parse(lines.ToList());
-            Value galaxy = env["almost"].Evaluate(env);
-            Value evalGal = UtilityFunctions.EvaluateFully(galaxy, env);
-            return evalGal;
-        }
     }
 }

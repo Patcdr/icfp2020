@@ -96,14 +96,12 @@ namespace app
             for (int y = 0; y < HEIGHT; y++)
             {
                 line = new StringBuilder();
-                line.Append($"{y%100:00} ");
 
                 for (int x = 0; x < WIDTH; x++)
                 {
                     line.Append(grid[x, y] ? "█" : " ");
                 }
 
-                line.Append($"{y%100:00} ");
                 lines.Add(line.ToString());
             }
 
@@ -112,25 +110,6 @@ namespace app
             for (int x = 0; x < WIDTH; x++)
             {
                 line.Append($"{x/10%10}");
-            }
-            line.Append("   ");
-            lines.Add(line.ToString());
-
-            line = new StringBuilder();
-            line.Append("   ");
-            for (int x = 0; x < WIDTH; x++)
-            {
-                line.Append($"{x%10}");
-            }
-            line.Append("   ");
-            lines.Add(line.ToString());
-
-            if (Drawer.drawing) {
-                System.IO.File.WriteAllLines($"grid{index}.txt", lines);
-                index += 1;
-
-                foreach (var l in lines) Console.WriteLine(l);
-                Console.WriteLine("======================================");
             }
 
             // Not sure what to return, but the spec has Draw
