@@ -39,7 +39,7 @@ namespace Core
 
         public static Value EvaluateFully(Value curr, Dictionary<string, Node> env)
         {
-            if (curr.IsNumber() || curr == Nil)
+            if (curr.IsNumber() || curr is NilClass)
             {
                 return curr;
             }

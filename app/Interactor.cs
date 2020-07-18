@@ -13,7 +13,7 @@ namespace app
         public static async Task<Result> Interact(IProtocol protocol)
         {
             // Start the protocol passing nil as the initial state and (0, 0) as the initial point
-            return await Interact(protocol, null, new ConsIntermediate2(new Number(0), new Number(0)));
+            return await Interact(protocol, new NilClass(), new ConsIntermediate2(new Number(0), new Number(0)));
         }
 
         // TODO: it is unclear whether Send will return more than a single point, but all
@@ -29,8 +29,7 @@ namespace app
                 return new Result()
                 {
                     NewState = newState,
-                    // TODO: after Drawer point types are fixed
-                    //MultiDrawResult = Drawer.MultipleDraw(response.Data),
+                    MultiDrawResult = Drawer.MultipleDraw(response.Data),
                 };
             }
             else

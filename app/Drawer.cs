@@ -10,34 +10,35 @@ namespace app
     // Probably going to have to redefine these
     using Point = Tuple<long, long>;
     using PointsList = IList<Tuple<long, long>>;
-    using MultiPointsList = IList<IList<IList<int>>>;
 
     class Drawer
     {
         private const int WIDTH = 17;
         private const int HEIGHT = 13;
 
-        public static void DrawCons(Value head)
+        public static object DrawCons(Value head)
         {
-            PointsList l = new List<Point>();
-            while (head != Library.Nil)
-            { 
-                var car = head.Invoke(Library.TrueVal, null);
-                var x = car.Invoke(Library.TrueVal, null).AsNumber();
-                var y = car.Invoke(Library.FalseVal, null).AsNumber();
-                l.Add(new Point(x, y));
+            PointsList points = new List<Point>();
+
+            foreach (Value point in UtilityFunctions.ListAsEnumerable(head, null))
+            {
+                var x = point.Invoke(Library.TrueVal, null).AsNumber();
+                var y = point.Invoke(Library.FalseVal, null).AsNumber();
+                points.Add(new Point(x, y));
+
                 head = head.Invoke(Library.FalseVal, null);
             }
-            Draw(l);
+
+            return Draw(points);
         }
 
-        public static IList<object> MultipleDraw(MultiPointsList pointsList)
+        public static IList<object> MultipleDraw(Value head)
         {
             var result = new List<object>();
 
-            foreach(PointsList points in pointsList)
+            foreach (Value points in UtilityFunctions.ListAsEnumerable(head, null))
             {
-                result.Add(Draw(points));
+                result.Add(DrawCons(points));
             }
 
             return result;

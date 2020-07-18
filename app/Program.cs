@@ -22,6 +22,9 @@ namespace app
             // Hacky hack!
             //EvaluateGalaxy();
 
+            //await Interactor.Interact(new StatelessDrawProtocol());
+            //return 0;
+
             // Default to the test server
             serverUrl = "https://icfpc2020-api.testkontur.ru";
             playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
