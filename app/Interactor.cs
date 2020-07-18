@@ -29,6 +29,8 @@ namespace app
                 {
                     NewState = newState,
                     MultiDrawResult = Drawer.MultipleDraw(response.Data),
+                    RawData = response.Data,
+                    Flag = response.Flag,
                 };
             }
             else
@@ -59,7 +61,11 @@ namespace app
         {
             public Value NewState { get; set; }
 
-            public IList<object> MultiDrawResult { get; set; }
+            public IList<bool[,]> MultiDrawResult { get; set; }
+
+            public Value RawData { get; set; }
+
+            public long Flag { get; set; }
         }
 
     }

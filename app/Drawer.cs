@@ -13,11 +13,15 @@ namespace app
 
     class Drawer
     {
-        private const int WIDTH = 50;
-        private const int HEIGHT = 50;
+        private const int OFFSET = 30;
+        private const int WIDTH = 50 + OFFSET;
+        private const int HEIGHT = 50 + OFFSET;
+        public static bool drawing = false;
 
-        public static object DrawCons(Value head)
+        public static bool[,] DrawCons(Value head)
         {
+            if (!Drawer.drawing)
+                return null;
             PointsList points = new List<Point>();
 
             foreach (Value point in UtilityFunctions.ListAsEnumerable(head, null))
@@ -25,21 +29,21 @@ namespace app
                 var x = point.Invoke(Library.TrueVal, null).AsNumber();
                 var y = point.Invoke(Library.FalseVal, null).AsNumber();
                 points.Add(new Point(x, y));
-
-                head = head.Invoke(Library.FalseVal, null);
             }
 
             return Draw(points);
         }
 
-        public static IList<object> MultipleDraw(Value head)
+        public static IList<bool[,]> MultipleDraw(Value head)
         {
-            var result = new List<object>();
+            var result = new List<bool[,]>();
 
             foreach (Value points in UtilityFunctions.ListAsEnumerable(head, null))
             {
                 result.Add(DrawCons(points));
             }
+
+
 
             Console.WriteLine("────────────────────────────────────");
             Console.WriteLine("────────────────────────────────────");
@@ -47,19 +51,21 @@ namespace app
             return result;
         }
 
-        public static object Draw(PointsList points)
+        public static bool[,] Draw(PointsList points)
         {
             // Convert the list of points to a grid
             bool[,] grid = new bool[WIDTH, HEIGHT];
 
             foreach (Point point in points)
             {
-                long x = point.Item1 + 30;
-                long y = point.Item2 + 30;
+                long x = point.Item1 + OFFSET;
+                long y = point.Item2 + OFFSET;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
+                    continue;
                     throw new ArgumentException($"Coordinate out of bounds: ({x}, {y})");
+
                 }
 
                 grid[x, y] = true;
@@ -94,7 +100,7 @@ namespace app
 
             // Not sure what to return, but the spec has Draw
             // returning the resulting pictures somehow.
-            return null;
+            return grid;
         }
     }
 }

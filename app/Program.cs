@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using static Core.Library;
+using System.Runtime.InteropServices;
 
 namespace app
 {
@@ -54,13 +55,12 @@ namespace app
                 new ConsIntermediate2(new Number(0), new Number(0)),  // nil ? ? ?
                 new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 0,0
                 new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 8,4
-                new ConsIntermediate2(new Number(8), new Number(4)),  // cross @ 2,-8
+                /*new ConsIntermediate2(new Number(8), new Number(4)),  // cross @ 2,-8
                 new ConsIntermediate2(new Number(2), new Number(-8)),  // decross @ 3,6
                 new ConsIntermediate2(new Number(3), new Number(6)),  // de cross @ 0, -14
                 new ConsIntermediate2(new Number(0), new Number(-14)), // de cross @ -4, 10
                 new ConsIntermediate2(new Number(-4), new Number(10)), // de cross @ 9, -3
-                new ConsIntermediate2(new Number(9), new Number(-3)), // de cross @ -4, 10
-                // new ConsIntermediate2(new Number(10), new Number(2))  // //
+                new ConsIntermediate2(new Number(9), new Number(-3)),*/ // de cross @ -4, 10
             };
             Interactor.Result result = null;
             for (int i = 0; i < points.Length; i++)
@@ -72,7 +72,36 @@ namespace app
 
                 result = Interactor.Interact(protocol, next, point);
             }
-return 0;
+
+            long last_x = -10000;
+            long last_y = -100000;
+            while(true)
+            {
+                Dictionary<long, int> y_count = new Dictionary<long, int>();
+                Dictionary<long, int> x_count = new Dictionary<long, int>();
+
+                foreach (Value point_list in UtilityFunctions.ListAsEnumerable(result.RawData, null))
+                {
+                    foreach (Value point in UtilityFunctions.ListAsEnumerable(point_list, null))
+                    {
+                        var x = point.Invoke(Library.TrueVal, null).AsNumber();
+                        var y = point.Invoke(Library.FalseVal, null).AsNumber();
+                        if (!y_count.ContainsKey(y)) y_count[y] = 0;
+                        if (!x_count.ContainsKey(x)) x_count[x] = 0;
+                        y_count[y]++;
+                        x_count[x]++;
+                    }
+                }
+
+                var max_y = y_count.OrderByDescending(i => i.Value).First().Key;
+                var max_x = x_count.OrderByDescending(i => i.Value).First().Key;
+                Console.WriteLine($"{max_x}, {max_y} {result.Flag}");
+                if (max_x == last_x && max_y == last_y) Drawer.drawing = true;
+                result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(max_x), new Number(max_y)));
+                last_x = max_x;
+                last_y = max_y;
+            }
+            return 0;
             for (int y = -10; y < 10; y++)
             {
                 for (int x = -10; x < 10; x++)
