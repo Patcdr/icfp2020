@@ -13,6 +13,7 @@ namespace app
         private readonly IProtocol protocol;
         private readonly Interactor interactor;
         private Value state;
+        private readonly Stack<(Value state, Point p)> history = new Stack<(Value, Point)>();
 
         public UIInteractor(Interactor interactor)
         {
@@ -23,10 +24,24 @@ namespace app
 
         public Dictionary<Point, byte> AdvanceState(Point p)
         {
+            history.Push((state, p));
             Result result = interactor.Interact(
                 protocol, state, new ConsIntermediate2(new Number(p.X), new Number(p.Y)));
             state = result.NewState;
             return CreateFrame(result.MultiDrawResult);
+        }
+
+        public Dictionary<Point, byte> UndoState(int n = 1)
+        {
+            while (n > 0 && history.Count > 0)
+            {
+                history.Pop();
+                n--;
+            }
+
+            var result = history.Pop();
+            state = result.state;
+            return AdvanceState(result.p);
         }
 
         public Dictionary<Point, byte> CreateFrame(IList<DrawFrame> frames)

@@ -100,6 +100,7 @@ namespace Squigglr
                 case Key.Up: Scaler.ShiftView(vertical: true); RenderFrame(currentFrame); break;
                 case Key.Left: Scaler.ShiftView(horizontal: true); RenderFrame(currentFrame); break;
                 case Key.Right: Scaler.ShiftView(horizontal: false); RenderFrame(currentFrame); break;
+                case Key.Z: currentFrame = gInterface.UndoState(); RenderFrame(currentFrame); break;
             }
         }
 
