@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace app
 {
-    class Drawer
+    class ConsoleDrawer
     {
         private const int X_OFFSET = 200;
         private const int Y_OFFSET = 150;
@@ -17,29 +17,17 @@ namespace app
 
         public static int index = 0;
 
-        public static bool[,] DrawCons(Value head)
+        public static void MultipleDraw(IEnumerable<DrawFrame> drawFrames)
         {
-            if (!Drawer.drawing)
-                return null;
-            
-
-            return Draw(new DrawFrame(head));
-        }
-
-        public static IList<bool[,]> MultipleDraw(Value head)
-        {
-            var result = new List<bool[,]>();
-
-            foreach (Value points in UtilityFunctions.ListAsEnumerable(head, null))
+            foreach (var frame in drawFrames)
             {
-                result.Add(DrawCons(points));
-            }
-            if (Drawer.drawing) {
-                Console.WriteLine("────────────────────────────────────");
-                Console.WriteLine("────────────────────────────────────");
+                Draw(frame);
             }
 
-            return result;
+            if (ConsoleDrawer.drawing) {
+                Console.WriteLine("────────────────────────────────────");
+                Console.WriteLine("────────────────────────────────────");
+            }
         }
 
         public static bool[,] Draw(DrawFrame drawFrame)
@@ -114,7 +102,7 @@ namespace app
             line.Append("   ");
             lines.Add(line.ToString());
 
-            if (Drawer.drawing) {
+            if (ConsoleDrawer.drawing) {
                 System.IO.File.WriteAllLines($"grid{index}.txt", lines);
                 index += 1;
 

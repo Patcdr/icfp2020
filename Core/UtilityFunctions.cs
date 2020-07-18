@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using static Core.Library;
 
@@ -63,5 +64,34 @@ namespace Core
                 curr = curr.Invoke(FalseVal, env);
             }
         }
+
+        // Utility to convert from a cons list to multiple DrawFrames
+        public static IList<DrawFrame> MultipleDraw(Value consList)
+        {
+            var result = new List<DrawFrame>();
+
+            foreach (Value points in UtilityFunctions.ListAsEnumerable(consList, null))
+            {
+                result.Add(Draw(points));
+            }
+
+            return result;
+        }
+
+        // Utility to convert from a cons list to a DrawFrame
+        public static DrawFrame Draw(Value consList)
+        {
+            var points = new List<Point>();
+
+            foreach (Value point in UtilityFunctions.ListAsEnumerable(consList, null))
+            {
+                int x = (int)point.Invoke(Library.TrueVal, null).AsNumber();
+                int y = (int)point.Invoke(Library.FalseVal, null).AsNumber();
+                points.Add(new Point(x, y));
+            }
+
+            return new DrawFrame(points);
+        }
+
     }
 }

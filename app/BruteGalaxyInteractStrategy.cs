@@ -29,7 +29,7 @@ namespace app
                 new ConsIntermediate2(new Number(0), new Number(0)),  // cross @ 8,4
             };
 
-            Drawer.drawing = true;
+            ConsoleDrawer.drawing = true;
 
             Interactor.Result result = null;
             for (int i = 0; i < points.Length; i++)
@@ -67,7 +67,7 @@ namespace app
                 Console.WriteLine($"{max_x}, {max_y} {result.Flag}");
                 if (max_x == last_x && max_y == last_y)
                 {
-                    Drawer.drawing = true;
+                    ConsoleDrawer.drawing = true;
                     Brute(protocol, result.NewState);
                 }
                 result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(max_x), new Number(max_y)));
@@ -89,8 +89,8 @@ namespace app
 
         private void Brute(IProtocol protocol, Value state)
         {
-            var drawing = Drawer.drawing;
-            Drawer.drawing = false;
+            var drawing = ConsoleDrawer.drawing;
+            ConsoleDrawer.drawing = false;
 
             var start = state.ToString();
 
@@ -102,9 +102,9 @@ namespace app
                     if (start != next.NewState.ToString())
                     {
                         Console.WriteLine($"\n    ({x}, {y}) {start} -> {next.NewState}");
-                        Drawer.drawing = true;
+                        ConsoleDrawer.drawing = true;
                         Interactor.Interact(protocol, state, new ConsIntermediate2(new Number(x), new Number(y)));
-                        Drawer.drawing = false;
+                        ConsoleDrawer.drawing = false;
                     }
                 }
                 Console.Write($"{y} ");
@@ -112,7 +112,7 @@ namespace app
 
             Console.WriteLine();
 
-            Drawer.drawing = drawing;
+            ConsoleDrawer.drawing = drawing;
         }
 
     }

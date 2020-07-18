@@ -31,10 +31,15 @@ namespace app
 
             if (response.Flag == 0)
             {
+                var drawFrames = UtilityFunctions.MultipleDraw(response.Data);
+
+                // TODO: maybe remove this once the squiggleizer is done?
+                ConsoleDrawer.MultipleDraw(drawFrames);
+
                 return new Result()
                 {
                     NewState = newState,
-                    MultiDrawResult = Drawer.MultipleDraw(response.Data),
+                    MultiDrawResult = drawFrames,
                     RawData = response.Data,
                     Flag = response.Flag,
                 };
@@ -60,7 +65,7 @@ namespace app
         {
             public Value NewState { get; set; }
 
-            public IList<bool[,]> MultiDrawResult { get; set; }
+            public IList<DrawFrame> MultiDrawResult { get; set; }
 
             public Value RawData { get; set; }
 

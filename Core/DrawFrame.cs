@@ -15,11 +15,6 @@ namespace Core
         public int CenterX { get { return (MinX + MaxX) / 2; } }
         public int CenterY { get { return (MinY + MaxY) / 2; } }
 
-        public DrawFrame(Value consList)
-            : this(ConsListToPoints(consList))
-        {
-        }
-
         public DrawFrame(IEnumerable<Point> points)
         {
             Points = new List<Point>(points).AsReadOnly();
@@ -62,14 +57,5 @@ namespace Core
                 Math.Max(MaxY, other.MaxY));
         }
 
-        private static IEnumerable<Point> ConsListToPoints(Value consList)
-        {
-            foreach (Value point in UtilityFunctions.ListAsEnumerable(consList, null))
-            {
-                int x = (int)point.Invoke(Library.TrueVal, null).AsNumber();
-                int y = (int)point.Invoke(Library.FalseVal, null).AsNumber();
-                yield return new Point(x, y);
-            }
-        }
     }
 }
