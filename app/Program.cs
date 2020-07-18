@@ -72,11 +72,10 @@ namespace app
             // Hack: load up Galaxy.txt
             string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
             //List<string> testLines = new List<string> { ":example = ap ap ap s isnil :example nil" };
-            Dictionary<string, Node> environment = Parser.Parse(lines.ToList());
-            Value stuff = environment["almost"].Evaluate(environment);
-            var moreStuff = UtilityFunctions.EvaluatePointList(
-                stuff.Invoke(FalseVal, environment).Invoke(TrueVal, environment), environment);
-            return stuff;
+            Dictionary<string, Node> env = Parser.Parse(lines.ToList());
+            Value galaxy = env["almost"].Evaluate(env);
+            Value evalGal = UtilityFunctions.EvaluateFully(galaxy, env);
+            return evalGal;
         }
     }
 }

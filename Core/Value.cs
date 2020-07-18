@@ -48,6 +48,11 @@ namespace Core
             throw new NotImplementedException();
         }
 
+        public virtual bool IsNumber()
+        {
+            return false;
+        }
+
         public override Value Evaluate(Dictionary<string, Node> environment)
         {
             return this;
@@ -66,6 +71,11 @@ namespace Core
         public override long AsNumber()
         {
             return n;
+        }
+
+        public override bool IsNumber()
+        {
+            return true;
         }
 
         public override string ToString()

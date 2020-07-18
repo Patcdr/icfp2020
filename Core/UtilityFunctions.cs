@@ -23,20 +23,32 @@ namespace Core
             }
         }
 
-        public static List<Tuple<long, long>> EvaluatePointList(Value initial, Dictionary<string, Node> environment)
+        public static List<Tuple<long, long>> EvaluatePointList(Value initial, Dictionary<string, Node> env)
         {
             List<Tuple<long, long>> points = new List<Tuple<long, long>>();
             Value curr = initial;
-            while (!UtilityFunctions.ToBool(IsNil.Invoke(curr, environment)))
+            while (!UtilityFunctions.ToBool(IsNil.Invoke(curr, env)))
             {
-                Value point = curr.Invoke(TrueVal, environment);
-                long car = point.Invoke(TrueVal, environment).AsNumber();
-                long cdr = point.Invoke(FalseVal, environment).AsNumber();
+                Value point = curr.Invoke(TrueVal, env);
+                long car = point.Invoke(TrueVal, env).AsNumber();
+                long cdr = point.Invoke(FalseVal, env).AsNumber();
                 points.Add(new Tuple<long, long>(car, cdr));
-                curr = curr.Invoke(FalseVal, environment);
+                curr = curr.Invoke(FalseVal, env);
             }
 
             return points;
+        }
+
+        public static Value EvaluateFully(Value curr, Dictionary<string, Node> env)
+        {
+            if (curr.IsNumber() || ToBool(IsNil.Invoke(curr, env)))
+            {
+                return curr;
+            }
+
+            Value car = EvaluateFully(curr.Invoke(TrueVal, env), env);
+            Value cdr = EvaluateFully(curr.Invoke(FalseVal, env), env);
+            return new ConsIntermediate2(car, cdr);
         }
     }
 }
