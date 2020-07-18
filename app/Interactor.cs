@@ -57,7 +57,7 @@ namespace app
         // Result of an interaction
         public class Result
         {
-            public object NewState { get; set; }
+            public Value NewState { get; set; }
 
             public IList<object> MultiDrawResult { get; set; }
         }

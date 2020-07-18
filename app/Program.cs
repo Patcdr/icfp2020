@@ -22,8 +22,15 @@ namespace app
             // Hacky hack!
             //EvaluateGalaxy();
 
-            //await Interactor.Interact(new StatelessDrawProtocol());
-            //return 0;
+            //IProtocol protocol = new GalaxyProtocol();
+            //IProtocol protocol = new StatelessDrawProtocol();
+            //IProtocol protocol = new StatefulDrawProtocol();
+            //Interactor.Result result = await Interactor.Interact(protocol);
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(2), new Number(3)));
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(1), new Number(2)));
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(3), new Number(2)));
+            //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
+            return 0;
 
             // Default to the test server
             serverUrl = "https://icfpc2020-api.testkontur.ru";
