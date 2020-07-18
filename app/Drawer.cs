@@ -13,10 +13,13 @@ namespace app
 
     class Drawer
     {
-        private const int OFFSET = 30;
-        private const int WIDTH = 50 + OFFSET;
-        private const int HEIGHT = 50 + OFFSET;
+        private const int X_OFFSET = 150;
+        private const int Y_OFFSET = 60;
+        private const int WIDTH = X_OFFSET * 2;
+        private const int HEIGHT = Y_OFFSET * 2;
         public static bool drawing = false;
+
+        public static int index = 0;
 
         public static bool[,] DrawCons(Value head)
         {
@@ -58,45 +61,59 @@ namespace app
 
             foreach (Point point in points)
             {
-                long x = point.Item1 + OFFSET;
-                long y = point.Item2 + OFFSET;
+                long x = point.Item1 + X_OFFSET;
+                long y = point.Item2 + Y_OFFSET;
 
                 if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
                 {
-                    continue;
-                    throw new ArgumentException($"Coordinate out of bounds: ({x}, {y})");
-
+                    throw new ArgumentException($"Coordinate out of bounds: ({point.Item1}, {point.Item2}) -> ({x}, {y})");
                 }
 
                 grid[x, y] = true;
             }
 
+            var lines = new List<string>();
+            StringBuilder line;
+
             // Draw the grid
-            Console.Write("   ");
-            for (int x = 0; x < WIDTH; x++)
-            {
-                Console.Write($"{x:00} ");
-            }
-            Console.WriteLine("   ");
+
+            // line = new StringBuilder();
+            // line.Append("   ");
+            // for (int x = 0; x < WIDTH; x++)
+            // {
+            //     line.Append($"{x%100:00} ");
+            // }
+            // line.Append("   ");
+            // lines.Add(line.ToString());
 
             for (int y = 0; y < HEIGHT; y++)
             {
-                Console.Write($"{y:00} ");
+                line = new StringBuilder();
+                line.Append($"{y%100:00} ");
 
                 for (int x = 0; x < WIDTH; x++)
                 {
-                    Console.Write(grid[x, y] ? "███" : "   ");
+                    line.Append(grid[x, y] ? "█" : " ");
                 }
 
-                Console.WriteLine($"{y:00} ");
+                line.Append($"{y%100:00} ");
+                lines.Add(line.ToString());
             }
 
-            Console.Write("   ");
-            for (int x = 0; x < WIDTH; x++)
-            {
-                Console.Write($"{x:00} ");
-            }
-            Console.WriteLine("   ");
+            // line = new StringBuilder();
+            // line.Append("   ");
+            // for (int x = 0; x < WIDTH; x++)
+            // {
+            //     line.Append($"{x%100!:00} ");
+            // }
+            // line.Append("   ");
+            // lines.Add(line.ToString());
+
+            // System.IO.File.WriteAllLines($"grid{index}.txt", lines);
+            // index += 1;
+
+            foreach (var l in lines) Console.WriteLine(l);
+            Console.WriteLine("======================================");
 
             // Not sure what to return, but the spec has Draw
             // returning the resulting pictures somehow.
