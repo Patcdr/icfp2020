@@ -177,6 +177,7 @@ namespace Squigglr
             MessageBox.Show("Click = Send Point\n" +
                             "Scroll = Zoom\n" +
                             "Arrow Keys = Pan\n" +
+                            "N = Open New Game\n" +
                             "Z = Undo\n");
         }
 

@@ -39,7 +39,6 @@ namespace app
         {
             return SetPage(5, 9, 36, 0);
         }
-
         public Dictionary<Point, byte> SetPage(int page, int subpage, int x, int y)
         {
             state = new ConsIntermediate2(

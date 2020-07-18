@@ -28,9 +28,9 @@ namespace app
             httpClient = new HttpClient { BaseAddress = serverUri };
         }
 
-        public Value Send(Value statement)
+        public Value Send(Value statement, Value player=null)
         {
-            //Console.WriteLine($"Sending: {statement}");
+            // Console.WriteLine($"Sending({player}): {statement}");
 
             var signal = NumberFunctions.Mod(statement, null);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
@@ -44,14 +44,14 @@ namespace app
             var content = response.Content.ReadAsStringAsync().Result;
             var answer = NumberFunctions.Dem(content);
 
-            //Console.WriteLine($"Server response: {answer}");
+            // Console.WriteLine($"Received({player}): {answer}");
 
             return answer;
         }
 
-        public Value Send(Value[] statement)
+        public Value Send(Value[] statement, Value player=null)
         {
-            return Send(UtilityFunctions.MakeList(statement));
+            return Send(UtilityFunctions.MakeList(statement), player);
         }
     }
 }

@@ -8,15 +8,14 @@ namespace app
     public abstract class BaseInteractStrategy
     {
         protected Interactor Interactor { get; }
-        protected readonly int PlayerKey;
 
-        public BaseInteractStrategy(Interactor interactor, int playerKey)
+        public BaseInteractStrategy(Interactor interactor)
         {
             Interactor = interactor;
-            PlayerKey = playerKey;
-
         }
 
         public abstract void Execute();
+
+        public abstract void Next();
     }
 }

@@ -11,7 +11,7 @@ namespace app
     {
         private readonly IProtocol protocol;
 
-        public BruteGalaxyInteractStrategy(Interactor interactor, int playerKey) : base(interactor, playerKey)
+        public BruteGalaxyInteractStrategy(Interactor interactor) : base(interactor)
         {
             protocol = new GalaxyProtocol();
         }
@@ -115,5 +115,9 @@ namespace app
             ConsoleDrawer.drawing = drawing;
         }
 
+        public override void Next()
+        {
+
+        }
     }
 }

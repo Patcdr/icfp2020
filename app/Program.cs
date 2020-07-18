@@ -8,18 +8,17 @@ namespace app
         {
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
-            int playerKey = 0;
             string apiKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
             if (args.Length == 2)
             {
                 serverUrl = args[0];
-                playerKey = int.Parse(args[1]);
+                apiKey = args[1];
             }
 
             Sender sender = new Sender(serverUrl, apiKey);
             Interactor interactor = new Interactor(sender);
-            BaseInteractStrategy interactStrategy = new GameInteractStrategy(interactor, playerKey);
+            BaseInteractStrategy interactStrategy = new HeadToHeadStrategy(interactor);
 
             interactStrategy.Execute();
 

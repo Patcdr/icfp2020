@@ -7,41 +7,34 @@ using static Core.Library;
 
 namespace app
 {
-    class GameInteractStrategy : BaseInteractStrategy
+    class GameInteractStrategy : HeadToHeadStrategy
     {
-        public static readonly Value JOIN = new Number(2);
-        public static readonly Value START = new Number(3);
-        public static readonly Value CMD = new Number(4);
-        public readonly Value Player;
+        public Value Player;
+        public Value Game;
 
-        public GameInteractStrategy(Interactor interactor, int playerKey) : base(interactor, playerKey)
+        public GameInteractStrategy(Interactor interactor, Value player) : base(interactor)
         {
-            Player = new Number(playerKey);
+            Player = player;
         }
 
         public override void Execute()
         {
-            var game = Interactor.sender.Send(new Value[] {
+            Game = Interactor.sender.Send(new Value[] {
                 JOIN, Player, NilList
-            });
+            }, Player);
 
-            game = Interactor.sender.Send(new Value[] {
+            Game = Interactor.sender.Send(new Value[] {
                 START, Player, UtilityFunctions.MakeList(new int[] {
                     0, 0, 0, 0
                 })
-            });
+            }, Player);
+        }
 
-            game = Interactor.sender.Send(new Value[] {
+        public override void Next()
+        {
+            Game = Interactor.sender.Send(new Value[] {
                 CMD, Player, NilList
-            });
-
-            // while (true)
-            for (var i = 0; i < 10; i++)
-            {
-                game = Interactor.sender.Send(new Value[] {
-                    CMD, Player, NilList
-                });
-            }
+            }, Player);
         }
     }
 }
