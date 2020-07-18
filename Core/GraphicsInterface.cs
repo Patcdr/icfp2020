@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Core
 {
-    interface GraphicsInterface
+    public interface GraphicsInterface
     {
         public Dictionary<Point, byte> AdvanceState(Point p);
     }
