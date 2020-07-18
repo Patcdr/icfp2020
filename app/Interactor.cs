@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace app
 {
-    class Interactor
+    public class Interactor
     {
 
         public static async Task<Result> Interact(IProtocol protocol)
