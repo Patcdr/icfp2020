@@ -26,6 +26,7 @@ namespace Squigglr
         GraphicsInterface gInterface;
         private Dictionary<IntPoint, byte> currentFrame;
         private readonly Rectangle MouseHover;
+        private int OffScreenCount = 0;
 
         public MainWindow()
         {
@@ -55,13 +56,24 @@ namespace Squigglr
         public void RenderFrame(Dictionary<IntPoint, byte> frame)
         {
             canvas.Children.Clear();
-            
+            OffScreenCount = 0;
+
             foreach (var pair in frame)
             {
                 canvas.Children.Add(CreateRectangle(pair.Key, pair.Value));
             }
 
             canvas.Children.Add(MouseHover);
+
+            if (OffScreenCount > 0)
+            {
+                var textBlock = new TextBlock();
+                textBlock.Text = "Offscreen Count Estimate: " + OffScreenCount;
+                textBlock.Foreground = new SolidColorBrush(Colors.Yellow);
+                Canvas.SetLeft(textBlock, 10);
+                Canvas.SetTop(textBlock, 10);
+                canvas.Children.Add(textBlock);
+            }
         }
 
         public Rectangle CreateRectangle(IntPoint p, byte color)
@@ -76,6 +88,12 @@ namespace Squigglr
             Point drawingPoint = Scaler.Convert(p);
             Canvas.SetLeft(r, drawingPoint.X);
             Canvas.SetTop(r, drawingPoint.Y);
+
+            if (drawingPoint.X < 0 || drawingPoint.X >= window.ActualWidth ||
+                drawingPoint.Y < 0 || drawingPoint.Y >= window.ActualHeight)
+            {
+                OffScreenCount++;
+            }
 
             return r;
         }
