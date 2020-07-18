@@ -41,6 +41,8 @@ namespace Squigglr
         GraphicsInterface gInterface;
         private double RealWidth;
         private double RealHeight;
+        private int PanShiftWidth = 0;
+        private int PanShiftHeight = 0;
         private Dictionary<IntPoint, byte> currentFrame;
 
         public MainWindow()
@@ -102,14 +104,14 @@ namespace Squigglr
 
         public IntPoint ScaleIt(IntPoint p)
         {
-            return new IntPoint((int)(p.X * SCALE + RealWidth / 2 - SCALE/2),
-                                (int)(p.Y * SCALE + RealHeight / 2 - SCALE/2));
+            return new IntPoint((int)(p.X * SCALE + RealWidth / 2 - SCALE/2 + PanShiftWidth * SCALE),
+                                (int)(p.Y * SCALE + RealHeight / 2 - SCALE/2 + PanShiftHeight * SCALE));
         }
 
         public IntPoint UnScaleIt(Point p)
         {
-            return new IntPoint((int)((p.X - RealWidth / 2 + SCALE/2) / SCALE),
-                                (int)((p.Y - RealHeight / 2 + SCALE/2) / SCALE));
+            return new IntPoint((int)((p.X - RealWidth / 2 + SCALE/2 - PanShiftWidth * SCALE) / SCALE),
+                                (int)((p.Y - RealHeight / 2 + SCALE/2 - PanShiftHeight * SCALE) / SCALE));
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -117,6 +119,17 @@ namespace Squigglr
             RealWidth = e.NewSize.Width;
             RealHeight = e.NewSize.Height;
             RenderFrame(currentFrame);
+        }
+
+        private void window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch(e.Key)
+            {
+                case Key.Down: PanShiftHeight--; RenderFrame(currentFrame); break;
+                case Key.Up: PanShiftHeight++; RenderFrame(currentFrame); break;
+                case Key.Left: PanShiftWidth++; RenderFrame(currentFrame); break;
+                case Key.Right: PanShiftWidth--; RenderFrame(currentFrame); break;
+            }
         }
     }
 }
