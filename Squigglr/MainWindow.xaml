@@ -10,12 +10,18 @@
         SizeChanged="window_SizeChanged"
         KeyDown="window_KeyDown">
     <Grid>
-        <Canvas 
-            x:Name="canvas" 
-            MouseLeftButtonDown="canvas_MouseLeftButtonDown" 
-            MouseMove="canvas_MouseMove" 
-            MouseWheel="canvas_MouseWheel">
-        </Canvas>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Background="Black">
+                <Button Content="Help" x:Name="HelpButton" Click="HelpButton_Click" />
+                <Button Content="Calibrate" x:Name="CalibrateButton" Click="CalibrateButton_Click" />
+            </Menu>
+            <Canvas 
+                x:Name="canvas" 
+                MouseLeftButtonDown="canvas_MouseLeftButtonDown" 
+                MouseMove="canvas_MouseMove" 
+                MouseWheel="canvas_MouseWheel">
+            </Canvas>
+        </DockPanel>
 
     </Grid>
 </Window>

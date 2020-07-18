@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -135,6 +136,37 @@ namespace Squigglr
             Scaler.Zoom(e.Delta > 0);
             Scaler.ResizeRectangle(MouseHover);
             RenderFrame(currentFrame);
+        }
+
+        private void HelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Click = Send Point\n" + 
+                            "Scroll = Zoom\n" +
+                            "Arrow Keys = Pan\n" +
+                            "Z = Undo\n");
+        }
+
+        private void CalibrateButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+            GetFrame(new IntPoint(0, 0));
+
+            GetFrame(new IntPoint(8, 4));
+            GetFrame(new IntPoint(2, -8));
+            GetFrame(new IntPoint(3, 6));
+            GetFrame(new IntPoint(0, -14));
+            GetFrame(new IntPoint(-4, 10));
+            GetFrame(new IntPoint(9, -3));
+            GetFrame(new IntPoint(-4, 10));
+            currentFrame = GetFrame(new IntPoint(1, 4));
+
+            RenderFrame(currentFrame);
+            CalibrateButton.Visibility = Visibility.Hidden;
         }
     }
 }
