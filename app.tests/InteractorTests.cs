@@ -60,7 +60,7 @@ namespace app.tests
         }
 
         [Test]
-        public async Task StatefulInteractorDrawTest()
+        public void StatefulInteractorDrawTest()
         {
             var points = new ConsIntermediate2 [] {
                 new ConsIntermediate2(new Number(0), new Number(0)),
@@ -73,12 +73,12 @@ namespace app.tests
             var protocol = new StatefulDrawProtocol();
             var point = new ConsIntermediate2(new Number(0), new Number(0));
 
-            var result = await Interactor.Interact(protocol);
+            var result = Interactor.Interact(protocol);
             Assert.AreEqual(1, result.MultiDrawResult.Count);
 
             for (int i = 1; i < points.Length; i++)
             {
-                result = await Interactor.Interact(protocol, result.NewState, points[i]);
+                result = Interactor.Interact(protocol, result.NewState, points[i]);
                 Assert.AreEqual(1, result.MultiDrawResult.Count);
                 Assert.AreEqual(points[i].ToString(), result.NewState.ToString().Substring(2, 9));
             }

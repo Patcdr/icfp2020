@@ -17,7 +17,7 @@ namespace app
         public static string serverUrl;
         public static string playerKey;
 
-        public static async Task<int> Main(string[] args)
+        public static int Main(string[] args)
         {
             // Default to the test server
             serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -64,7 +64,7 @@ namespace app
             //result = await Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(4), new Number(0)));
             return 0;
 
-            var content = await Send(new ConsIntermediate2(new Number(1), Library.Nil));
+            //var content = await Send(new ConsIntermediate2(new Number(1), Library.Nil));
 
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");
@@ -72,17 +72,17 @@ namespace app
             return 0;
         }
 
-        public static async Task<string> Send(Value statement) {
+        public static string Send(Value statement) {
             var signal = NumberFunctions.Mod(statement, null);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
-            using var response = await httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent);
+            using var response = httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent).Result;
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Unexpected server response: {response}");
                 return "";
             }
 
-            var content = await response.Content.ReadAsStringAsync();
+            var content = response.Content.ReadAsStringAsync().Result;
             var answer = NumberFunctions.Dem(content);
             Console.WriteLine($"Server response: {answer}");
 

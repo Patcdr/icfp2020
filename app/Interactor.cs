@@ -36,7 +36,7 @@ namespace app
             {
                 // This is the way it is defined. If we need to we can
                 // convert this from tail recursion to a loop.
-                return await Interact(protocol, newState, await Send(response.Data));
+                return Interact(protocol, newState, Send(response.Data));
             }
         }
 
@@ -48,9 +48,9 @@ namespace app
             return state;
         }
 
-        private static async Task<Value> Send(Value data)
+        private static Value Send(Value data)
         {
-            var content = await Program.Send(data);
+            var content = Program.Send(data);
             return NumberFunctions.Dem(content);
         }
 
