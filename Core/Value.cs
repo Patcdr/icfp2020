@@ -19,7 +19,7 @@ namespace Core
         public static readonly Value Divide = new DivideClass();
         public static readonly Value EqualVal = new EqualsClass();
         public static readonly Value LessThan = new LessThanClass();
-        public static readonly Value IfZero = new EqualsConstant(0);
+        public static readonly Value IfZero = new EqualsConstant(new Number(0));
         public static readonly Value SCombo = new SClass();
         public static readonly Value BCombo = new BClass();
         public static readonly Value CCombo = new CClass();
@@ -366,7 +366,7 @@ namespace Core
     {
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new EqualsConstant(val.Evaluate(environment).AsNumber());
+            return new EqualsConstant(val);
         }
 
         public override string ToString()
@@ -377,16 +377,30 @@ namespace Core
 
     public class EqualsConstant : Value
     {
-        private readonly long n;
+        private readonly Node node;
+        private bool evaluated;
+        private long num;
 
-        public EqualsConstant(long n)
+        public EqualsConstant(Node node)
         {
-            this.n = n;
+            this.node = node;
+            evaluated = false;
         }
 
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return n == val.Evaluate(environment).AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
+            if (!evaluated)
+            {
+                num = node.Evaluate(environment).AsNumber();
+                evaluated = true;
+            }
+            return num == val.Evaluate(environment).AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
+        }
+
+
+        public override string ToString()
+        {
+            return $"(ap eq {node})";
         }
     }
 
@@ -394,7 +408,7 @@ namespace Core
     {
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new LessThanConstant(val.Evaluate(environment).AsNumber());
+            return new LessThanConstant(val);
         }
 
         public override string ToString()
@@ -405,16 +419,30 @@ namespace Core
 
     public class LessThanConstant : Value
     {
-        private readonly long n;
+        private readonly Node node;
+        private bool evaluated;
+        private long num;
 
-        public LessThanConstant(long n)
+        public LessThanConstant(Node node)
         {
-            this.n = n;
+            this.node = node;
+            evaluated = false;
         }
 
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return n < val.Evaluate(environment).AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
+            if (!evaluated)
+            {
+                num = node.Evaluate(environment).AsNumber();
+                evaluated = true;
+            }
+            return num < val.Evaluate(environment).AsNumber() ? (Value)Library.TrueVal : Library.FalseVal;
+        }
+
+
+        public override string ToString()
+        {
+            return $"(ap lt {node})";
         }
     }
 
