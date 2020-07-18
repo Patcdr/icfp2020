@@ -65,6 +65,26 @@ namespace Core
             }
         }
 
+        public static Value MakeList(Value[] items)
+        {
+            Value list = NilList;
+            for (var i = items.Length - 1; i >= 0; i--)
+            {
+                list = new ConsIntermediate2(items[i], list);
+            }
+            return list;
+        }
+
+        public static Value MakeList(int[] items)
+        {
+            var list = new Value[items.Length];
+            for(var i = 0; i < list.Length; i++)
+            {
+                list[i] = new Number(items[i]);
+            }
+            return MakeList(list);
+        }
+
         // Utility to convert from a cons list to multiple DrawFrames
         public static IList<DrawFrame> MultipleDraw(Value consList)
         {

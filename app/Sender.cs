@@ -48,5 +48,10 @@ namespace app
 
             return answer;
         }
+
+        public Value Send(Value[] statement)
+        {
+            return Send(UtilityFunctions.MakeList(statement));
+        }
     }
 }

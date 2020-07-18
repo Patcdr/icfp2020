@@ -8,17 +8,18 @@ namespace app
         {
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
-            string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
+            int playerKey = 0;
+            string apiKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
             if (args.Length == 2)
             {
                 serverUrl = args[0];
-                playerKey = args[1];
+                playerKey = int.Parse(args[1]);
             }
 
-            Sender sender = new Sender(serverUrl, playerKey);
+            Sender sender = new Sender(serverUrl, apiKey);
             Interactor interactor = new Interactor(sender);
-            BaseInteractStrategy interactStrategy = new BruteGalaxyInteractStrategy(interactor);
+            BaseInteractStrategy interactStrategy = new GameInteractStrategy(interactor, playerKey);
 
             interactStrategy.Execute();
 
@@ -27,6 +28,5 @@ namespace app
 
             return 0;
         }
-
     }
 }

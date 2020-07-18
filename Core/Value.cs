@@ -13,6 +13,7 @@ namespace Core
         public static readonly Power2Class Power2 = new Power2Class();
         public static readonly IdentityClass Identity = new IdentityClass();
         public static readonly Value Nil = new NilClass();
+        public static readonly Value NilList = Nil;
         public static readonly Value IsNil = new IsNilClass();
         public static readonly Value Add = new AddClass();
         public static readonly Value Mult = new MultClass();

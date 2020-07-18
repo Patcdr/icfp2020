@@ -8,7 +8,7 @@ namespace app
 {
     public class Interactor
     {
-        private readonly Sender sender;
+        public readonly Sender sender;
 
         public Interactor(Sender sender)
         {
