@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
-using Core;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
