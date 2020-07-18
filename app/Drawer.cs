@@ -76,15 +76,23 @@ namespace app
             StringBuilder line;
 
             // Draw the grid
+            line = new StringBuilder();
+            line.Append("   ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                line.Append($"{x/10%10}");
+            }
+            line.Append("   ");
+            lines.Add(line.ToString());
 
-            // line = new StringBuilder();
-            // line.Append("   ");
-            // for (int x = 0; x < WIDTH; x++)
-            // {
-            //     line.Append($"{x%100:00} ");
-            // }
-            // line.Append("   ");
-            // lines.Add(line.ToString());
+            line = new StringBuilder();
+            line.Append("   ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                line.Append($"{x%10}");
+            }
+            line.Append("   ");
+            lines.Add(line.ToString());
 
             for (int y = 0; y < HEIGHT; y++)
             {
@@ -100,14 +108,23 @@ namespace app
                 lines.Add(line.ToString());
             }
 
-            // line = new StringBuilder();
-            // line.Append("   ");
-            // for (int x = 0; x < WIDTH; x++)
-            // {
-            //     line.Append($"{x%100!:00} ");
-            // }
-            // line.Append("   ");
-            // lines.Add(line.ToString());
+            line = new StringBuilder();
+            line.Append("   ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                line.Append($"{x/10%10}");
+            }
+            line.Append("   ");
+            lines.Add(line.ToString());
+
+            line = new StringBuilder();
+            line.Append("   ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                line.Append($"{x%10}");
+            }
+            line.Append("   ");
+            lines.Add(line.ToString());
 
             System.IO.File.WriteAllLines($"grid{index}.txt", lines);
             index += 1;
