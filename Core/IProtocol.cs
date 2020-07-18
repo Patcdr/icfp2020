@@ -23,7 +23,7 @@ namespace Core
         /// <param name="state">The protocol-dependent state</param>
         /// <param name="point">The (x, y) point to input</param>
         /// <returns>A Response containing the protocol's result</returns>
-        Response call(object state, IList<int> point);
+        Response call(object state, Value point);
 
         public class Response
         {
@@ -36,7 +36,7 @@ namespace Core
             // representing points. In other words, a list of lists of points.
             // Each list of points will be drawn on a separate
             // This entire value will be passed to Drawer.MultipleDraw when Flag == 0.
-            public IList<IList<IList<int>>> Data { get; set; }
+            public Value Data { get; set; }
         }
     }
 }
