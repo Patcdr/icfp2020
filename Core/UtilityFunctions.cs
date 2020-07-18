@@ -26,14 +26,12 @@ namespace Core
         public static List<Tuple<long, long>> EvaluatePointList(Value initial, Dictionary<string, Node> env)
         {
             List<Tuple<long, long>> points = new List<Tuple<long, long>>();
-            Value curr = initial;
-            while (!UtilityFunctions.ToBool(IsNil.Invoke(curr, env)))
+
+            foreach (Value point in ListAsEnumerable(initial, env))
             {
-                Value point = curr.Invoke(TrueVal, env);
                 long car = point.Invoke(TrueVal, env).AsNumber();
                 long cdr = point.Invoke(FalseVal, env).AsNumber();
                 points.Add(new Tuple<long, long>(car, cdr));
-                curr = curr.Invoke(FalseVal, env);
             }
 
             return points;
@@ -54,6 +52,16 @@ namespace Core
             }
 
             throw new Exception("Not a number, nil, or Cons cell");
+        }
+
+        public static IEnumerable<Value> ListAsEnumerable(Value list, Dictionary<string, Node> env)
+        {
+            Value curr = list;
+            while (!ToBool(IsNil.Invoke(curr, env)))
+            {
+                yield return curr.Invoke(TrueVal, env);
+                curr = curr.Invoke(FalseVal, env);
+            }
         }
     }
 }
