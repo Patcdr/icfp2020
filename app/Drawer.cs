@@ -14,7 +14,7 @@ namespace app
     class Drawer
     {
         private const int X_OFFSET = 200;
-        private const int Y_OFFSET = 125;
+        private const int Y_OFFSET = 150;
         private const int WIDTH = X_OFFSET * 2;
         private const int HEIGHT = Y_OFFSET * 2;
         public static bool drawing = false;
@@ -45,11 +45,10 @@ namespace app
             {
                 result.Add(DrawCons(points));
             }
-
-
-
-            Console.WriteLine("────────────────────────────────────");
-            Console.WriteLine("────────────────────────────────────");
+            if (Drawer.drawing) {
+                Console.WriteLine("────────────────────────────────────");
+                Console.WriteLine("────────────────────────────────────");
+            }
 
             return result;
         }
@@ -126,11 +125,13 @@ namespace app
             line.Append("   ");
             lines.Add(line.ToString());
 
-            System.IO.File.WriteAllLines($"grid{index}.txt", lines);
-            index += 1;
+            if (Drawer.drawing) {
+                System.IO.File.WriteAllLines($"grid{index}.txt", lines);
+                index += 1;
 
-            foreach (var l in lines) Console.WriteLine(l);
-            Console.WriteLine("======================================");
+                foreach (var l in lines) Console.WriteLine(l);
+                Console.WriteLine("======================================");
+            }
 
             // Not sure what to return, but the spec has Draw
             // returning the resulting pictures somehow.
