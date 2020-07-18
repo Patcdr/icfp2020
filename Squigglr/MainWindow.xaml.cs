@@ -96,7 +96,7 @@ namespace Squigglr
                 Fill = new SolidColorBrush(c)
             };
 
-            IntPoint drawingPoint = ScaleIt(p);
+            Point drawingPoint = ScaleIt(p);
             Canvas.SetLeft(r, drawingPoint.X);
             Canvas.SetTop(r, drawingPoint.Y);
 
@@ -109,16 +109,16 @@ namespace Squigglr
             RenderFrame(GetFrame(p));
         }
 
-        public IntPoint ScaleIt(IntPoint p)
+        public Point ScaleIt(IntPoint p)
         {
-            return new IntPoint((int)(p.X * SCALE + RealWidth / 2 - SCALE/2 + PanShiftWidth * SCALE),
-                                (int)(p.Y * SCALE + RealHeight / 2 - SCALE/2 + PanShiftHeight * SCALE));
+            return new Point(p.X * SCALE + RealWidth / 2 - SCALE/2 + PanShiftWidth * SCALE,
+                             p.Y * SCALE + RealHeight / 2 - SCALE/2 + PanShiftHeight * SCALE);
         }
 
         public IntPoint UnScaleIt(Point p)
         {
-            return new IntPoint((int)((p.X - RealWidth / 2 + SCALE/2 - PanShiftWidth * SCALE) / SCALE),
-                                (int)((p.Y - RealHeight / 2 + SCALE/2 - PanShiftHeight * SCALE) / SCALE));
+            return new IntPoint((int)Math.Round((p.X - RealWidth / 2 - PanShiftWidth * SCALE) / SCALE),
+                                (int)Math.Round((p.Y - RealHeight / 2 - PanShiftHeight * SCALE) / SCALE));
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -142,9 +142,9 @@ namespace Squigglr
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
             IntPoint p = UnScaleIt(e.GetPosition(canvas));
-            p = ScaleIt(p);
-            Canvas.SetLeft(MouseHover, p.X);
-            Canvas.SetTop(MouseHover, p.Y);
+            Point p2 = ScaleIt(p);
+            Canvas.SetLeft(MouseHover, p2.X);
+            Canvas.SetTop(MouseHover, p2.Y);
         }
     }
 }
