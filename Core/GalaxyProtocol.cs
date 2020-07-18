@@ -11,7 +11,16 @@ namespace Core
     {
         public IProtocol.Response call(Value state, Value point)
         {
-            string[] lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
+            string[] lines;
+            try {
+                lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
+            } catch (FileNotFoundException) {
+                try {
+                    lines = File.ReadAllLines(@"../../../../galaxy.txt");
+                } catch (FileNotFoundException) {
+                    lines = File.ReadAllLines(@"../galaxy.txt");
+                }
+            }
 
             Dictionary<string, Node> env = Parser.Parse(lines.ToList());
             Value protocol = env["galaxy"].Evaluate(env);
