@@ -562,6 +562,11 @@ namespace Core
         {
             return new ConsIntermediate1(val1);
         }
+
+        public override string ToString()
+        {
+            return "cons";
+        }
     }
 
     public class ConsIntermediate1 : Value

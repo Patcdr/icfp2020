@@ -1,8 +1,9 @@
 using Core;
+using static Core.Library;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace app
+namespace app.tests
 {
     [TestFixture]
     public class NumberFunctionsTests

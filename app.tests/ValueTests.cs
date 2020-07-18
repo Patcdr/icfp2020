@@ -1,8 +1,9 @@
+using Core;
 using NUnit.Framework;
 using System;
 using static Core.Library;
 
-namespace Core.tests
+namespace app.tests
 {
     public class ValueTests
     {
