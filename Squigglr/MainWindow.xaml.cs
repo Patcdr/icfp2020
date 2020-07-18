@@ -45,12 +45,17 @@ namespace Squigglr
         private int PanShiftHeight = 0;
         private Dictionary<IntPoint, byte> currentFrame;
 
+        private Rectangle MouseHover;
+
         public MainWindow()
         {
             InitializeComponent();
             canvas.Background = new SolidColorBrush(Colors.Black);
             RealWidth = window.Width;
             RealHeight = window.Height;
+
+            MouseHover = CreateRectangle(new IntPoint(0, 0), 255);
+            MouseHover.Fill = new SolidColorBrush(Colors.Green);
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -71,11 +76,13 @@ namespace Squigglr
         public void RenderFrame(Dictionary<IntPoint, byte> frame)
         {
             canvas.Children.Clear();
-
+            
             foreach (var pair in frame)
             {
                 canvas.Children.Add(CreateRectangle(pair.Key, pair.Value));
             }
+
+            canvas.Children.Add(MouseHover);
         }
 
         public Rectangle CreateRectangle(IntPoint p, byte color)
@@ -130,6 +137,14 @@ namespace Squigglr
                 case Key.Left: PanShiftWidth++; RenderFrame(currentFrame); break;
                 case Key.Right: PanShiftWidth--; RenderFrame(currentFrame); break;
             }
+        }
+
+        private void canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            IntPoint p = UnScaleIt(e.GetPosition(canvas));
+            p = ScaleIt(p);
+            Canvas.SetLeft(MouseHover, p.X);
+            Canvas.SetTop(MouseHover, p.Y);
         }
     }
 }

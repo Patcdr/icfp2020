@@ -10,7 +10,7 @@
         SizeChanged="window_SizeChanged"
         KeyDown="window_KeyDown">
     <Grid>
-        <Canvas x:Name="canvas" MouseLeftButtonDown="canvas_MouseLeftButtonDown">
+        <Canvas x:Name="canvas" MouseLeftButtonDown="canvas_MouseLeftButtonDown" MouseMove="canvas_MouseMove">
             
         </Canvas>
 
