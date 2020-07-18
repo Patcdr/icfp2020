@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Squigglr"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        x:Name="window">
+        x:Name="window" SizeChanged="window_SizeChanged">
     <Grid>
         <Canvas x:Name="canvas" MouseLeftButtonDown="canvas_MouseLeftButtonDown">
             

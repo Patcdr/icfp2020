@@ -24,7 +24,7 @@ namespace Squigglr
     public partial class MainWindow : Window
     {
         public const int SCALE = 10;
-
+        
         public class TempGraphics : GraphicsInterface
         {
             private Dictionary<IntPoint, byte> frame { get; set; } = new Dictionary<IntPoint, byte>();
@@ -39,13 +39,16 @@ namespace Squigglr
         }
 
         GraphicsInterface gInterface;
+        private double RealWidth;
+        private double RealHeight;
+        private Dictionary<IntPoint, byte> currentFrame;
 
         public MainWindow()
         {
             InitializeComponent();
             canvas.Background = new SolidColorBrush(Colors.Black);
-            canvas.Width = window.Width;
-            canvas.Height = window.Height;
+            RealWidth = window.Width;
+            RealHeight = window.Height;
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -54,7 +57,13 @@ namespace Squigglr
             Sender sender = new Sender(serverUrl, playerKey);
             Interactor interactor = new Interactor(sender);
             gInterface = new UIInteractor(interactor);
-            RenderFrame(gInterface.AdvanceState(new IntPoint(0, 0)));
+            RenderFrame(GetFrame(new IntPoint(0, 0)));
+        }
+
+        public Dictionary<IntPoint, byte> GetFrame(IntPoint p)
+        {
+            currentFrame = gInterface.AdvanceState(p);
+            return currentFrame;
         }
 
         public void RenderFrame(Dictionary<IntPoint, byte> frame)
@@ -88,19 +97,26 @@ namespace Squigglr
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IntPoint p = UnScaleIt(e.GetPosition(canvas));
-            RenderFrame(gInterface.AdvanceState(p));
+            RenderFrame(GetFrame(p));
         }
 
         public IntPoint ScaleIt(IntPoint p)
         {
-            return new IntPoint((int)(p.X * SCALE + canvas.Width / 2 - SCALE/2),
-                                (int)(p.Y * SCALE + canvas.Height / 2 - SCALE/2));
+            return new IntPoint((int)(p.X * SCALE + RealWidth / 2 - SCALE/2),
+                                (int)(p.Y * SCALE + RealHeight / 2 - SCALE/2));
         }
 
         public IntPoint UnScaleIt(Point p)
         {
-            return new IntPoint((int)((p.X - canvas.Width / 2 + SCALE/2) / SCALE),
-                                (int)((p.Y - canvas.Height / 2 + SCALE/2) / SCALE));
+            return new IntPoint((int)((p.X - RealWidth / 2 + SCALE/2) / SCALE),
+                                (int)((p.Y - RealHeight / 2 + SCALE/2) / SCALE));
+        }
+
+        private void window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RealWidth = e.NewSize.Width;
+            RealHeight = e.NewSize.Height;
+            RenderFrame(currentFrame);
         }
     }
 }
