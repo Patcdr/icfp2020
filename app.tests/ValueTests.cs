@@ -34,7 +34,7 @@ namespace app.tests
             var cf = new ConstantFunction(inner);
             Assert.Catch<NotImplementedException>(() => cf.AsNumber());
             Assert.AreEqual(cf, cf.Evaluate(null));
-            Assert.AreEqual(inner, cf.Invoke(null, Value.EMPTY_ENV));
+            Assert.Catch<NullReferenceException>(() => cf.Invoke(null, Value.EMPTY_ENV), "Cannot have a null inner node");
 
             inner = new Number(123);
             cf = new ConstantFunction(inner);
@@ -59,7 +59,7 @@ namespace app.tests
 
             Value val = null;
             var result = t.Invoke(val, Value.EMPTY_ENV);
-            Assert.AreEqual(val, result.Invoke(null, Value.EMPTY_ENV));
+            Assert.Catch<NullReferenceException>(() => result.Invoke(null, Value.EMPTY_ENV), "Cannot have a null inner node");
 
             val = new Number(123);
             result = t.Invoke(val, Value.EMPTY_ENV);
@@ -84,19 +84,14 @@ namespace app.tests
 
             Value val = null;
             var result = f.Invoke(val, Value.EMPTY_ENV);
-            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
+            Assert.Catch<NullReferenceException>(() => result.Invoke(null, Value.EMPTY_ENV), "Cannot have a null inner node");
 
             val = new Number(123);
             result = f.Invoke(val, Value.EMPTY_ENV);
-            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
+            Assert.Catch<NullReferenceException>(() => result.Invoke(null, Value.EMPTY_ENV), "Cannot invoke the Identity function with null");
 
-            val = Nil;
             result = f.Invoke(val, Value.EMPTY_ENV);
-            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
-
-            val = Identity;
-            result = f.Invoke(val, Value.EMPTY_ENV);
-            Assert.AreEqual(null, result.Invoke(null, Value.EMPTY_ENV));
+            Assert.AreEqual(Nil, result.Invoke(Nil, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -196,7 +191,7 @@ namespace app.tests
             Assert.AreEqual(id, id.Evaluate(null));
 
             Value val = null;
-            Assert.AreEqual(null, id.Invoke(null, Value.EMPTY_ENV));
+            Assert.Catch<NullReferenceException>(() => id.Invoke(null, Value.EMPTY_ENV), "Cannot have a null inner node");
 
             val = new Number(123);
             var result = id.Invoke(val, Value.EMPTY_ENV);
@@ -246,10 +241,7 @@ namespace app.tests
             Assert.Catch<NotImplementedException>(() => add.AsNumber());
             Assert.AreEqual(add, add.Evaluate(null));
 
-            Value val = null;
-            Assert.Catch<NullReferenceException>(() => add.Invoke(val, Value.EMPTY_ENV));
-
-            val = new Number(123);
+            Value val = new Number(123);
             Value val2 = new Number(234);
 
             var result = add.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV);
@@ -259,10 +251,10 @@ namespace app.tests
             Assert.AreEqual(357, result.AsNumber());
 
             val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => add.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => add.Invoke(Nil, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
 
             val = Identity;
-            Assert.Catch<NotImplementedException>(() => add.Invoke(val, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => add.Invoke(Identity, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -273,10 +265,7 @@ namespace app.tests
             Assert.Catch<NotImplementedException>(() => mult.AsNumber());
             Assert.AreEqual(mult, mult.Evaluate(null));
 
-            Value val = null;
-            Assert.Catch<NullReferenceException>(() => mult.Invoke(val, Value.EMPTY_ENV));
-
-            val = new Number(123);
+            Value val = new Number(123);
             Value val2 = new Number(234);
 
             var result = mult.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV);
@@ -285,11 +274,8 @@ namespace app.tests
             result = mult.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(28782, result.AsNumber());
 
-            val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => mult.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
-
-            val = Identity;
-            Assert.Catch<NotImplementedException>(() => mult.Invoke(val, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => mult.Invoke(Nil, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => mult.Invoke(Identity, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -300,10 +286,7 @@ namespace app.tests
             Assert.Catch<NotImplementedException>(() => div.AsNumber());
             Assert.AreEqual(div, div.Evaluate(null));
 
-            Value val = null;
-            Assert.Catch<NullReferenceException>(() => div.Invoke(val, Value.EMPTY_ENV));
-
-            val = new Number(123);
+            Value val = new Number(123);
             Value val2 = new Number(234);
 
             var result = div.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV);
@@ -312,11 +295,8 @@ namespace app.tests
             result = div.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV);
             Assert.AreEqual(1, result.AsNumber());
 
-            val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => div.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
-
-            val = Identity;
-            Assert.Catch<NotImplementedException>(() => div.Invoke(val, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => div.Invoke(Nil, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => div.Invoke(Identity, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
         }
 
         [Test]
@@ -327,10 +307,7 @@ namespace app.tests
             Assert.Catch<NotImplementedException>(() => eq.AsNumber());
             Assert.AreEqual(eq, eq.Evaluate(null));
 
-            Value val = null;
-            Assert.Catch<NullReferenceException>(() => eq.Invoke(val, Value.EMPTY_ENV));
-
-            val = new Number(123);
+            Value val = new Number(123);
             Value val2 = new Number(234);
             Assert.AreEqual(FalseVal, eq.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
             Assert.AreEqual(FalseVal, eq.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
@@ -339,11 +316,10 @@ namespace app.tests
             Assert.AreEqual(TrueVal, eq.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
             Assert.AreEqual(TrueVal, eq.Invoke(val2, Value.EMPTY_ENV).Invoke(val, Value.EMPTY_ENV));
 
-            val2 = Nil;
-            Assert.Catch<NotImplementedException>(() => eq.Invoke(val, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
-
-            val = Identity;
-            Assert.Catch<NotImplementedException>(() => eq.Invoke(val, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(Nil, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(Nil, Value.EMPTY_ENV).Invoke(Nil, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(Nil, Value.EMPTY_ENV).Invoke(Identity, Value.EMPTY_ENV));
+            Assert.Catch<NotImplementedException>(() => eq.Invoke(Identity, Value.EMPTY_ENV).Invoke(val2, Value.EMPTY_ENV));
         }
 
         public void LessThanClassTests()
