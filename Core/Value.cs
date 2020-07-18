@@ -107,7 +107,7 @@ namespace Core
 
         public override string ToString()
         {
-            return "(ap i " + val + ")";
+            return "(ap t " + val + ")";
         }
     }
 
@@ -211,6 +211,11 @@ namespace Core
         {
             return val.Evaluate(environment);
         }
+
+        public override string ToString()
+        {
+            return "i";
+        }
     }
 
     public class IsNilClass : Value
@@ -235,7 +240,7 @@ namespace Core
     {
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new AddConstant(val.Evaluate(environment).AsNumber());
+            return new AddConstant(val);
         }
 
         public override string ToString()
@@ -246,16 +251,30 @@ namespace Core
 
     public class AddConstant : Value
     {
-        private readonly long n;
+        private readonly Node node;
+        private bool evaluated;
+        private long num;
 
-        public AddConstant(long n)
+        public AddConstant(Node node)
         {
-            this.n = n;
+            this.node = node;
+            evaluated = false;
         }
 
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(n + val.Evaluate(environment).AsNumber());
+            if (!evaluated)
+            {
+                num = node.Evaluate(environment).AsNumber();
+                evaluated = true;
+            }
+            return new Number(num + val.Evaluate(environment).AsNumber());
+        }
+
+
+        public override string ToString()
+        {
+            return $"(ap add {node})";
         }
     }
 
@@ -263,7 +282,7 @@ namespace Core
     {
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new MultConstant(val.Evaluate(environment).AsNumber());
+            return new MultConstant(val);
         }
 
         public override string ToString()
@@ -274,16 +293,30 @@ namespace Core
 
     public class MultConstant : Value
     {
-        private readonly long n;
+        private readonly Node node;
+        private bool evaluated;
+        private long num;
 
-        public MultConstant(long n)
+        public MultConstant(Node node)
         {
-            this.n = n;
+            this.node = node;
+            evaluated = false;
         }
 
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(n * val.Evaluate(environment).AsNumber());
+            if (!evaluated)
+            {
+                num = node.Evaluate(environment).AsNumber();
+                evaluated = true;
+            }
+            return new Number(num * val.Evaluate(environment).AsNumber());
+        }
+
+
+        public override string ToString()
+        {
+            return $"(ap mul {node})";
         }
     }
 
@@ -291,7 +324,7 @@ namespace Core
     {
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new DivideConstant(val.Evaluate(environment).AsNumber());
+            return new DivideConstant(val);
         }
 
         public override string ToString()
@@ -302,16 +335,30 @@ namespace Core
 
     public class DivideConstant : Value
     {
-        private readonly long n;
+        private readonly Node node;
+        private bool evaluated;
+        private long num;
 
-        public DivideConstant(long n)
+        public DivideConstant(Node node)
         {
-            this.n = n;
+            this.node = node;
+            evaluated = false;
         }
 
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return new Number(n / val.Evaluate(environment).AsNumber());
+            if (!evaluated)
+            {
+                num = node.Evaluate(environment).AsNumber();
+                evaluated = true;
+            }
+            return new Number(num / val.Evaluate(environment).AsNumber());
+        }
+
+
+        public override string ToString()
+        {
+            return $"(ap div {node})";
         }
     }
 
