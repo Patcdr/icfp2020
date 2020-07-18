@@ -148,14 +148,41 @@ namespace Squigglr
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            gInterface.SaveClicks();
-            MessageBox.Show("Saved");
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "SavedClicks"; // Default file name
+            dlg.DefaultExt = ".saves"; // Default file extension
+            dlg.Filter = "Saves (.saves)|*.saves"; // Filter files by extension
+
+            // Show save file dialog box
+            bool? result = dlg.ShowDialog();
+
+            // Process save file dialog box results
+            if (result == true)
+            {
+                // Save document
+                string filename = dlg.FileName;
+
+                gInterface.SaveClicks(filename);
+                MessageBox.Show("Saved");
+            }
         }
 
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            currentFrame = gInterface.LoadClicks();
-            RenderFrame(currentFrame);
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "SavedClicks";
+            dlg.DefaultExt = ".saves";
+            dlg.Filter = "Saves (.saves)|*.saves";
+
+            bool? result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dlg.FileName;
+
+                currentFrame = gInterface.LoadClicks(filename);
+                RenderFrame(currentFrame);
+            }
         }
 
         private void CalibrateButton_Click(object sender, RoutedEventArgs e)

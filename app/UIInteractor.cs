@@ -46,15 +46,15 @@ namespace app
             return AdvanceState(result.p);
         }
 
-        public void SaveClicks()
+        public void SaveClicks(string filename = null)
         {
             string str = string.Join(Environment.NewLine, history.Select(x => $"{x.p.X},{x.p.Y}").Reverse().Skip(1));
-            File.WriteAllText("SavedClicks", str);
+            File.WriteAllText(filename ?? "SavedClicks.saves", str);
         }
 
-        public Dictionary<Point, byte> LoadClicks()
+        public Dictionary<Point, byte> LoadClicks(string filename = null)
         {
-            string[] lines = File.ReadAllText("SavedClicks").Split(Environment.NewLine);
+            string[] lines = File.ReadAllText(filename ?? "SavedClicks.saves").Split(Environment.NewLine);
             Dictionary<Point, byte> result = null;
 
             foreach (var line in lines)
