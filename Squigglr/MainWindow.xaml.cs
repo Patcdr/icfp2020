@@ -23,7 +23,7 @@ namespace Squigglr
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const int SCALE = 10;
+        public double SCALE = 10;
         
         public class TempGraphics : GraphicsInterface
         {
@@ -145,6 +145,21 @@ namespace Squigglr
             Point p2 = ScaleIt(p);
             Canvas.SetLeft(MouseHover, p2.X);
             Canvas.SetTop(MouseHover, p2.Y);
+        }
+       
+        private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            SCALE += e.Delta > 0 ? 0.5 : -0.5;
+
+            if (SCALE < 0.2)
+            {
+                SCALE = 0.2;
+            }
+
+            MouseHover.Width = SCALE;
+            MouseHover.Height = SCALE;
+
+            RenderFrame(currentFrame);
         }
     }
 }
