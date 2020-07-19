@@ -25,7 +25,9 @@ namespace Squigglr
     public partial class MainWindow : Window
     {
         private readonly Rectangle MouseHover;
+        private readonly Rectangle MeasureStartingLocation;
         private readonly TextBlock OffScreen;
+        private readonly TextBlock CurrentPosition;
         private int OffScreenCount = 0;
         private readonly Frame frame;
 
@@ -48,6 +50,11 @@ namespace Squigglr
             Canvas.SetLeft(OffScreen, 10);
             Canvas.SetTop(OffScreen, 10);
             OffScreen.Visibility = Visibility.Hidden;
+
+            CurrentPosition = new TextBlock();
+            CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
+            Canvas.SetLeft(OffScreen, 10);
+            Canvas.SetTop(OffScreen, 25);
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -133,6 +140,8 @@ namespace Squigglr
                 OffScreen.Visibility = Visibility.Hidden;
                 canvas.Children.Add(OffScreen);
             }
+
+            canvas.Children.Add(CurrentPosition);
         }
 
         public void Update()
@@ -169,6 +178,14 @@ namespace Squigglr
             IntPoint p = Scaler.Convert(e.GetPosition(canvas));
             frame.Advance(p);
             Render();
+        }
+
+        /// <summary>
+        /// Measure distance from a point
+        /// </summary>
+        private void Canvas_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -213,6 +230,7 @@ namespace Squigglr
             Point p2 = Scaler.Convert(p);
             Canvas.SetLeft(MouseHover, p2.X);
             Canvas.SetTop(MouseHover, p2.Y);
+            CurrentPosition.Text = $"({p.X}, {p.Y})";
         }
 
         private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)

@@ -20,6 +20,7 @@
             <Canvas 
                 x:Name="canvas" 
                 MouseLeftButtonDown="canvas_MouseLeftButtonDown" 
+                MouseRightButtonDown="Canvas_OnMouseRightButtonDown"
                 MouseMove="canvas_MouseMove" 
                 MouseWheel="canvas_MouseWheel">
             </Canvas>
