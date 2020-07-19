@@ -35,11 +35,13 @@ namespace app
             // Extract fuel from gamestate
 
             var gameState = new GameState(sender.Send(new Value[] {START, Player, UtilityFunctions.MakeList(new int[] {1, 1, 1, 1})}));
-             
+
+            if (gameState.GameStateVal == 2) return;
             gameState = new GameState(sender.Send(new Value[] { CMD, Player, C(N(0), C(N(gameState.GetShipByPlayerId(gameState.PlayerId).ID), C(N(-1), N(0)))) }));
 
             for(long i = gameState.CurrentTurn; i < gameState.TotalTurns; i++)
             {
+                if (gameState.GameStateVal == 2) return;
                 gameState = new GameState(sender.Send(new Value[] { CMD, Player, Nil}));
 
             }
