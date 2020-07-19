@@ -26,6 +26,7 @@ namespace app
             }
 
             httpClient = new HttpClient { BaseAddress = serverUri };
+            httpClient.Timeout = TimeSpan.FromDays(1);
         }
 
         public Value Send(Value statement, Value player=null)
