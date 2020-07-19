@@ -57,7 +57,7 @@ namespace Core
         public GameState(Value server_state)
         {
             this.server_state = server_state;
-            this.GameStateVal = UtilityFunctions.Addr("car", server_state).AsNumber();
+            this.GameStateVal = UtilityFunctions.Addr("cdar", server_state).AsNumber();
             if (GameStateVal == 1)
             {
                 this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
