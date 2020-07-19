@@ -52,7 +52,7 @@ namespace app
         public static string Visualize(GameState state)
         {
             var guid = Guid.NewGuid().ToString();
-            var client = new AmazonS3Client("AKIAV3HLA4UAHMJV4GGM", "zyuUE/gFaGJs2ovAida+D0EKMrycI8TZew8A3CTe");
+            var client = new AmazonS3Client("AKIAV3HLA4UAHMJV4GGM", "zyuUE/gFaGJs2ovAida+D0EKMrycI8TZew8A3CTe", Amazon.RegionEndpoint.USWest2);
 
             Console.WriteLine($"Uploading for visualization {guid}");
             Console.WriteLine(GameLog.Write(state));
