@@ -43,15 +43,15 @@ namespace app
                 else
                 {
                     // Not on a diagonal - fire in the direction where I'm closest to the planet.
-                    if (Math.Abs(ship.Position.X) > Math.Abs(ship.Position.Y))
+                    if (Math.Abs(ship.Position.X) < Math.Abs(ship.Position.Y))
                     {
                         int yDir = ship.Position.Y > 0 ? -1 : 1;
                         Command(Thrust(ship.ID, new Point(0, yDir)));
                     }
                     else
                     {
-                        int yDir = ship.Position.Y > 0 ? -1 : 1;
-                        Command(Thrust(ship.ID, new Point(0, yDir)));
+                        int xDir = ship.Position.X > 0 ? -1 : 1;
+                        Command(Thrust(ship.ID, new Point(xDir, 0)));
                     }
                 }
             }
