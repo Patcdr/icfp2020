@@ -32,7 +32,7 @@ namespace app
             else if (args.Length == 2)
             {
                 // Submission mode
-                new PatRunner(new Sender(serverUrl, key), long.Parse(key)).Start();
+                new DontDieRunner(new Sender(serverUrl, key), long.Parse(key)).Start();
             }
             else {
                 Console.Error.WriteLine("Invalid arguments");
