@@ -33,7 +33,7 @@ namespace app
 
         public Value Send(Value statement, Value player=null)
         {
-            // Console.WriteLine($"Sending({player}): {statement}");
+            Console.WriteLine($"Sending({player}): {statement}");
 
             var signal = NumberFunctions.Mod(statement, null);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
@@ -47,7 +47,7 @@ namespace app
             var content = response.Content.ReadAsStringAsync().Result;
             var answer = NumberFunctions.Dem(content);
 
-            // Console.WriteLine($"Received({player}): {answer}");
+            Console.WriteLine($"Received({player}): {answer}");
 
             UtilityFunctions.PrettyPrint(answer, "");
 
