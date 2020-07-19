@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using Core;
 using static Core.Library;
@@ -37,7 +38,7 @@ namespace app
             var gameState = new GameState(sender.Send(new Value[] {START, Player, UtilityFunctions.MakeList(new int[] {1, 1, 1, 1})}));
 
             if (gameState.GameStateVal == 2) return;
-            gameState = new GameState(sender.Send(new Value[] { CMD, Player, C(N(0), C(N(gameState.GetShipByPlayerId(gameState.PlayerId).ID), C(N(-1), N(0)))) }));
+            gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, new Point(0, 1))) }));
 
             for(long i = gameState.CurrentTurn; i < gameState.TotalTurns; i++)
             {
@@ -45,7 +46,13 @@ namespace app
                 gameState = new GameState(sender.Send(new Value[] { CMD, Player, Nil}));
 
             }
+            // CMD(THRUST, ()), 
 
+        }
+
+        public Value Thrust(long shipId, Point vector)
+        {
+            return C(N(0), C(N(shipId), C(C(N(vector.X), N(vector.Y)), Nil)));
         }
 
 
