@@ -82,8 +82,8 @@ namespace app
 
         public override Value Next(GameState state)
         {
-            var attack = Task<Value>.Factory.StartNew(() => {return AttackBot.Next(null); });
-            var defend = Task<Value>.Factory.StartNew(() => {return DefendBot.Next(null); });
+            var attack = Task<Value>.Factory.StartNew(() => {return AttackBot.Next(state); });
+            var defend = Task<Value>.Factory.StartNew(() => {return DefendBot.Next(state); });
             attack.Wait();
             defend.Wait();
 

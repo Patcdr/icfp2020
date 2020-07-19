@@ -34,7 +34,7 @@ namespace app
             for (int i = 0; i < ActionHandler.AllDirections.Count; i++)
             {
                 double product = unitVectors[i].Item1 * currentPosition.X
-                    + unitVectors[i].Item2 + currentPosition.Y;
+                    + unitVectors[i].Item2 * currentPosition.Y;
                 if (product > bestProduct)
                 {
                     bestDirection = ActionHandler.AllDirections[i];
