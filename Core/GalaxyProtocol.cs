@@ -10,6 +10,7 @@ namespace Core
     public class GalaxyProtocol : IProtocol
     {
         private readonly Dictionary<string, Node> env;
+        Value protocol;
 
         public GalaxyProtocol()
         {
@@ -31,12 +32,11 @@ namespace Core
             }
 
             env = Parser.Parse(lines.ToList());
+            protocol = env["galaxy"].Evaluate(env);
         }
 
         public IProtocol.Response call(Value state, Value point)
         {
-            Value protocol = env["galaxy"].Evaluate(env);
-
             // ap ap galaxy <state> <point>
             Node root = new Apply(new Apply(protocol, state), point);
             Value result = root.Evaluate(env);

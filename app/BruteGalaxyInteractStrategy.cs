@@ -16,7 +16,7 @@ namespace app
             protocol = new GalaxyProtocol();
         }
 
-        public override void Start()
+        public override Value Start()
         {
             var points = new ConsIntermediate2[] {
                 new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 0 nil
@@ -85,6 +85,8 @@ namespace app
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
+
+            return null;
         }
 
         private void Brute(IProtocol protocol, Value state)

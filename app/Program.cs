@@ -21,6 +21,8 @@ namespace app
             Sender sender = new Sender(serverUrl, key);
             Interactor interactor = new Interactor(sender);
 
+            // new GameInteractStrategy(interactor, new Number(0)).Run(); return -2;
+
             BaseInteractStrategy strategy;
             if (args.Length == 0)
             {

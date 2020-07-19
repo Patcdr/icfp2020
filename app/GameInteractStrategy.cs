@@ -13,19 +13,14 @@ namespace app
         {
         }
 
-        public override void Start()
+        public override Value Start()
         {
-            base.Start(1, 1, 1, 1);
+            return base.Start(1, 1, 1, 1);
         }
 
         public override Value Next(GameState next)
         {
-            Game = Interactor.sender.Send(new Value[] {
-                CMD, Player, NilList
-                // CMD, Player, new ConsIntermediate2(UtilityFunctions.MakeList(UtilityFunctions.MakeList(new Core.Number(1), new Core.Number(0))), Library.Nil)
-            }, Player);
-
-            return Game;
+            return Command(CMD, Player, NilList);
         }
     }
 }

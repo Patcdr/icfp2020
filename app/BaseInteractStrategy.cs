@@ -9,18 +9,13 @@ namespace app
     public abstract class BaseInteractStrategy
     {
         protected Interactor Interactor { get; }
+        private readonly IProtocol Protocol;
 
         public Action<Value> Step;
 
         public Value Player;
         public Value Game;
-
-        public Value State
-        {
-            get {
-                return Game.Cdr().Cdr().Cdr();
-            }
-        }
+        public Value Local;
 
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
@@ -32,31 +27,34 @@ namespace app
         public virtual bool IsStarted() { return Game.Cdr().Car().AsNumber() > 0; }
         public virtual bool IsRunning() { return Game.Cdr().Car().AsNumber() == 1; }
         public virtual bool IsFinished() { return Game.Cdr().Car().AsNumber() == 2; }
+        public Value Turn { get { return UtilityFunctions.Addr("dddaa", Game); } }
 
-        public BaseInteractStrategy(Interactor interactor)
+        public BaseInteractStrategy(Interactor interactor) : this(interactor, null)
         {
-            Interactor = interactor;
         }
 
         public BaseInteractStrategy(Interactor interactor, Value player)
         {
             Interactor = interactor;
             Player = player;
+            Protocol = new GalaxyProtocol();
+            Boot();
         }
 
         public virtual int Run()
         {
-            Start();
+            Game = Start();
 
             // Play 256 rounds or until the game is over.
-            for (var i = 0; i < 300; i++)
+            for (var i = 0; i < 256; i++)
             {
+                Console.WriteLine($"Turn {Turn} {Game}");
+
                 if (!IsRunning()) {
                     Console.WriteLine("Game OVER!");
                     return i;
                 }
 
-                Console.WriteLine($"Turn {i}");
                 Game = Next(null);
 
                 if (Step != null) Step(Game);
@@ -64,27 +62,59 @@ namespace app
             return 256;
         }
 
-        public virtual void Start(int a, int b, int c, int d)
+        public virtual Value Start(int a, int b, int c, int d)
         {
-            Game = Interactor.sender.Send(new Value[] {
-                JOIN, Player, NilList
-            }, Player);
+            var player = Command(JOIN, Player, NilList);
 
-            Game = Interactor.sender.Send(new Value[] {
-                START, Player, UtilityFunctions.MakeList(new int[] {
-                    a, b, c, d
-                })
-            }, Player);
+            var started = Command(START, Player,
+                UtilityFunctions.MakeList(new int[] {a, b, c, d}));
 
-            if (Step != null) Step(Game);
+            if (Step != null) Step(started);
+
+            return started;
         }
 
-        public virtual void Start()
+        public virtual Value Start()
         {
             // TODO: Be smarter about choosing values
-            Start(1, 1, 1, 1);
+            return Start(1, 1, 1, 1);
         }
 
         public abstract Value Next(GameState state);
+
+        public Value Ask()
+        {
+            Interact(36, 0);
+            Interact(44, 0);
+            return C(
+                UtilityFunctions.Addr("dadddadaada", Local),
+                UtilityFunctions.Addr("dadddadadada", Local)
+            );
+        }
+
+        public Value Command(params Value[] command)
+        {
+            var result = Interactor.sender.Send(command, Player);
+            Interact(result);
+            return result;
+        }
+
+        public void Interact(int x, int y)
+        {
+            Interact(C(N(x), N(y)));
+        }
+
+        public void Interact(Value next)
+        {
+            Console.WriteLine("Next: " + next);
+            Local = Interactor.Interact(Protocol, Local, next).NewState;
+            UtilityFunctions.PrettyPrint(Local, null);
+        }
+
+        private void Boot() {
+            Local = C(N(5), C(C(N(2), C(N(0), C(Nil, C(Nil, C(Nil, C(Nil, C(Nil, C(N(38273), Nil)))))))), C(N(9), C(Nil, Nil))));
+        }
+        Value C(Value a, Value b) { return new ConsIntermediate2(a, b); }
+        Value N(int a) { return new Number(a); }
     }
 }
