@@ -25,6 +25,11 @@ namespace app
 
         public override Value Next(GameState state)
         {
+            if (PlayerId == -1)
+            {
+                PlayerId = (int)state.PlayerId;
+            }
+
             handler.SetCurrentState(Local);
             Ship myShip = state.GetShipByPlayerId(PlayerId);
             if (myShip.Health > 1)
