@@ -51,6 +51,8 @@ namespace Core
         public readonly List<Ship> Ships;
         public readonly long ArenaSize;
         public readonly long StarSize;
+        public readonly long TotalPoints;
+
         public Value server_state;
 
 
@@ -58,10 +60,14 @@ namespace Core
         {
             this.server_state = server_state;
             this.GameStateVal = UtilityFunctions.Addr("cdar", server_state).AsNumber();
-            if (GameStateVal == 1)
+            if (GameStateVal < 2)
             {
                 this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
                 this.PlayerId = UtilityFunctions.Addr("cddadar", server_state).AsNumber();
+                this.TotalPoints = UtilityFunctions.Addr("cddaddaar", server_state).AsNumber();
+            }
+            if (GameStateVal == 1)
+            {
                 this.CurrentTurn = UtilityFunctions.Addr("cdddaar", server_state).AsNumber();
                 var cons = UtilityFunctions.Addr("cddadddar", server_state);
                 if (cons != Library.Nil)

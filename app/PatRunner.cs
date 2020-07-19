@@ -32,13 +32,15 @@ namespace app
 
         public void Start()
         {
-            sender.Send(new Value[] {JOIN, (Player), NilList});
+            var gameState = new GameState(sender.Send(new Value[] {JOIN, (Player), NilList}));
             // Extract fuel from gamestate
 
-            var gameState = new GameState(sender.Send(new Value[] {START, Player, UtilityFunctions.MakeList(new int[] {1, 1, 1, 1})}));
+            gameState = new GameState(sender.Send(new Value[] {START, Player, UtilityFunctions.MakeList(new int[] {(int)gameState.TotalPoints - 3, 1, 1, 1})}));
 
             if (gameState.GameStateVal == 2) return;
-            gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, new Point(0, 1))) }));
+            var ship = gameState.GetShipByPlayerId(gameState.PlayerId);
+            var opposite = new Point(Math.Sign(ship.Position.X), Math.Sign(ship.Position.Y)); 
+            gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, opposite)) }));
 
             for(long i = gameState.CurrentTurn; i < gameState.TotalTurns; i++)
             {
