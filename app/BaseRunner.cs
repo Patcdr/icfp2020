@@ -15,10 +15,14 @@ namespace app
         public static readonly Value START = new Number(3);
         public static readonly Value CMD = new Number(4);
 
-        protected Number Player;
-        protected GameState State;
+        public static readonly Value ACCELERATE = new Number(0);
+        public static readonly Value DETONATE = new Number(1);
+        public static readonly Value SHOOT = new Number(2);
 
-        private Sender Sender;
+        protected Number Player { get; private set; }
+        protected GameState State { get; private set; }
+
+        private readonly Sender Sender;
 
         public BaseRunner(Sender sender, long player = 0)
         {
@@ -36,6 +40,8 @@ namespace app
         // Extract fuel from gamestate
         protected bool IsDone { get { return State.GameStateVal == 2; } }
 
+        #region Interactions with Server (changes state)
+
         protected void Join()
         {
             State = new GameState(Sender.Send(new Value[] { JOIN, (Player), NilList }));
@@ -46,18 +52,38 @@ namespace app
             State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, babies }) }));
         }
 
-        protected void Command(Value commands)
+        protected void Command(params Value[] commands)
         {
-            State = new GameState(Sender.Send(new Value[] { CMD, Player, commands }));
+            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }));
         }
+
+        #endregion
+
+        #region Commands
+
+        protected Value Thrust(long shipId, Point vector)
+        {
+            return C(ACCELERATE, C(N(shipId), C(C(N(vector.X), N(vector.Y)), Nil)));
+        }
+
+        protected Value Detonate(long shipId)
+        {
+            return C(DETONATE, C(N(shipId), Nil));
+        }
+
+        protected Value Shoot(long shipId, Point vector, long hamburger)
+        {
+            return C(SHOOT, C(N(shipId), C(C(N(vector.X), N(vector.Y)), C(N(hamburger), Nil))));
+        }
+
+        #endregion
+
+        #region Helper Functions
 
         protected Value C(Value a, Value b) { return new ConsIntermediate2(a, b); }
         protected Value N(int a) { return new Number(a); }
         protected Value N(long a) { return new Number(a); }
 
-        protected Value Thrust(long shipId, Point vector)
-        {
-            return C(N(0), C(N(shipId), C(C(N(vector.X), N(vector.Y)), Nil)));
-        }
+        #endregion
     }
 }

@@ -32,7 +32,7 @@ namespace app
                 var opposite = new Point(Math.Sign(ship.Position.X)*-1, Math.Sign(ship.Position.Y)*-1);
                 var ninetyDegrees = new Point(opposite.Y, -opposite.X);
                 
-                Command(UtilityFunctions.MakeList(Thrust(State.GetMyFirstShip().ID, ninetyDegrees)));
+                Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
                 
                 //Console.WriteLine($"-- Turn {i} --");
                 //Console.WriteLine(State);
@@ -42,7 +42,7 @@ namespace app
             {
                 if (IsDone) return;
 
-                Command(UtilityFunctions.MakeList(Nil));
+                Command(Nil);
 
                 //Console.WriteLine($"-- Turn {i} --");
                 //Console.WriteLine(State);
