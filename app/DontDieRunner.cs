@@ -32,28 +32,31 @@ namespace app
                 }
 
                 Ship ship = State.GetMyFirstShip();
-                
+                Point thrust = new Point(0, 0);
+
                 // Am I on a diagonal?
                 if (ship.Position.X == ship.Position.Y)
                 {
                     int xDir = ship.Position.X > 0 ? -1 : 1;
                     int yDir = ship.Position.Y > 0 ? -1 : 1;
-                    Command(Thrust(ship.ID, new Point(xDir, yDir)));
+                    thrust = new Point(xDir, yDir);
                 }
                 else
                 {
-                    // Not on a diagonal - fire in the direction where I'm closest to the planet.
+                    // Not on a diagonal - fire in the direction where I'm furthest from the planet.
                     if (Math.Abs(ship.Position.X) < Math.Abs(ship.Position.Y))
                     {
                         int yDir = ship.Position.Y > 0 ? -1 : 1;
-                        Command(Thrust(ship.ID, new Point(0, yDir)));
+                        thrust = new Point(0, yDir);
                     }
                     else
                     {
                         int xDir = ship.Position.X > 0 ? -1 : 1;
-                        Command(Thrust(ship.ID, new Point(xDir, 0)));
+                        thrust = new Point(xDir, 0);
                     }
                 }
+
+                Command(Thrust(ship.ID, thrust));
             }
         }
     }
