@@ -50,14 +50,19 @@ namespace Squigglr
 
         public void Load(string filename)
         {
-            gInterface.StartGame();
             points = gInterface.LoadClicks(filename);
             Render();
         }
 
-        public void Restart()
+        public void StartGame()
         {
             points = gInterface.StartGame();
+            Render();
+        }
+
+        public void SetState(Value s)
+        {
+            points = gInterface.SetState(s);
             Render();
         }
 

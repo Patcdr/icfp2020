@@ -7,7 +7,7 @@ using static Core.Library;
 
 namespace app
 {
-    class GameInteractStrategy : BaseInteractStrategy
+    public class GameInteractStrategy : BaseInteractStrategy
     {
         public GameInteractStrategy(Interactor interactor, Value player) : base(interactor, player)
         {
@@ -18,11 +18,13 @@ namespace app
             base.Start(1, 1, 1, 1);
         }
 
-        public override void Next()
+        public override Value Next()
         {
             Game = Interactor.sender.Send(new Value[] {
                 CMD, Player, NilList
             }, Player);
+
+            return Game;
         }
     }
 }

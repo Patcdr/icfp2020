@@ -115,9 +115,9 @@ namespace app
             ConsoleDrawer.drawing = drawing;
         }
 
-        public override void Next()
+        public override Value Next()
         {
-
+            return null;
         }
     }
 }

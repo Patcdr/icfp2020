@@ -10,8 +10,17 @@ namespace app
     {
         protected Interactor Interactor { get; }
 
+        public Action<Value> Step;
+
         public Value Player;
         public Value Game;
+
+        public Value State
+        {
+            get {
+                return Game.Cdr().Cdr().Cdr();
+            }
+        }
 
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
@@ -35,24 +44,51 @@ namespace app
             Player = player;
         }
 
-        public virtual void Start(int a, int b, int c, int d)
+        public virtual int Run()
+        {
+            Join();
+            Start();
+
+            // Play 256 rounds or until the game is over.
+            for (var i = 0; i < 256; i++)
+            {
+                Game = Next();
+
+                if (Step != null) Step(Game);
+
+                if (!IsRunning()) {
+                    return i;
+                }
+            }
+            return 256;
+        }
+
+        public virtual void Join()
         {
             Game = Interactor.sender.Send(new Value[] {
                 JOIN, Player, NilList
             }, Player);
 
+            if (Step != null) Step(Game);
+        }
+
+        public virtual void Start(int a, int b, int c, int d)
+        {
             Game = Interactor.sender.Send(new Value[] {
                 START, Player, UtilityFunctions.MakeList(new int[] {
                     a, b, c, d
                 })
             }, Player);
+
+            if (Step != null) Step(Game);
         }
 
         public virtual void Start()
         {
+            // TODO: Be smarter about choosing values
             Start(1, 1, 1, 1);
         }
 
-        public abstract void Next();
+        public abstract Value Next();
     }
 }

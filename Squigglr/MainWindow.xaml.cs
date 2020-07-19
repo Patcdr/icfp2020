@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using app;
 using IntPoint = System.Drawing.Point;
+using Core;
 
 namespace Squigglr
 {
@@ -27,6 +28,9 @@ namespace Squigglr
         private readonly TextBlock OffScreen;
         private int OffScreenCount = 0;
         private readonly Frame frame;
+
+        Sender sender;
+        Interactor interactor;
 
         public MainWindow()
         {
@@ -49,8 +53,8 @@ namespace Squigglr
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
             string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
-            Sender sender = new Sender(serverUrl, playerKey);
-            Interactor interactor = new Interactor(sender);
+            sender = new Sender(serverUrl, playerKey);
+            interactor = new Interactor(sender);
 
             var gInterface = new UIInteractor(interactor);
 
@@ -181,9 +185,26 @@ namespace Squigglr
                 case Key.Up: Scaler.ShiftView(vertical: true); Update(); break;
                 case Key.Left: Scaler.ShiftView(horizontal: true); Update(); break;
                 case Key.Right: Scaler.ShiftView(horizontal: false); Update(); break;
-                case Key.N: frame.Restart(); Render(); break;
+                case Key.N: frame.StartGame(); Render(); break;
+                case Key.A: RunAttackAI(); Render(); break;
+                case Key.D: RunDefendAI(); Render(); break;
                 case Key.Z: frame.Undo(); Render(); break;
             }
+        }
+
+        private void RunDefendAI() {}
+        private void RunAttackAI()
+        {
+            frame.StartGame();
+            frame.Advance(new IntPoint(44, 00));
+
+            var strategy = new HeadToHeadStrategy(interactor, (Value state) => {
+                if (state != null) frame.SetState(state);
+            });
+            strategy.AttackStep = (Value state) => {
+                if (state != null) frame.SetState(state);
+            };
+            strategy.Run();
         }
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
@@ -270,7 +291,7 @@ namespace Squigglr
                 new IntPoint(-4, 10),
                 new IntPoint(1, 4)
             });
-            
+
             Render();
             CalibrateButton.Visibility = Visibility.Hidden;
         }

@@ -35,6 +35,17 @@ namespace app
             return CreateFrame(result.MultiDrawResult);
         }
 
+        public Dictionary<Point, byte> SetState(Value s)
+        {
+            var p = new Point(0, 0);
+
+            history.Push((s, p));
+            result = interactor.Interact(protocol, state, s);
+            state = result.NewState;
+
+            return CreateFrame(result.MultiDrawResult);
+        }
+
         public Dictionary<Point, byte> StartGame()
         {
             return SetPage(5, 9, 36, 0);

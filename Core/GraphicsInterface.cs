@@ -8,6 +8,7 @@ namespace Core
     public interface GraphicsInterface
     {
         public Dictionary<Point, byte> AdvanceState(Point p);
+        public Dictionary<Point, byte> SetState(Value s);
         public Dictionary<Point, byte> UndoState(int n = 1);
         public void SaveClicks(string fileName = null);
         public Dictionary<Point, byte> LoadClicks(string fileName = null);

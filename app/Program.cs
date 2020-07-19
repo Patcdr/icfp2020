@@ -21,38 +21,28 @@ namespace app
             Sender sender = new Sender(serverUrl, key);
             Interactor interactor = new Interactor(sender);
 
-            BaseInteractStrategy interactStrategy;
+            BaseInteractStrategy strategy;
             if (args.Length == 0)
             {
                 // Rumble mode with explicit bots
-                interactStrategy = new HeadToHeadStrategy(interactor);
+                strategy = new HeadToHeadStrategy(interactor);
             }
             else if (args.Length == 2)
             {
                 // Submission mode
-                interactStrategy = new GameInteractStrategy(interactor, new Number(long.Parse(key)));
+                strategy = new GameInteractStrategy(interactor, new Number(long.Parse(key)));
             }
             else if (args.Length == 4)
             {
                 // Rumble mode with default bots
-                interactStrategy = new HeadToHeadStrategy(interactor, args[3], args[4]);
+                strategy = new HeadToHeadStrategy(interactor, args[3], args[4]);
             }
             else {
                 Console.Error.WriteLine("Invalid arguments");
                 return -1;
             }
 
-            interactStrategy.Start();
-
-            // Play 256 rounds or until the game is over.
-            for (var i = 0; i < 256; i++)
-            {
-                interactStrategy.Next();
-
-                if (!interactStrategy.IsRunning()) {
-                    break;
-                }
-            }
+            strategy.Run();
 
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");
