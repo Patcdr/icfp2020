@@ -33,8 +33,10 @@ namespace app
             else if (args.Length == 2)
             {
                 // Submission mode
-                //strategy = new DontDieAI(sender, new Number(long.Parse(key)), -1);
-                strategy = new GameInteractStrategy(sender, new Number(long.Parse(key)), -1);
+                new PatRunner(sender, long.Parse(key)).Start();
+                return 0;
+                strategy = new DontDieAI(sender, new Number(long.Parse(key)), -1);
+                //strategy = new GameInteractStrategy(sender, new Number(long.Parse(key)), -1);
             }
             else if (args.Length == 4)
             {
