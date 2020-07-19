@@ -140,6 +140,11 @@ namespace Squigglr
                 canvas.Children.Add(rect);
             }
 
+            foreach (var label in frame.NumberOverlays.Values)
+            {
+                canvas.Children.Add(label);
+            }
+
             canvas.Children.Add(MouseHover);
 
             if (OffScreenCount > 0)
