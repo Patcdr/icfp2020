@@ -49,15 +49,17 @@ namespace app
             Start();
 
             // Play 256 rounds or until the game is over.
-            for (var i = 0; i < 256; i++)
+            for (var i = 0; i < 300; i++)
             {
+                if (!IsRunning()) {
+                    Console.WriteLine("Game OVER!");
+                    return i;
+                }
+
+                Console.WriteLine($"Turn {i}");
                 Game = Next();
 
                 if (Step != null) Step(Game);
-
-                if (!IsRunning()) {
-                    return i;
-                }
             }
             return 256;
         }
