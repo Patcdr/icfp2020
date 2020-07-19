@@ -25,7 +25,6 @@ namespace app
         // examples show that Interact takes a point as its last argument.
         public Result Interact(IProtocol protocol, Value state, Value point)
         {
-
             var response = protocol.call(state, point);
             var newState = Modem(response.NewState);
 
