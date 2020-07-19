@@ -10,8 +10,8 @@ namespace app
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
 
-        private BaseRunner Attacker;
-        private BaseRunner Defender;
+        public BaseRunner Attacker;
+        public BaseRunner Defender;
 
         public DoubleRunner(Sender sender, BaseRunner attacker, BaseRunner defender)
         {
