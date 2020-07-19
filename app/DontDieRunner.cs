@@ -20,7 +20,7 @@ namespace app
 
             if (IsDone) return;
 
-            Initialize((int)State.TotalPoints - 9, 0, 8, 1);
+            Initialize((int)State.TotalPoints - 98, 0, 8, 1);
 
             // Game loop
             for (long i = State.CurrentTurn; i < State.TotalTurns; i++)

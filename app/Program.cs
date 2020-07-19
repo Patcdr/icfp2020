@@ -25,7 +25,7 @@ namespace app
                 // Rumble mode with explicit bots
                 new DoubleRunner(
                     new Sender(serverUrl, key),
-                    new PatRunner(new Sender(serverUrl, key)),
+                    new DontDieRunner(new Sender(serverUrl, key)),
                     new PatRunner(new Sender(serverUrl, key))
                 ).Start();
             }
