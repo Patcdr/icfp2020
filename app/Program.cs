@@ -20,33 +20,24 @@ namespace app
 
             Console.Error.WriteLine($"Running against {serverUrl} as {key}. {args.Length}");
 
-            Sender sender = new Sender(serverUrl, key);
-
-            // new GameInteractStrategy(sender, new Number(0)).Run(); return -2;
-
-            BaseInteractStrategy strategy;
             if (args.Length == 0)
             {
-                // Rumble mode with default bots
-                strategy = new HeadToHeadStrategy(sender);
+                // Rumble mode with explicit bots
+                new DoubleRunner(
+                    new Sender(serverUrl, key),
+                    new PatRunner(new Sender(serverUrl, key)),
+                    new PatRunner(new Sender(serverUrl, key))
+                ).Start();
             }
             else if (args.Length == 2)
             {
                 // Submission mode
-                new PatRunner(sender, long.Parse(key)).Start();
-                return 0;
-            }
-            else if (args.Length == 4)
-            {
-                // Rumble mode with given bots
-                strategy = new HeadToHeadStrategy(sender, args[3], args[4]);
+                new PatRunner(new Sender(serverUrl, key), long.Parse(key)).Start();
             }
             else {
                 Console.Error.WriteLine("Invalid arguments");
                 return -1;
             }
-
-            strategy.Run();
 
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");
