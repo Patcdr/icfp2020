@@ -96,9 +96,9 @@ namespace Core
             return Ships.Where(x => x.ID == shipId).First();
         }
 
-        public Ship GetShipByPlayerId(long playerId)
+        public Ship GetMyFirstShip()
         {
-            return Ships.Where(x => x.PlayerID == playerId).First();
+            return Ships.Where(x => x.PlayerID == PlayerId).First();
         }
 
         public override string ToString()

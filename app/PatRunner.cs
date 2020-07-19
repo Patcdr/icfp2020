@@ -47,11 +47,11 @@ namespace app
             for (long i = gameState.CurrentTurn; i < end; i++)
             {
                 if (gameState.GameStateVal == 2) return;
-                var ship = gameState.GetShipByPlayerId(gameState.PlayerId);
+                var ship = gameState.GetMyFirstShip();
 
                 var opposite = new Point(Math.Sign(ship.Position.X)*-1, Math.Sign(ship.Position.Y)*-1);
                 var ninetyDegrees = new Point(opposite.Y, -opposite.X);
-                gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, ninetyDegrees)) }));
+                gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetMyFirstShip().ID, ninetyDegrees)) }));
 
             }
 
