@@ -13,7 +13,6 @@ namespace app
 
         public DontDieAI(Interactor interactor) : base(interactor)
         {
-            // TODO: Replace null with galaxy protocol.
             handler = new ActionHandler(new ClickInteractor(interactor, Protocol, Local));
             unitVectors = ActionHandler.AllDirections.Select(x => ScaleToUnitLength(x)).ToList();
         }
@@ -24,7 +23,8 @@ namespace app
             handler.Thrust(state, myShip.ID, GetThrustDirection(myShip.Position));
 
             Local = handler.GetCurrentState();
-            return null;
+            var result = Interact(0, 0);
+            return result;
         }
 
         private Point GetThrustDirection(Point currentPosition)
