@@ -43,7 +43,15 @@ namespace app
             var opposite = new Point(Math.Sign(ship.Position.X), Math.Sign(ship.Position.Y)); 
             gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, opposite)) }));
 
-            for(long i = gameState.CurrentTurn; i < gameState.TotalTurns; i++)
+            var end = gameState.CurrentTurn + 5;
+            for (long i = gameState.CurrentTurn; i < end; i++)
+            {
+                opposite = new Point(Math.Sign(ship.Position.X), Math.Sign(ship.Position.Y));
+                gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, opposite)) }));
+
+            }
+
+            for (long i = gameState.CurrentTurn; i < gameState.TotalTurns; i++)
             {
                 if (gameState.GameStateVal == 2) return;
                 gameState = new GameState(sender.Send(new Value[] { CMD, Player, Nil}));
