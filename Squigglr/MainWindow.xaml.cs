@@ -24,13 +24,21 @@ namespace Squigglr
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly SolidColorBrush MouseHoverBrush = new SolidColorBrush(Colors.Green);
+
         private readonly Rectangle MouseHover;
         private readonly TextBlock OffScreen;
+        private readonly TextBlock CurrentPosition;
         private int OffScreenCount = 0;
         private readonly Frame frame;
 
+        private readonly Rectangle MeasureStartingLocationBlock;
+        private IntPoint? measureStartingLocationPoint;
+
         Sender sender;
         Interactor interactor;
+        private ActionHandler actionHandler;
+        private bool isTargettingLaser = false;
 
         public MainWindow()
         {
@@ -40,7 +48,7 @@ namespace Squigglr
 
             MouseHover = new Rectangle();
             Scaler.ResizeRectangle(MouseHover);
-            MouseHover.Fill = new SolidColorBrush(Colors.Green);
+            MouseHover.Fill = MouseHoverBrush;
 
             OffScreen = new TextBlock();
             OffScreen.Text = "Offscreen Count Estimate: N/A";
@@ -48,6 +56,16 @@ namespace Squigglr
             Canvas.SetLeft(OffScreen, 10);
             Canvas.SetTop(OffScreen, 10);
             OffScreen.Visibility = Visibility.Hidden;
+
+            CurrentPosition = new TextBlock();
+            CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
+            Canvas.SetLeft(OffScreen, 10);
+            Canvas.SetTop(OffScreen, 25);
+
+            MeasureStartingLocationBlock = new Rectangle();
+            Scaler.ResizeRectangle(MeasureStartingLocationBlock);
+            MeasureStartingLocationBlock.Fill = new SolidColorBrush(Colors.Red);
+            MeasureStartingLocationBlock.Visibility = Visibility.Hidden;
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -57,6 +75,8 @@ namespace Squigglr
             interactor = new Interactor(sender);
 
             var gInterface = new UIInteractor(interactor);
+
+            actionHandler = new ActionHandler(gInterface);
 
             frame = new Frame(gInterface);
 
@@ -120,6 +140,11 @@ namespace Squigglr
                 canvas.Children.Add(rect);
             }
 
+            foreach (var label in frame.NumberOverlays.Values)
+            {
+                canvas.Children.Add(label);
+            }
+
             canvas.Children.Add(MouseHover);
 
             if (OffScreenCount > 0)
@@ -133,6 +158,9 @@ namespace Squigglr
                 OffScreen.Visibility = Visibility.Hidden;
                 canvas.Children.Add(OffScreen);
             }
+
+            canvas.Children.Add(CurrentPosition);
+            canvas.Children.Add(MeasureStartingLocationBlock);
         }
 
         public void Update()
@@ -167,8 +195,46 @@ namespace Squigglr
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IntPoint p = Scaler.Convert(e.GetPosition(canvas));
-            frame.Advance(p);
-            Render();
+
+            if (isTargettingLaser)
+            {
+                actionHandler.Laser(null, 0, p);
+                isTargettingLaser = false;
+                MouseHover.Fill = MouseHoverBrush;
+            }
+            else
+            {
+                frame.Advance(p);
+                Render();
+            }
+        }
+
+        /// <summary>
+        /// Measure distance from a point
+        /// </summary>
+        private void Canvas_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!measureStartingLocationPoint.HasValue)
+            {
+                measureStartingLocationPoint = Scaler.Convert(e.GetPosition(canvas));
+                Point p2 = Scaler.Convert(measureStartingLocationPoint.Value);
+                Canvas.SetLeft(MeasureStartingLocationBlock, p2.X);
+                Canvas.SetTop(MeasureStartingLocationBlock, p2.Y);
+                MeasureStartingLocationBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                IntPoint end = Scaler.Convert(e.GetPosition(canvas));
+                var sb = new StringBuilder();
+                IntPoint start = measureStartingLocationPoint.Value;
+                sb.AppendLine($"Original point: ({start.X}, {start.Y})");
+                sb.AppendLine($"Current point: ({end.X}, {end.Y})");
+                sb.AppendLine($"DeltaX: ({end.X - start.X}) DeltaY: ({end.Y - start.Y})");
+                MessageBox.Show(sb.ToString());
+
+                measureStartingLocationPoint = null;
+                MeasureStartingLocationBlock.Visibility = Visibility.Hidden;
+            }
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -188,8 +254,24 @@ namespace Squigglr
                 case Key.N: frame.StartGame(); Render(); break;
                 case Key.A: RunAttackAI(); Render(); break;
                 case Key.D: RunDefendAI(); Render(); break;
+                case Key.R: StepGame(); Render(); break;
                 case Key.Z: frame.Undo(); Render(); break;
             }
+        }
+
+        HeadToHeadStrategy strat;
+        public void StepGame()
+        {
+            if (strat == null)
+            {
+                strat = new HeadToHeadStrategy(sender, "DontDieAI", "DontDieAI");
+                strat.Start();
+            }
+            else {
+                strat.TakeStep();
+            }
+            frame.Show(strat.AttackBot.Frames);
+            Render();
         }
 
         private void RunDefendAI() {}
@@ -198,7 +280,7 @@ namespace Squigglr
             frame.StartGame();
             frame.Advance(new IntPoint(44, 00));
 
-            var strategy = new HeadToHeadStrategy(interactor, (Value state) => {
+            var strategy = new HeadToHeadStrategy(sender, (Value state) => {
                 if (state != null) frame.SetState(state);
             });
             strategy.AttackStep = (Value state) => {
@@ -213,6 +295,7 @@ namespace Squigglr
             Point p2 = Scaler.Convert(p);
             Canvas.SetLeft(MouseHover, p2.X);
             Canvas.SetTop(MouseHover, p2.Y);
+            CurrentPosition.Text = $"({p.X}, {p.Y})";
         }
 
         private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -295,5 +378,59 @@ namespace Squigglr
             Render();
             CalibrateButton.Visibility = Visibility.Hidden;
         }
+
+        #region UI ship driving
+        private void ExplodeButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Explode(new GameState(interactor.LastResponse), 0);
+        }
+
+        private void UpLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpLeftDirection);
+        }
+
+        private void UpButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpDirection);
+        }
+
+        private void UpRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpRightDirection);
+        }
+
+        private void RightButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.RightDirection);
+        }
+
+        private void DownRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownRightDirection);
+        }
+
+        private void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownDirection);
+        }
+
+        private void DownLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownLeftDirection);
+        }
+
+        private void LeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.LeftDirection);
+        }
+        private void LaserButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Toggle us into laser mode.
+            isTargettingLaser = true;
+            MouseHover.Fill = new SolidColorBrush(Colors.Red);
+        }
+
+        #endregion
     }
 }

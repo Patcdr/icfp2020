@@ -11,12 +11,12 @@ namespace app
     {
         private readonly IProtocol protocol;
 
-        public BruteGalaxyInteractStrategy(Interactor interactor) : base(interactor)
+        public BruteGalaxyInteractStrategy(Sender sender) : base(sender)
         {
             protocol = new GalaxyProtocol();
         }
 
-        public override void Start()
+        public override Value Start()
         {
             var points = new ConsIntermediate2[] {
                 new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 0 nil
@@ -85,6 +85,8 @@ namespace app
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
             result = Interactor.Interact(protocol, result.NewState, new ConsIntermediate2(new Number(0), new Number(0)));
+
+            return null;
         }
 
         private void Brute(IProtocol protocol, Value state)
@@ -115,7 +117,7 @@ namespace app
             ConsoleDrawer.drawing = drawing;
         }
 
-        public override Value Next()
+        public override Value Next(GameState state)
         {
             return null;
         }

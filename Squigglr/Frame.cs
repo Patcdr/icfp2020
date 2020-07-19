@@ -17,17 +17,25 @@ namespace Squigglr
         private GraphicsInterface gInterface;
 
         public List<Rectangle> Rects { get; private set; }
+        public Dictionary<IntPoint, Label> NumberOverlays { get; }
 
         public Frame(GraphicsInterface gInterface)
         {
             this.gInterface = gInterface;
             Rects = new List<Rectangle>();
+            NumberOverlays = new Dictionary<IntPoint, Label>();
             Advance(new IntPoint(0, 0));
         }
 
         public void Advance(IntPoint p)
         {
             points = gInterface.AdvanceState(p);
+            Render();
+        }
+
+        public void Show(IList<DrawFrame> frames)
+        {
+            points = gInterface.CreateFrame(frames);
             Render();
         }
 
@@ -73,6 +81,23 @@ namespace Squigglr
             {
                 Rects.Add(CreateRectangle(pair.Key, pair.Value));
             }
+
+            NumberOverlays.Clear();
+            // Number extraction/overlay. This should *probably* be in the frame instead of here.
+            var whitePixels = points.Where(x => x.Value == 255).Select(x => x.Key);
+            List<NumberLocation> numberLocations = GlyphParsing.ExtractNumbers(whitePixels);
+            foreach (var location in numberLocations)
+            {
+                var numberLabel = new Label();
+                numberLabel.Foreground = new SolidColorBrush(Colors.Red); // Yeah, this should be in a static. There aren't too many of these.
+                numberLabel.Content = location.num;
+                numberLabel.Visibility = Visibility.Visible;
+                numberLabel.FontSize = 20;
+                Point loc = Scaler.Convert(location.p);
+                Canvas.SetLeft(numberLabel, loc.X);
+                Canvas.SetTop(numberLabel, loc.Y);
+                NumberOverlays.Add(location.p, numberLabel);
+            }
         }
 
         public void Update()
@@ -85,6 +110,11 @@ namespace Squigglr
                 var p = pointKeys[i];
 
                 UpdateRectangle(rect, p);
+            }
+
+            foreach (var kvp in NumberOverlays)
+            {
+                UpdateNumberOverlay(kvp.Value, kvp.Key);
             }
         }
 
@@ -110,6 +140,13 @@ namespace Squigglr
             Point drawingPoint = Scaler.Convert(p);
             Canvas.SetLeft(rect, drawingPoint.X);
             Canvas.SetTop(rect, drawingPoint.Y);
+        }
+
+        private void UpdateNumberOverlay(Label numberLabel, IntPoint p)
+        {
+            Point drawingPoint = Scaler.Convert(p);
+            Canvas.SetLeft(numberLabel, drawingPoint.X);
+            Canvas.SetTop(numberLabel, drawingPoint.Y);
         }
     }
 }

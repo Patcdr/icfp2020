@@ -7,7 +7,7 @@ using Image = System.Collections.Generic.HashSet<System.Drawing.Point>;
 
 namespace Core
 {
-    struct NumberLocation
+    public struct NumberLocation
     {
         public readonly Point p;
         public readonly long num;
@@ -19,7 +19,7 @@ namespace Core
         }
     }
 
-    class GlyphParsing
+    public class GlyphParsing
     {
 
         public static List<NumberLocation> ExtractNumbers(IEnumerable<Point> image)
@@ -64,9 +64,9 @@ namespace Core
 
             // Check for a black border
             if (!LineIsClear(im, x - 1, y - 1, 1, 0, width + 3)
-                && !LineIsClear(im, x - 1, y - 1, 0, 1, height + 3)
-                && !LineIsClear(im, x - 1, y + height + 1, 1, 0, width + 3)
-                && !LineIsClear(im, x + width + 1, y - 1, 0, 1, height + 3))
+                || !LineIsClear(im, x - 1, y - 1, 0, 1, height + 3)
+                || !LineIsClear(im, x - 1, y + height + 1, 1, 0, width + 3)
+                || !LineIsClear(im, x + width + 1, y - 1, 0, 1, height + 3))
             {
                 return false;
             }

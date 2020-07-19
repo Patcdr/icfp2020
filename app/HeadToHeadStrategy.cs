@@ -23,69 +23,77 @@ namespace app
         public override bool IsFinished() { return AttackBot.IsFinished() && DefendBot.IsFinished(); }
 
 
-        public HeadToHeadStrategy(Interactor interactor, Action<Value> step) :
-               this(interactor, "GameInteractStrategy", "GameInteractStrategy", step)
+        public HeadToHeadStrategy(Sender sender, Action<Value> step) :
+               this(sender, "GameInteractStrategy", "GameInteractStrategy", step)
                {
 
                }
-        public HeadToHeadStrategy(Interactor interactor, string attackAI, string defendAI) :
-               this(interactor, attackAI, defendAI, null)
+        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI) :
+               this(sender, attackAI, defendAI, null)
         {}
 
-        public HeadToHeadStrategy(Interactor interactor, string attackAI, string defendAI, Action<Value> step) : base(interactor)
+        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI, Action<Value> step) : base(sender)
         {
             Step = step;
 
             AttackAI = "app." + attackAI;
             DefendAI = "app." + defendAI;
 
-            var players = Interactor.sender.Send(new Value[] {
-                ASK, NULL
-            });
+            var players = Ask();
 
             if (Step != null) Step(players);
 
-            var attack = players.Cdr().Car().Car().Cdr().Car();
-            var defend = players.Cdr().Car().Cdr().Car().Cdr().Car();
+            var attack = players.Car();
+            var defend = players.Cdr();
 
             AttackBot = (GameInteractStrategy)Activator.CreateInstance(
                 Type.GetType(AttackAI),
-                new Object[] { Interactor, attack }
+                new Object[] { sender, attack, 0 }
             );
 
             DefendBot = (GameInteractStrategy)Activator.CreateInstance(
                 Type.GetType(DefendAI),
-                new Object[] { Interactor, defend }
+                new Object[] { sender, defend, 1 }
             );
         }
 
-        public HeadToHeadStrategy(Interactor interactor) : this(interactor, "GameInteractStrategy", "GameInteractStrategy")
+        public HeadToHeadStrategy(Sender sender) : this(sender, "GameInteractStrategy", "GameInteractStrategy")
         {
         }
 
-        public override void Start()
+        public override Value Start()
         {
-            var attackExecute = Task.Factory.StartNew(() => AttackBot.Start());
-            var defendExecute = Task.Factory.StartNew(() => DefendBot.Start());
-            attackExecute.Wait();
-            defendExecute.Wait();
+            var attack = Task<Value>.Factory.StartNew(AttackBot.Start);
+            var defend = Task<Value>.Factory.StartNew(DefendBot.Start);
+            attack.Wait();
+            defend.Wait();
 
-            if (Step != null) Step(null);
-            if (AttackStep != null) AttackStep(AttackBot.Game);
-            if (DefendStep != null) DefendStep(DefendBot.Game);
+            AttackBot.Game = attack.Result;
+            DefendBot.Game = defend.Result;
+
+            if (Step != null) Step(attack.Result);
+            if (AttackStep != null) AttackStep(attack.Result);
+            if (DefendStep != null) DefendStep(defend.Result);
+
+            Game = attack.Result;
+
+            return attack.Result;
         }
 
-        public override Value Next()
+        public override Value Next(GameState state)
         {
-            var attackNext = Task.Factory.StartNew(() => AttackBot.Next());
-            var defendNext = Task.Factory.StartNew(() => DefendBot.Next());
-            attackNext.Wait();
-            defendNext.Wait();
+            var attack = Task<Value>.Factory.StartNew(() => {return AttackBot.Next(state); });
+            var defend = Task<Value>.Factory.StartNew(() => {return DefendBot.Next(state); });
+            attack.Wait();
+            defend.Wait();
 
-            if (AttackStep != null) AttackStep(AttackBot.Game);
-            if (DefendStep != null) DefendStep(DefendBot.Game);
+            AttackBot.Game = attack.Result;
+            DefendBot.Game = defend.Result;
 
-            return null;
+            if (AttackStep != null) AttackStep(attack.Result);
+            if (DefendStep != null) DefendStep(defend.Result);
+
+            return attack.Result;
         }
     }
 }

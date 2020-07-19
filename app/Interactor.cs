@@ -9,6 +9,7 @@ namespace app
     public class Interactor
     {
         public readonly Sender sender;
+        public Value LastResponse;
 
         public Interactor(Sender sender)
         {
@@ -25,7 +26,6 @@ namespace app
         // examples show that Interact takes a point as its last argument.
         public Result Interact(IProtocol protocol, Value state, Value point)
         {
-
             var response = protocol.call(state, point);
             var newState = Modem(response.NewState);
 
@@ -48,7 +48,8 @@ namespace app
             {
                 // This is the way it is defined. If we need to we can
                 // convert this from tail recursion to a loop.
-                return Interact(protocol, newState, sender.Send(response.Data));
+                LastResponse = sender.Send(response.Data);
+                return Interact(protocol, newState, LastResponse);
             }
         }
 

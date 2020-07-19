@@ -8,19 +8,16 @@ namespace app
 {
     public abstract class BaseInteractStrategy
     {
-        protected Interactor Interactor { get; }
+        public Interactor Interactor { get; }
+        public readonly IProtocol Protocol;
 
         public Action<Value> Step;
 
         public Value Player;
         public Value Game;
-
-        public Value State
-        {
-            get {
-                return Game.Cdr().Cdr().Cdr();
-            }
-        }
+        public Value Local;
+        public IList<DrawFrame> Frames;
+        public int PlayerId;
 
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
@@ -32,59 +29,123 @@ namespace app
         public virtual bool IsStarted() { return Game.Cdr().Car().AsNumber() > 0; }
         public virtual bool IsRunning() { return Game.Cdr().Car().AsNumber() == 1; }
         public virtual bool IsFinished() { return Game.Cdr().Car().AsNumber() == 2; }
+        public Value Turn { get { return UtilityFunctions.Addr("dddaa", Game); } }
 
-        public BaseInteractStrategy(Interactor interactor)
+        public BaseInteractStrategy(Sender sender) : this(sender, null, 0)
         {
-            Interactor = interactor;
         }
 
-        public BaseInteractStrategy(Interactor interactor, Value player)
+        public BaseInteractStrategy(Sender sender, Value player, int playerId)
         {
-            Interactor = interactor;
+            Interactor = new Interactor(sender);
             Player = player;
+            Protocol = new GalaxyProtocol();
+            Boot();
+            PlayerId = playerId;
         }
 
         public virtual int Run()
         {
-            Start();
+            Game = Start();
 
             // Play 256 rounds or until the game is over.
-            for (var i = 0; i < 300; i++)
+            for (var i = 0; i < 256; i++)
             {
+                Console.WriteLine($"Turn {Turn} {Game}");
+
                 if (!IsRunning()) {
                     Console.WriteLine("Game OVER!");
                     return i;
                 }
 
-                Console.WriteLine($"Turn {i}");
-                Game = Next();
+                Game = Next(new GameState(Game));
 
                 if (Step != null) Step(Game);
             }
             return 256;
         }
 
-        public virtual void Start(int a, int b, int c, int d)
+        public virtual IList<DrawFrame> TakeStep()
         {
-            Game = Interactor.sender.Send(new Value[] {
-                JOIN, Player, NilList
-            }, Player);
+            Game = Next(new GameState(Game));
+            return Frames;
+        }
 
-            Game = Interactor.sender.Send(new Value[] {
-                START, Player, UtilityFunctions.MakeList(new int[] {
-                    a, b, c, d
-                })
-            }, Player);
+        public virtual Value Start(int a, int b, int c, int d)
+        {
+            Game = JoinInteract();
+
+            Game = StartInteract(a, b, c, d);
 
             if (Step != null) Step(Game);
+
+            return Game;
         }
 
-        public virtual void Start()
+        public virtual Value Start()
         {
             // TODO: Be smarter about choosing values
-            Start(1, 1, 1, 1);
+            return Start(1, 1, 1, 1);
         }
 
-        public abstract Value Next();
+        public abstract Value Next(GameState state);
+
+        public Value Ask()
+        {
+            Interact(36, 0);
+            Interact(44, 0);
+            return C(
+                UtilityFunctions.Addr("dadddadaada", Local),
+                UtilityFunctions.Addr("dadddadadada", Local)
+            );
+        }
+
+        public Value JoinInteract()
+        {
+            Interact(36, 0);
+            Interact(27, 0);
+            Local = UtilityFunctions.Replace("cdadar", Local, Player);
+            return Interact(27, 0);
+        }
+
+        public Value StartInteract(int a, int b, int c, int d)
+        {
+            Local = UtilityFunctions.Replace("cdaddaar", Local, N(a));
+            Local = UtilityFunctions.Replace("cdaddadar", Local, N(b));
+            Local = UtilityFunctions.Replace("cdaddaddar", Local, N(c));
+            Local = UtilityFunctions.Replace("cdaddadddar", Local, N(d));
+
+            Interact(76, -19);
+            Interact(76, 19);
+
+            return Interactor.LastResponse;
+        }
+
+        public Value Command(params Value[] command)
+        {
+            var result = Interactor.sender.Send(command, Player);
+            return Interact(result);
+        }
+
+        public Value Interact(int x, int y)
+        {
+            return Interact(C(N(x), N(y)));
+        }
+
+        public Value Interact(Value next)
+        {
+            Console.WriteLine("Next: " + next);
+            var result = Interactor.Interact(Protocol, Local, next);
+            Local = result.NewState;
+            Frames = result.MultiDrawResult;
+            // UtilityFunctions.PrettyPrint(Local, null);
+            return Interactor.LastResponse;
+        }
+
+        private void Boot() {
+            Local = C(N(5), C(C(N(2), C(N(0), C(Nil, C(Nil, C(Nil, C(Nil, C(Nil, C(N(38273), Nil)))))))), C(N(9), C(Nil, Nil))));
+        }
+        Value C(Value a, Value b) { return new ConsIntermediate2(a, b); }
+        Value N(int a) { return new Number(a); }
     }
 }

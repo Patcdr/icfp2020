@@ -21,23 +21,25 @@ namespace app
             Console.Error.WriteLine($"Running against {serverUrl} as {key}. {args.Length}");
 
             Sender sender = new Sender(serverUrl, key);
-            Interactor interactor = new Interactor(sender);
+
+            // new GameInteractStrategy(sender, new Number(0)).Run(); return -2;
 
             BaseInteractStrategy strategy;
             if (args.Length == 0)
             {
                 // Rumble mode with explicit bots
-                strategy = new HeadToHeadStrategy(interactor);
+                strategy = new HeadToHeadStrategy(sender);
             }
             else if (args.Length == 2)
             {
                 // Submission mode
-                strategy = new GameInteractStrategy(interactor, new Number(long.Parse(key)));
+                strategy = new DontDieAI(sender, new Number(long.Parse(key)), -1);
+                //strategy = new GameInteractStrategy(sender, new Number(long.Parse(key)), -1);
             }
             else if (args.Length == 4)
             {
                 // Rumble mode with default bots
-                strategy = new HeadToHeadStrategy(interactor, args[3], args[4]);
+                strategy = new HeadToHeadStrategy(sender, args[3], args[4]);
             }
             else {
                 Console.Error.WriteLine("Invalid arguments");
