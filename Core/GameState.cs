@@ -9,6 +9,7 @@ namespace Core
     public class Ship
     {
 
+        public readonly long PlayerID;
         public readonly long ID;
         public readonly Point Position;
         public readonly Point Velocity;
@@ -20,6 +21,8 @@ namespace Core
 
         public Ship(Value ship)
         {
+            this.PlayerID = UtilityFunctions.Addr("car", ship).AsNumber();
+            this.ID = UtilityFunctions.Addr("cdar", ship).AsNumber();
             this.Position = ToPoint(UtilityFunctions.Addr("caddar", ship));
             this.Velocity = ToPoint(UtilityFunctions.Addr("cadddar", ship));
 
