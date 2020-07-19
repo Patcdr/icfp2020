@@ -17,6 +17,7 @@ namespace app
         public Value Game;
         public Value Local;
         public IList<DrawFrame> Frames;
+        public int PlayerId;
 
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
@@ -30,16 +31,17 @@ namespace app
         public virtual bool IsFinished() { return Game.Cdr().Car().AsNumber() == 2; }
         public Value Turn { get { return UtilityFunctions.Addr("dddaa", Game); } }
 
-        public BaseInteractStrategy(Sender sender) : this(sender, null)
+        public BaseInteractStrategy(Sender sender) : this(sender, null, 0)
         {
         }
 
-        public BaseInteractStrategy(Sender sender, Value player)
+        public BaseInteractStrategy(Sender sender, Value player, int playerId)
         {
             Interactor = new Interactor(sender);
             Player = player;
             Protocol = new GalaxyProtocol();
             Boot();
+            PlayerId = playerId;
         }
 
         public virtual int Run()

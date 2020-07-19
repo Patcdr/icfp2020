@@ -11,7 +11,7 @@ namespace app
         private ActionHandler handler;
         private List<Tuple<double, double>> unitVectors;
 
-        public DontDieAI(Sender sender, Value player) : base(sender, player)
+        public DontDieAI(Sender sender, Value player, int playerId) : base(sender, player, playerId)
         {
             handler = new ActionHandler(new ClickInteractor(Interactor, Protocol, Local));
             unitVectors = ActionHandler.AllDirections.Select(x => ScaleToUnitLength(x)).ToList();
@@ -26,7 +26,7 @@ namespace app
         public override Value Next(GameState state)
         {
             handler.SetCurrentState(Local);
-            Ship myShip = state.GetShipByPlayerId(1);
+            Ship myShip = state.GetShipByPlayerId(PlayerId);
             if (myShip.Health > 1)
             {
                 handler.Thrust(state, myShip.ID, GetThrustDirection(myShip.Position));

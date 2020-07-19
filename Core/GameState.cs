@@ -51,10 +51,12 @@ namespace Core
         public readonly List<Ship> Ships;
         public readonly long ArenaSize;
         public readonly long StarSize;
+        public Value server_state;
 
 
         public GameState(Value server_state)
         {
+            this.server_state = server_state;
             this.GameStateVal = UtilityFunctions.Addr("car", server_state).AsNumber();
             this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
             this.PlayerId = UtilityFunctions.Addr("cddadar", server_state).AsNumber();

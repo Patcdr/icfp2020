@@ -31,7 +31,7 @@ namespace app
             else if (args.Length == 2)
             {
                 // Submission mode
-                strategy = new GameInteractStrategy(sender, new Number(long.Parse(key)));
+                strategy = new GameInteractStrategy(sender, new Number(long.Parse(key)), 0);
             }
             else if (args.Length == 4)
             {

@@ -48,12 +48,12 @@ namespace app
 
             AttackBot = (GameInteractStrategy)Activator.CreateInstance(
                 Type.GetType(AttackAI),
-                new Object[] { sender, attack }
+                new Object[] { sender, attack, 0 }
             );
 
             DefendBot = (GameInteractStrategy)Activator.CreateInstance(
                 Type.GetType(DefendAI),
-                new Object[] { sender, defend }
+                new Object[] { sender, defend, 1 }
             );
         }
 
