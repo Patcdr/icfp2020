@@ -63,18 +63,6 @@ namespace app
         {
         }
 
-        public override void Join()
-        {
-            var attackExecute = Task.Factory.StartNew(() => AttackBot.Join());
-            var defendExecute = Task.Factory.StartNew(() => DefendBot.Join());
-            attackExecute.Wait();
-            defendExecute.Wait();
-
-            if (Step != null) Step(null);
-            if (AttackStep != null) AttackStep(AttackBot.Game);
-            if (DefendStep != null) DefendStep(DefendBot.Game);
-        }
-
         public override void Start()
         {
             var attackExecute = Task.Factory.StartNew(() => AttackBot.Start());

@@ -46,7 +46,6 @@ namespace app
 
         public virtual int Run()
         {
-            Join();
             Start();
 
             // Play 256 rounds or until the game is over.
@@ -63,17 +62,12 @@ namespace app
             return 256;
         }
 
-        public virtual void Join()
+        public virtual void Start(int a, int b, int c, int d)
         {
             Game = Interactor.sender.Send(new Value[] {
                 JOIN, Player, NilList
             }, Player);
 
-            if (Step != null) Step(Game);
-        }
-
-        public virtual void Start(int a, int b, int c, int d)
-        {
             Game = Interactor.sender.Send(new Value[] {
                 START, Player, UtilityFunctions.MakeList(new int[] {
                     a, b, c, d
