@@ -12,7 +12,7 @@ namespace Core
             throw new NotImplementedException();
         }
 
-        public void Burn(int shipId, Point direction)
+        public void Thrust(int shipId, Point direction)
         {
             throw new NotImplementedException();
         }
