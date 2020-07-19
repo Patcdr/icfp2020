@@ -35,6 +35,7 @@ namespace Squigglr
 
         Sender sender;
         Interactor interactor;
+        private ActionHandler actionHandler;
 
         public MainWindow()
         {
@@ -61,6 +62,7 @@ namespace Squigglr
             MeasureStartingLocationBlock = new Rectangle();
             Scaler.ResizeRectangle(MeasureStartingLocationBlock);
             MeasureStartingLocationBlock.Fill = new SolidColorBrush(Colors.Red);
+            MeasureStartingLocationBlock.Visibility = Visibility.Hidden;
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -70,6 +72,8 @@ namespace Squigglr
             interactor = new Interactor(sender);
 
             var gInterface = new UIInteractor(interactor);
+
+            actionHandler = new ActionHandler(gInterface);
 
             frame = new Frame(gInterface);
 
@@ -340,5 +344,52 @@ namespace Squigglr
             Render();
             CalibrateButton.Visibility = Visibility.Hidden;
         }
+
+        #region UI ship driving
+        private void ExplodeButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Explode(0);
+        }
+
+        private void UpLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.UpLeftDirection);
+        }
+
+        private void UpButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.UpDirection);
+        }
+
+        private void UpRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.UpRightDirection);
+        }
+
+        private void RightButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.RightDirection);
+        }
+
+        private void DownRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.DownRightDirection);
+        }
+
+        private void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.DownDirection);
+        }
+
+        private void DownLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.DownLeftDirection);
+        }
+
+        private void LeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            actionHandler.Thrust(0, ActionHandler.LeftDirection);
+        }
+        #endregion
     }
 }

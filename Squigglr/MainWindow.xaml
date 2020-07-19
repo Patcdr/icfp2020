@@ -17,6 +17,29 @@
                 <Button Content="Load" x:Name="LoadButton" Click="LoadButton_Click" />
                 <Button Content="Calibrate" x:Name="CalibrateButton" Click="CalibrateButton_Click" />
             </Menu>
+            <StackPanel DockPanel.Dock="Left" Width="80" Background="DimGray" ZIndex="1000">
+                <Button x:Name="ExplodeButton" Content="Explode" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" Click="ExplodeButton_Click"/>
+                <Grid Width="80" Height="80" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="UpLeftButton" Content="🡴" Grid.Row="0" Grid.Column="0" Click="UpLeftButton_Click" />
+                    <Button x:Name="UpButton" Content="🡱" Grid.Row="0" Grid.Column="1" Click="UpButton_Click" />
+                    <Button x:Name="UpRightButton" Content="🡵" Grid.Row="0" Grid.Column="2" Click="UpRightButton_Click" />
+                    <Button x:Name="RightButton" Content="🡲" Grid.Row="1" Grid.Column="2" Click="RightButton_Click" />
+                    <Button x:Name="DownRightButton" Content="🡶" Grid.Row="2" Grid.Column="2" Click="DownRightButton_Click" />
+                    <Button x:Name="DownButton" Content="🡳" Grid.Row="2" Grid.Column="1" Click="DownButton_Click" />
+                    <Button x:Name="DownLeftButton" Content="🡷" Grid.Row="2" Grid.Column="0" Click="DownLeftButton_Click" />
+                    <Button x:Name="LeftButton" Content="🡰" Grid.Row="1" Grid.Column="0" Click="LeftButton_Click" />
+                </Grid>
+            </StackPanel>
             <Canvas 
                 x:Name="canvas" 
                 MouseLeftButtonDown="canvas_MouseLeftButtonDown" 
@@ -25,6 +48,5 @@
                 MouseWheel="canvas_MouseWheel">
             </Canvas>
         </DockPanel>
-
     </Grid>
 </Window>

@@ -8,6 +8,17 @@ namespace Core
 {
     public class ActionHandler
     {
+        #region Directions
+        public static readonly Point UpLeftDirection = new Point(-1, -1);
+        public static readonly Point UpDirection = new Point(0, -1);
+        public static readonly Point UpRightDirection = new Point(1, -1);
+        public static readonly Point RightDirection = new Point(1, 0);
+        public static readonly Point DownRightDirection = new Point(1, 1);
+        public static readonly Point DownDirection = new Point(0, 1);
+        public static readonly Point DownLeftDirection = new Point(-1, 1);
+        public static readonly Point LeftDirection = new Point(-1, 0);
+        #endregion
+
         private ClickInteractor interactor;
         public ActionHandler(ClickInteractor interactor)
         {
