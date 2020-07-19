@@ -19,10 +19,15 @@ namespace app
         private Sender sender;
         private Number Player;
 
-        public PatRunner(Sender sender, long player)
+        public PatRunner(Sender sender, long player=0)
         {
             this.sender = sender;
             this.Player = new Number(player);
+        }
+
+        public void SetPlayer(Number player)
+        {
+            Player = player;
         }
 
         Value C(Value a, Value b) { return new ConsIntermediate2(a, b); }
