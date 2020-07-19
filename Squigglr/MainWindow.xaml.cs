@@ -32,7 +32,6 @@ namespace Squigglr
         private readonly TextBlock Turn;
         private readonly TextBlock Ship;
         private int selectedShipId;
-        private readonly IList<TextBlock> shipIndicators = new List<TextBlock>();
 
         private int OffScreenCount = 0;
         private readonly Frame frame;
@@ -97,7 +96,6 @@ namespace Squigglr
         public void Render()
         {
             canvas.Children.Clear();
-            shipIndicators.Clear();
 
             OffScreenCount = 0;
 
@@ -142,43 +140,14 @@ namespace Squigglr
 
         public void Update()
         {
-            frame.Update();
-
-            OffScreenCount = 0;
-
-            foreach (var rect in frame.Rects)
-            {
-                double x = Canvas.GetLeft(rect);
-                double y = Canvas.GetTop(rect);
-
-                if (x < 0 || x >= window.ActualWidth ||
-                    y < 0 || y >= window.ActualHeight)
-                {
-                    OffScreenCount++;
-                }
-            }
-
-            if (OffScreenCount > 0)
-            {
-                OffScreen.Text = "Offscreen Count Estimate: " + OffScreenCount;
-                OffScreen.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                OffScreen.Visibility = Visibility.Hidden;
-            }
-
-            RenderGameState();
+            Render();
         }
 
         private void RenderGameState()
         {
             GameState gameState = gInterface.GameState;
 
-            foreach(var si in shipIndicators)
-            {
-                canvas.Children.Remove(si);
-            }
+            //DrawRectangle(0, 0, gameState.StarSize, 128);
 
             foreach (var ship in gameState.Ships)
             {
@@ -193,7 +162,17 @@ namespace Squigglr
                 Canvas.SetTop(shipIndicator, p.Y + 3);
 
                 canvas.Children.Add(shipIndicator);
-                shipIndicators.Add(shipIndicator);
+
+                /*
+                Line line = new Line();
+                line.Stroke = new SolidColorBrush(Colors.Crimson);
+                line.StrokeThickness = 3;
+                line.X1 = p.X;
+                line.Y1 = p.Y;
+                line.X2 = 0;
+                line.Y2 = 0;
+                canvas.Children.Add(line);
+                */
             }
 
             canvas.Children.Remove(Turn);
@@ -203,6 +182,22 @@ namespace Squigglr
             canvas.Children.Remove(Ship);
             Ship.Text = $"Ship: {gameState.Ships[0].Role}\n{gameState.Ships[0].Position}";
             canvas.Children.Add(Ship);
+        }
+
+        private void DrawRectangle(long x, long y, long radius, byte color)
+        {
+            var c = Color.FromRgb(color, color, color);
+
+            var r = new Rectangle();
+
+            Scaler.ResizeRectangle(r, radius);
+            r.Fill = new SolidColorBrush(c);
+
+            Point drawingPoint = Scaler.Convert(new IntPoint((int)x, (int)y));
+            Canvas.SetLeft(r, drawingPoint.X - radius);
+            Canvas.SetTop(r, drawingPoint.Y - radius);
+
+            canvas.Children.Add(r);
         }
 
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

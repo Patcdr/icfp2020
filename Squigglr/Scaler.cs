@@ -27,10 +27,10 @@ namespace Squigglr
                                 (int)Math.Round((p.Y - RealHeight / 2 - PanShiftHeight * Scale) / Scale));
         }
 
-        public static void ResizeRectangle(Rectangle r)
+        public static void ResizeRectangle(Rectangle r, long radius = 1)
         {
-            r.Width = Scale;
-            r.Height = Scale;
+            r.Width = Scale * radius;
+            r.Height = Scale * radius;
         }
 
         public static void ResizeWindow(Size size)
