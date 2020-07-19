@@ -9,15 +9,15 @@ namespace app
 {
     public class ClickInteractor
     {
-        private readonly IProtocol protocol;
-        private readonly Interactor interactor;
-        private Value state;
+        protected readonly IProtocol protocol;
+        protected readonly Interactor interactor;
+        protected Value state;
 
-        public ClickInteractor(Interactor interactor, IProtocol protocol, Value startingState)
+        public ClickInteractor(Interactor interactor)
         {
             this.interactor = interactor;
-            this.protocol = protocol;
-            state = startingState;
+            protocol = new GalaxyProtocol();
+            state = Nil;
         }
 
         public IList<DrawFrame> Click(Point p)

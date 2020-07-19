@@ -10,19 +10,13 @@ using System.IO;
 
 namespace app
 {
-    public class UIInteractor : GraphicsInterface
+    public class UIInteractor : ClickInteractor, GraphicsInterface
     {
-        private readonly IProtocol protocol;
-        private readonly Interactor interactor;
-        private Value state;
         private Result result;
         private readonly Stack<(Value state, Point p)> history = new Stack<(Value, Point)>();
 
-        public UIInteractor(Interactor interactor)
+        public UIInteractor(Interactor interactor) : base(interactor)
         {
-            this.interactor = interactor;
-            protocol = new GalaxyProtocol();
-            state = Nil;
         }
 
         public Dictionary<Point, byte> AdvanceState(Point p)
