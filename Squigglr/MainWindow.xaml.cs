@@ -25,11 +25,13 @@ namespace Squigglr
     public partial class MainWindow : Window
     {
         private readonly Rectangle MouseHover;
-        private readonly Rectangle MeasureStartingLocation;
         private readonly TextBlock OffScreen;
         private readonly TextBlock CurrentPosition;
         private int OffScreenCount = 0;
         private readonly Frame frame;
+
+        private readonly Rectangle MeasureStartingLocationBlock;
+        private IntPoint? measureStartingLocationPoint;
 
         Sender sender;
         Interactor interactor;
@@ -55,6 +57,10 @@ namespace Squigglr
             CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
             Canvas.SetLeft(OffScreen, 10);
             Canvas.SetTop(OffScreen, 25);
+
+            MeasureStartingLocationBlock = new Rectangle();
+            Scaler.ResizeRectangle(MeasureStartingLocationBlock);
+            MeasureStartingLocationBlock.Fill = new SolidColorBrush(Colors.Red);
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -142,6 +148,7 @@ namespace Squigglr
             }
 
             canvas.Children.Add(CurrentPosition);
+            canvas.Children.Add(MeasureStartingLocationBlock);
         }
 
         public void Update()
@@ -185,7 +192,27 @@ namespace Squigglr
         /// </summary>
         private void Canvas_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
+            if (!measureStartingLocationPoint.HasValue)
+            {
+                measureStartingLocationPoint = Scaler.Convert(e.GetPosition(canvas));
+                Point p2 = Scaler.Convert(measureStartingLocationPoint.Value);
+                Canvas.SetLeft(MeasureStartingLocationBlock, p2.X);
+                Canvas.SetTop(MeasureStartingLocationBlock, p2.Y);
+                MeasureStartingLocationBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                IntPoint end = Scaler.Convert(e.GetPosition(canvas));
+                var sb = new StringBuilder();
+                IntPoint start = measureStartingLocationPoint.Value;
+                sb.AppendLine($"Original point: ({start.X}, {start.Y})");
+                sb.AppendLine($"Current point: ({end.X}, {end.Y})");
+                sb.AppendLine($"DeltaX: ({end.X - start.X}) DeltaY: ({end.Y - start.Y})");
+                MessageBox.Show(sb.ToString());
+
+                measureStartingLocationPoint = null;
+                MeasureStartingLocationBlock.Visibility = Visibility.Hidden;
+            }
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
