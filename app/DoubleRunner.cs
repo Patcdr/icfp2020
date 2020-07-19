@@ -25,12 +25,15 @@ namespace app
             Defender.SetPlayer((Number)UtilityFunctions.Addr("dadada", players));
         }
 
-        public void Start()
+        public GameState Start()
         {
             var attack = Task.Factory.StartNew(Attacker.Start);
             var defend = Task.Factory.StartNew(Defender.Start);
+
             attack.Wait();
             defend.Wait();
+
+            return Attacker.State;
         }
     }
 }

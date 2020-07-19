@@ -99,6 +99,7 @@ EOF
     allowed_methods = ["GET", "HEAD"]
     allowed_origins = [
       "https://www.rumbletoon.com",
+      "https://allanca.github.io",
       "http://localhost:3000",
       "https://localhost:3000"
     ]
@@ -134,6 +135,7 @@ EOF
     allowed_methods = ["GET", "HEAD"]
     allowed_origins = [
       "https://www.rumbletoon.com",
+      "https://allanca.github.io",
       "http://localhost:3000",
       "https://localhost:3000"
     ]

@@ -12,6 +12,8 @@ namespace Core
 
         public static string Write(GameState state)
         {
+            if (state == null) return "";
+
             var last = state;
             var ticks = new List<GameState>();
             while (state != null) {
@@ -21,19 +23,17 @@ namespace Core
             ticks.Reverse();
 
             var sb = new StringBuilder();
+            sb.Append("[");
+
+            sb.Append("1, "); // isSucceeded
+            sb.Append("0, "); // gameType
+            sb.Append($"{last.GameStateVal}, "); // ApiGameStatus
+            sb.Append($"{last.CurrentTurn}, "); // ticks
+
+            sb.Append("[[1, 0, 4], [0, 1, 3]], "); // players
+
+            sb.Append($"[[{last.StarSize}, {last.ArenaSize}], "); // planet
             sb.Append("[\n");
-
-            sb.Append("  1,\n"); // isSucceeded
-            sb.Append("  0,\n"); // gameType
-            sb.Append($"  {last.GameStateVal},\n"); // ApiGameStatus
-            sb.Append($"  {last.CurrentTurn},\n"); // ticks
-
-            sb.Append("  [[1, 0, 4], [0, 1, 3]]\n"); // players
-
-            sb.Append("  [\n");
-            sb.Append($"  [{last.PlanetRadius}, {last.PlanetSafeRadius}],\n"); // planet
-            sb.Append("  [\n");
-
             {
                 var tickout = new List<string>();
                 for (var i = 0; i < ticks.Count; i++)
@@ -45,15 +45,14 @@ namespace Core
                             true
                         ) +
                         "]"
-                        ).Replace("\n", "").Replace(",]", "]")
+                        ).Replace("\n", "").Replace(", ]", "]").Replace(')', ']').Replace('(','[')
                     );
                 }
                 sb.Append(String.Join(",\n", tickout) + "\n");
             }
-            sb.Append("  ]\n");
-            sb.Append("  ]\n");
+            sb.Append("]]");
 
-            sb.Append("]\n");
+            sb.Append("]");
             return sb.ToString();
         }
     }

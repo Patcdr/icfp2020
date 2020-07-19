@@ -62,10 +62,6 @@ namespace Core
         public readonly long StarSize;
         public readonly long TotalPoints;
 
-        public readonly long PlanetRadius;
-        public readonly long PlanetSafeRadius;
-
-
         public Value server_state;
         public readonly GameState Prev;
 
@@ -82,10 +78,7 @@ namespace Core
             this.PlayerId = UtilityFunctions.Addr("cddadar", server_state).AsNumber();
             this.TotalPoints = UtilityFunctions.Addr("cddaddaar", server_state).AsNumber();
 
-            this.PlanetRadius = UtilityFunctions.Addr("cddadddaar", server_state).AsNumber();
-            this.PlanetSafeRadius = UtilityFunctions.Addr("cddadddadar", server_state).AsNumber();
-
-            if (GameStateVal == 1)
+            if (GameStateVal >= 1)
             {
                 this.CurrentTurn = UtilityFunctions.Addr("cdddaar", server_state).AsNumber();
                 var cons = UtilityFunctions.Addr("cddadddar", server_state);

@@ -210,12 +210,12 @@ namespace Core
                 string indent = "".PadLeft(level * 4, ' ');
                 if (x is long)
                 {
-                    return (compact ? "" : indent) + x.ToString() + (compact ? "," : " #" + prefix) + "\n";
+                    return (compact ? "" : indent) + x.ToString() + (compact ? ", " : " #" + prefix) + "\n";
                 }
                 else if (x is Tuple<long, long>)
                 {
                     var y = x as Tuple<long, long>;
-                    return (compact ? "" : indent) + $"({y.Item1}, {y.Item2})" +(compact ? "," : " #" + prefix) + "\n";
+                    return (compact ? "" : indent) + $"({y.Item1}, {y.Item2})" +(compact ? ", " : " #" + prefix) + "\n";
                 }
                 else if (x is List<Tuple<string, object>>)
                 {
@@ -224,11 +224,11 @@ namespace Core
                     {
                         acccc += rec2(i, level + 1);
                     }
-                    return acccc + (compact ? "" : indent) + "],\n";
+                    return acccc + (compact ? "" : indent) + "], \n";
                 }
                 else if (x == null)
                 {
-                    return (compact ? "" : indent + "Nil" + " #" + prefix) + "\n";
+                    return (compact ? "[]" : indent + "Nil" + " #" + prefix) + "\n";
                 }
                 throw new Exception("The hell is this?");
             }

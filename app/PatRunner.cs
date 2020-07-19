@@ -22,8 +22,8 @@ namespace app
 
             Initialize(0, 0, 1);
 
-            var end = gameState.CurrentTurn + 6;
-            for (long i = gameState.CurrentTurn; i < end; i++)
+            var end = State.CurrentTurn + 6;
+            for (long i = State.CurrentTurn; i < end; i++)
             {
                 if (IsDone) return;
 
@@ -31,9 +31,9 @@ namespace app
 
                 var opposite = new Point(Math.Sign(ship.Position.X)*-1, Math.Sign(ship.Position.Y)*-1);
                 var ninetyDegrees = new Point(opposite.Y, -opposite.X);
-
+                
                 Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
-
+                
                 //Console.WriteLine($"-- Turn {i} --");
                 //Console.WriteLine(State);
             }

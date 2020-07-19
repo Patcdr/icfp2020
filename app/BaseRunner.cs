@@ -21,7 +21,7 @@ namespace app
         public static readonly Value SPLIT = new Number(3);
 
         protected Number Player { get; private set; }
-        protected GameState State { get; private set; }
+        public GameState State { get; private set; }
 
         private readonly Sender Sender;
 
@@ -59,13 +59,12 @@ namespace app
 
         protected void Command(params Value[] commands)
         {
-            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }));
+            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }), State);
         }
 
         #endregion
 
         #region Commands
-
         protected Value Thrust(long shipId, Point vector)
         {
             return C(ACCELERATE, C(N(shipId), C(C(N(vector.X), N(vector.Y)), Nil)));
