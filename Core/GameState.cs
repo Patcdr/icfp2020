@@ -77,8 +77,8 @@ namespace Core
                 var cons = UtilityFunctions.Addr("cddadddar", server_state);
                 if (cons != Library.Nil)
                 {
-                    this.ArenaSize = UtilityFunctions.Addr("car", cons).AsNumber();
-                    this.StarSize = UtilityFunctions.Addr("cdar", cons).AsNumber();
+                    this.StarSize = UtilityFunctions.Addr("car", cons).AsNumber();
+                    this.ArenaSize = UtilityFunctions.Addr("cdar", cons).AsNumber();
                 }
 
                 this.Ships = new List<Ship>();
