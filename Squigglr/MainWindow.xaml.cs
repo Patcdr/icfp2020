@@ -382,47 +382,47 @@ namespace Squigglr
         #region UI ship driving
         private void ExplodeButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Explode(null, 0);
+            actionHandler.Explode(new GameState(interactor.LastResponse), 0);
         }
 
         private void UpLeftButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.UpLeftDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpLeftDirection);
         }
 
         private void UpButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.UpDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpDirection);
         }
 
         private void UpRightButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.UpRightDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpRightDirection);
         }
 
         private void RightButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.RightDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.RightDirection);
         }
 
         private void DownRightButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.DownRightDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownRightDirection);
         }
 
         private void DownButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.DownDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownDirection);
         }
 
         private void DownLeftButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.DownLeftDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownLeftDirection);
         }
 
         private void LeftButton_Click(object sender, RoutedEventArgs e)
         {
-            actionHandler.Thrust(null, 0, ActionHandler.LeftDirection);
+            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.LeftDirection);
         }
         private void LaserButton_Click(object sender, RoutedEventArgs e)
         {

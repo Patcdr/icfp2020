@@ -79,5 +79,10 @@ namespace Core
         {
             return interactor.state;
         }
+
+        public void SetCurrentState(Value state)
+        {
+            interactor.state = state;
+        }
     }
 }

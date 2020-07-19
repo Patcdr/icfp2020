@@ -17,10 +17,20 @@ namespace app
             unitVectors = ActionHandler.AllDirections.Select(x => ScaleToUnitLength(x)).ToList();
         }
 
+        public override Value Start()
+        {
+            // TODO: Be smarter about choosing values
+            return Start(446, 0, 0, 1);
+        }
+
         public override Value Next(GameState state)
         {
+            handler.SetCurrentState(Local);
             Ship myShip = state.GetShipByPlayerId(1);
-            handler.Thrust(state, myShip.ID, GetThrustDirection(myShip.Position));
+            if (myShip.Health > 1)
+            {
+                handler.Thrust(state, myShip.ID, GetThrustDirection(myShip.Position));
+            }
 
             Local = handler.GetCurrentState();
             var result = Interact(0, 0);
