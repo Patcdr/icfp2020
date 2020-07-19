@@ -9,20 +9,32 @@ namespace Core
 {
     public class GalaxyProtocol : IProtocol
     {
-        public IProtocol.Response call(Value state, Value point)
+        private readonly Dictionary<string, Node> env;
+
+        public GalaxyProtocol()
         {
             string[] lines;
-            try {
+            try
+            {
                 lines = File.ReadAllLines(@"..\..\..\..\galaxy.txt");
-            } catch (FileNotFoundException) {
-                try {
+            }
+            catch (FileNotFoundException)
+            {
+                try
+                {
                     lines = File.ReadAllLines(@"../../../../galaxy.txt");
-                } catch (FileNotFoundException) {
+                }
+                catch (FileNotFoundException)
+                {
                     lines = File.ReadAllLines(@"../galaxy.txt");
                 }
             }
 
-            Dictionary<string, Node> env = Parser.Parse(lines.ToList());
+            env = Parser.Parse(lines.ToList());
+        }
+
+        public IProtocol.Response call(Value state, Value point)
+        {
             Value protocol = env["galaxy"].Evaluate(env);
 
             // ap ap galaxy <state> <point>
