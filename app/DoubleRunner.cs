@@ -10,10 +10,10 @@ namespace app
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
 
-        private PatRunner Attacker;
-        private PatRunner Defender;
+        private BaseRunner Attacker;
+        private BaseRunner Defender;
 
-        public DoubleRunner(Sender sender, PatRunner attacker, PatRunner defender)
+        public DoubleRunner(Sender sender, BaseRunner attacker, BaseRunner defender)
         {
             var players = sender.Send(new Value[] {ASK, NULL});
 
