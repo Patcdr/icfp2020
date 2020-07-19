@@ -67,6 +67,11 @@ namespace Core
         {
             return Invoke(Library.FalseVal, EMPTY_ENV);
         }
+
+        public virtual Value Cadr(string address)
+        {
+            return UtilityFunctions.Addr(address, this);
+        }
     }
 
     public class Number : Value

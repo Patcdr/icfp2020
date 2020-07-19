@@ -71,14 +71,13 @@ namespace app
 
         public virtual Value Start(int a, int b, int c, int d)
         {
-            var player = Command(JOIN, Player, NilList);
+            Game = JoinInteract();
 
-            var started = Command(START, Player,
-                UtilityFunctions.MakeList(new int[] {a, b, c, d}));
+            Game = StartInteract(a, b, c, d);
 
-            if (Step != null) Step(started);
+            if (Step != null) Step(Game);
 
-            return started;
+            return Game;
         }
 
         public virtual Value Start()
@@ -97,6 +96,27 @@ namespace app
                 UtilityFunctions.Addr("dadddadaada", Local),
                 UtilityFunctions.Addr("dadddadadada", Local)
             );
+        }
+
+        public Value JoinInteract()
+        {
+            Interact(36, 0);
+            Interact(27, 0);
+            Local = UtilityFunctions.Replace("cdadar", Local, Player);
+            return Interact(27, 0);
+        }
+
+        public Value StartInteract(int a, int b, int c, int d)
+        {
+            Local = UtilityFunctions.Replace("cdaddaar", Local, N(a));
+            Local = UtilityFunctions.Replace("cdaddadar", Local, N(b));
+            Local = UtilityFunctions.Replace("cdaddaddar", Local, N(c));
+            Local = UtilityFunctions.Replace("cdaddadddar", Local, N(d));
+
+            Interact(76, -19);
+            Interact(76, 19);
+
+            return Interactor.LastResponse;
         }
 
         public Value Command(params Value[] command)

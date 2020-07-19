@@ -75,6 +75,8 @@ namespace app
             if (AttackStep != null) AttackStep(attack.Result);
             if (DefendStep != null) DefendStep(defend.Result);
 
+            Game = attack.Result;
+
             return attack.Result;
         }
 

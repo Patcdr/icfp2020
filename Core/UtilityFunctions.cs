@@ -115,6 +115,34 @@ namespace Core
             return curr;
         }
 
+        public static Value Replace(string address, Value consPile, Value value, Dictionary<string, Node> env = null)
+        {
+            if (address.Length == 0)
+            {
+                return value;
+            }
+
+            char c = address[0];
+            switch (c)
+            {
+                case 'c':
+                case 'r':
+                    return Replace(address.Substring(1), consPile, value, env);
+                case 'a':
+                    return new ConsIntermediate2(
+                        Replace(address.Substring(1), consPile.Invoke(TrueVal, env), value, env),
+                        consPile.Invoke(FalseVal, env)
+                    );
+                case 'd':
+                    return new ConsIntermediate2(
+                        consPile.Invoke(TrueVal, env),
+                        Replace(address.Substring(1), consPile.Invoke(FalseVal, env), value, env)
+                    );
+                default:
+                    throw new Exception("Too lazy to be witty");
+            }
+        }
+
         // Utility to convert from a cons list to multiple DrawFrames
         public static IList<DrawFrame> MultipleDraw(Value consList)
         {
@@ -142,7 +170,7 @@ namespace Core
 
             return new DrawFrame(points);
         }
-        public static void PrettyPrint(Value list, String filename)
+        public static void PrettyPrint(Value list, String filename=null)
         {
             Tuple<string, object> rec(Value thing, string prefix)
             {

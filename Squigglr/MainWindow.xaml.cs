@@ -259,7 +259,7 @@ namespace Squigglr
             }
         }
 
-        BaseInteractStrategy strat;
+        HeadToHeadStrategy strat;
         public void StepGame()
         {
             if (strat == null)
@@ -270,7 +270,7 @@ namespace Squigglr
             else {
                 strat.TakeStep();
             }
-            frame.Show(strat.Frames);
+            frame.Show(strat.AttackBot.Frames);
             Render();
         }
 
