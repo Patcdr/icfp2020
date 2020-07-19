@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace app
 {
-    class DoubleRunner
+    public class DoubleRunner
     {
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);

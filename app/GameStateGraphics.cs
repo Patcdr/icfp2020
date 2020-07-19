@@ -12,23 +12,23 @@ namespace app
 {
     public class GameStateGraphics : GraphicsInterface
     {
-        private readonly BaseInteractStrategy strategy;
+        private readonly DoubleRunner runner;
         public GameState GameState { get; private set; }
 
-        public GameStateGraphics(BaseInteractStrategy strategy)
+        public GameStateGraphics(DoubleRunner runner)
         {
-            this.strategy = strategy;
+            this.runner = runner;
         }
 
         public Dictionary<Point, byte> AdvanceState(Point p)
         {
-            GameState = strategy.Next(GameState);
+            GameState = runner.Step();
             return GameStateToFrame(GameState);
         }
 
         public Dictionary<Point, byte> StartGame()
         {
-            GameState = strategy.Start();
+            GameState = runner.Join();
             return GameStateToFrame(GameState);
         }
 

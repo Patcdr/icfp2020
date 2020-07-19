@@ -83,9 +83,13 @@ namespace Squigglr
             string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
             Sender sender = new Sender(serverUrl, playerKey);
-            HeadToHeadStrategy strategy = new HeadToHeadStrategy(sender);
 
-            gInterface = new GameStateGraphics(strategy);
+            var runner = new DoubleRunner(
+                    new Sender(serverUrl, playerKey),
+                    new DontDieRunner(new Sender(serverUrl, playerKey)),
+                    new DontDieRunner(new Sender(serverUrl, playerKey)));
+
+            gInterface = new GameStateGraphics(runner);
             gInterface.StartGame();
 
             frame = new Frame(gInterface);
