@@ -41,7 +41,7 @@ namespace app
             using var response = httpClient.PostAsync($"/aliens/send?apiKey={playerKey}", requestContent).Result;
             if (!response.IsSuccessStatusCode)
             {
-                throw new InvalidOperationException($"Unexpected server response: {response}");
+                throw new InvalidOperationException($"Unexpected server response: {response} {response.Content}");
             }
 
             var content = response.Content.ReadAsStringAsync().Result;
