@@ -91,6 +91,27 @@ namespace Core
             return MakeList(list);
         }
 
+        // Can be used to caddr
+        public static Value Addr(string address, Value consPile, Dictionary<string, Node> env = null)
+        {
+            Value curr = consPile;
+            foreach (char c in address)
+            {
+                switch (c)
+                {
+                    case 'a':
+                        curr = curr.Invoke(TrueVal, env);
+                        break;
+                    case 'd':
+                        curr = curr.Invoke(FalseVal, env);
+                        break;
+                    default:
+                        throw new Exception("Too lazy to be witty");
+                }
+            }
+            return curr;
+        }
+
         // Utility to convert from a cons list to multiple DrawFrames
         public static IList<DrawFrame> MultipleDraw(Value consList)
         {
