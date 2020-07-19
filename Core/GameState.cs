@@ -44,6 +44,7 @@ namespace Core
 
     public class GameState
     {
+        public readonly long PlayerId;
         public readonly long TotalTurns;
         public readonly long CurrentTurn;
         public readonly long GameStateVal;
@@ -56,6 +57,7 @@ namespace Core
         {
             this.GameStateVal = UtilityFunctions.Addr("car", server_state).AsNumber();
             this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
+            this.PlayerId = UtilityFunctions.Addr("cddadar", server_state).AsNumber();
             this.CurrentTurn = UtilityFunctions.Addr("cdddaar", server_state).AsNumber();
             var cons = UtilityFunctions.Addr("cddadddar", server_state);
             if (cons != Library.Nil)
