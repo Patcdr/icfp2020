@@ -8,8 +8,8 @@ namespace app
 {
     public abstract class BaseInteractStrategy
     {
-        protected Interactor Interactor { get; }
-        private readonly IProtocol Protocol;
+        public Interactor Interactor { get; }
+        public readonly IProtocol Protocol;
 
         public Action<Value> Step;
 

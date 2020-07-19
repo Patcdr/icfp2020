@@ -14,7 +14,7 @@ namespace app
         public DontDieAI(Interactor interactor) : base(interactor)
         {
             // TODO: Replace null with galaxy protocol.
-            handler = new ActionHandler(new ClickInteractor(interactor, null, State));
+            handler = new ActionHandler(new ClickInteractor(interactor, Protocol, Local));
             unitVectors = ActionHandler.AllDirections.Select(x => ScaleToUnitLength(x)).ToList();
         }
 
