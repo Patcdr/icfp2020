@@ -31,16 +31,16 @@ namespace app
 
         public void Start()
         {
-            var gameState = new GameState(sender.Send(new Value[] {JOIN, (Player), NilList}));
+            sender.Send(new Value[] {JOIN, (Player), NilList});
             // Extract fuel from gamestate
 
-            gameState = new GameState(sender.Send(new Value[] {START, Player, UtilityFunctions.MakeList(new int[] {1, 1, 1, 1})}));
+            var gameState = new GameState(sender.Send(new Value[] {START, Player, UtilityFunctions.MakeList(new int[] {1, 1, 1, 1})}));
              
             gameState = new GameState(sender.Send(new Value[] { CMD, Player, C(N(0), C(N(gameState.GetShipByPlayerId(gameState.PlayerId).ID), C(N(-1), N(0)))) }));
 
             for(long i = gameState.CurrentTurn; i < gameState.TotalTurns; i++)
             {
-                gameState = new GameState(sender.Send(new Value[] { CMD, Player, Nil }));
+                gameState = new GameState(sender.Send(new Value[] { CMD, Player, Nil}));
 
             }
 
