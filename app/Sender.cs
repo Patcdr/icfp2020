@@ -58,5 +58,10 @@ namespace app
         {
             return Send(UtilityFunctions.MakeList(statement), player);
         }
+
+        public Value Send(params Value[] statement)
+        {
+            return Send(UtilityFunctions.MakeList(statement));
+        }
     }
 }
