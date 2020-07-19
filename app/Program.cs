@@ -31,8 +31,10 @@ namespace app
                     new DontDieRunner(new Sender(serverUrl, key)),
                     new DontDieRunner(new Sender(serverUrl, key))
                 );
-                var game = runner.Start();
-                Visualize(game, runner.Attacker.GetType().Name, runner.Defender.GetType().Name);
+                runner.Start();
+
+                var summary = runner.Attacker.Summarize();
+                Visualize(summary, runner.Attacker, runner.Defender);
             }
             else if (args.Length == 2)
             {
@@ -50,20 +52,30 @@ namespace app
             return 0;
         }
 
-        public static string Visualize(GameState state, string attacker, string defender)
+        public static string Visualize(Value summary, BaseRunner attacker, BaseRunner defender)
         {
             var guid = Guid.NewGuid().ToString();
             var client = new AmazonS3Client("AKIAV3HLA4UAHMJV4GGM", "zyuUE/gFaGJs2ovAida+D0EKMrycI8TZew8A3CTe", Amazon.RegionEndpoint.USWest2);
 
             Console.WriteLine($"Uploading for visualization {guid}");
-            Console.WriteLine(GameLog.Write(state));
 
+            var log = UtilityFunctions.PrettyPrint(summary, true).Trim().Trim(',');
+            log = log.Replace('(', '[').Replace(')', ']');
+            log = log.Replace("\n", "").Replace(", ]", "]").Replace(')', ']').Replace('(','[');
             client.PutObjectAsync(new PutObjectRequest
             {
                 BucketName = "logs.rumbletoon.com",
                 Key = $"games/{guid}",
-                ContentBody = GameLog.Write(state)
+                ContentBody = log
             }).Wait();
+
+            var ticks = UtilityFunctions.Addr("cdddar", summary).AsNumber();
+            var role = UtilityFunctions.Addr("cddddaaar", summary).AsNumber();
+            var status = UtilityFunctions.Addr("cddddaaddar", summary).AsNumber();
+            var winner = (
+                (role == 0 && status == 3) || (role == 1 && status == 4) ?
+                "Attacker" : "Defender"
+            );
 
             client.PutObjectAsync(new PutObjectRequest
             {
@@ -71,36 +83,36 @@ namespace app
                 Key = $"games/{guid}.json",
                 ContentBody = $@"[
                     ""attacker"": [
-                        ""playerKey"": ""1001"",
+                        ""playerKey"": ""{attacker.Player.AsNumber()}"",
                         ""submissionId"": 0,
                         ""team"": [
                             ""customData"": [
                                 ""country"": ""PRK""
                             ],
                             ""teamId"": ""4ce2a471-c310-4dae-8fb0-ef006a1f4e02"",
-                            ""teamName"": ""{attacker}""
+                            ""teamName"": ""{attacker.GetType().Name}""
                         ],
                         ""timeout"": false
                     ],
-                    ""createdAt"": ""2020-07-19T20:40:44.81364+03:00"",
+                    ""createdAt"": ""{DateTime.UtcNow.ToString("o")}"",
                     ""defender"": [
-                        ""playerKey"": ""5005"",
+                        ""playerKey"": ""{defender.Player.AsNumber()}"",
                         ""submissionId"": 0,
                         ""team"": [
                             ""customData"": [
                                 ""country"": ""PRK""
                             ],
                             ""teamId"": ""4ce2a471-c310-4dae-8fb0-ef006a1f4e02"",
-                            ""teamName"": ""{defender}""
+                            ""teamName"": ""{defender.GetType().Name}""
                         ],
                         ""timeout"": false
                     ],
-                    ""finishedAt"": ""2020-07-19T20:41:54.297563+03:00"",
+                    ""finishedAt"": ""{DateTime.UtcNow.ToString("o")}"",
                     ""gameId"": ""{guid}"",
-                    ""ticks"": {state.CurrentTurn},
+                    ""ticks"": {ticks},
                     ""tournamentId"": 0,
                     ""tournamentRoundId"": 0,
-                    ""winner"": ""Attacker""
+                    ""winner"": ""{winner}""
                 ]".Replace('[', '{').Replace(']', '}')
             }).Wait();
 

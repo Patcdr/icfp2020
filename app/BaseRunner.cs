@@ -17,6 +17,7 @@ namespace app
         public static readonly Value JOIN = new Number(2);
         public static readonly Value START = new Number(3);
         public static readonly Value CMD = new Number(4);
+        public static readonly Value SUMMARY = new Number(5);
 
         public static readonly Value ACCELERATE = new Number(0);
         public static readonly Value DETONATE = new Number(1);
@@ -27,7 +28,7 @@ namespace app
 
         #region Properties
 
-        protected Number Player { get; private set; }
+        public Number Player { get; private set; }
         public GameState State { get; private set; }
 
         // Extract fuel from gamestate
@@ -75,6 +76,11 @@ namespace app
         protected void Command(params Value[] commands)
         {
             State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }), State);
+        }
+
+        public Value Summarize()
+        {
+            return Sender.Send(new Value[] { SUMMARY, Player });
         }
 
         #endregion
