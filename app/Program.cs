@@ -26,12 +26,13 @@ namespace app
             if (args.Length == 0)
             {
                 // Rumble mode with explicit bots
-                var game = new DoubleRunner(
+                var runner = new DoubleRunner(
                     new Sender(serverUrl, key),
                     new DontDieRunner(new Sender(serverUrl, key)),
                     new PatRunner(new Sender(serverUrl, key))
-                ).Start();
-                Visualize(game);
+                );
+                var game = runner.Start();
+                Visualize(game, runner.Attacker.GetType().Name, runner.Defender.GetType().Name);
             }
             else if (args.Length == 2)
             {
@@ -49,7 +50,7 @@ namespace app
             return 0;
         }
 
-        public static string Visualize(GameState state)
+        public static string Visualize(GameState state, string attacker, string defender)
         {
             var guid = Guid.NewGuid().ToString();
             var client = new AmazonS3Client("AKIAV3HLA4UAHMJV4GGM", "zyuUE/gFaGJs2ovAida+D0EKMrycI8TZew8A3CTe", Amazon.RegionEndpoint.USWest2);
@@ -77,7 +78,7 @@ namespace app
                                 ""country"": ""PRK""
                             ],
                             ""teamId"": ""4ce2a471-c310-4dae-8fb0-ef006a1f4e02"",
-                            ""teamName"": ""PatRunner""
+                            ""teamName"": ""{attacker}""
                         ],
                         ""timeout"": false
                     ],
@@ -90,7 +91,7 @@ namespace app
                                 ""country"": ""PRK""
                             ],
                             ""teamId"": ""4ce2a471-c310-4dae-8fb0-ef006a1f4e02"",
-                            ""teamName"": ""PatRunner""
+                            ""teamName"": ""{defender}""
                         ],
                         ""timeout"": false
                     ],
