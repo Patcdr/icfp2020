@@ -24,6 +24,8 @@ namespace Squigglr
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly SolidColorBrush MouseHoverBrush = new SolidColorBrush(Colors.Green);
+
         private readonly Rectangle MouseHover;
         private readonly TextBlock OffScreen;
         private readonly TextBlock CurrentPosition;
@@ -36,6 +38,7 @@ namespace Squigglr
         Sender sender;
         Interactor interactor;
         private ActionHandler actionHandler;
+        private bool isTargettingLaser = false;
 
         public MainWindow()
         {
@@ -45,7 +48,7 @@ namespace Squigglr
 
             MouseHover = new Rectangle();
             Scaler.ResizeRectangle(MouseHover);
-            MouseHover.Fill = new SolidColorBrush(Colors.Green);
+            MouseHover.Fill = MouseHoverBrush;
 
             OffScreen = new TextBlock();
             OffScreen.Text = "Offscreen Count Estimate: N/A";
@@ -187,8 +190,18 @@ namespace Squigglr
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IntPoint p = Scaler.Convert(e.GetPosition(canvas));
-            frame.Advance(p);
-            Render();
+
+            if (isTargettingLaser)
+            {
+                actionHandler.Laser(0, p);
+                isTargettingLaser = false;
+                MouseHover.Fill = MouseHoverBrush;
+            }
+            else
+            {
+                frame.Advance(p);
+                Render();
+            }
         }
 
         /// <summary>
@@ -390,6 +403,13 @@ namespace Squigglr
         {
             actionHandler.Thrust(0, ActionHandler.LeftDirection);
         }
+        private void LaserButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Toggle us into laser mode.
+            isTargettingLaser = true;
+            MouseHover.Fill = new SolidColorBrush(Colors.Red);
+        }
+
         #endregion
     }
 }

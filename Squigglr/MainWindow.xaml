@@ -18,7 +18,7 @@
                 <Button Content="Calibrate" x:Name="CalibrateButton" Click="CalibrateButton_Click" />
             </Menu>
             <StackPanel DockPanel.Dock="Left" Width="80" Background="DimGray" ZIndex="1000">
-                <Button x:Name="ExplodeButton" Content="Explode" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" Click="ExplodeButton_Click"/>
+                <Button x:Name="ExplodeButton" Content="Explode" Margin="0, 5, 0, 5" Click="ExplodeButton_Click"/>
                 <Grid Width="80" Height="80" >
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -39,6 +39,7 @@
                     <Button x:Name="DownLeftButton" Content="🡷" Grid.Row="2" Grid.Column="0" Click="DownLeftButton_Click" />
                     <Button x:Name="LeftButton" Content="🡰" Grid.Row="1" Grid.Column="0" Click="LeftButton_Click" />
                 </Grid>
+                <Button x:Name="LaserButton" Content="Laser" Margin="0, 5, 0, 0" Click="LaserButton_Click" />
             </StackPanel>
             <Canvas 
                 x:Name="canvas" 
