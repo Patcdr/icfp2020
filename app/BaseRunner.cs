@@ -84,7 +84,7 @@ namespace app
         //Split: [3, ship_id, (fuel, hamburger, cooling, babies)] (Properties are given in a nil-terminated list and are 0, 1, 2, 4, 8, or 16.)
         protected Value Split(long shipId, int fuel, int hamburger, int cooling, int babies)
         {
-            return C(SPLIT, C(N(shipId), UtilityFunctions.MakeList(new int[] { fuel, hamburger, cooling, babies })));
+            return C(SPLIT, C(N(shipId), C(UtilityFunctions.MakeList(new int[] { fuel, hamburger, cooling, babies }), Nil)));
         }
 
         #endregion

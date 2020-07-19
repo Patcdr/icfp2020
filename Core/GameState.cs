@@ -91,6 +91,8 @@ namespace Core
             }
         }
 
+        public bool IsAttacker => PlayerId == 0;
+
         public Ship GetShipById(long shipId)
         {
             return Ships.Where(x => x.ID == shipId).First();
