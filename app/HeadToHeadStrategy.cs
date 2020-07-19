@@ -57,8 +57,8 @@ namespace app
             AttackBot.Game = attack.Result;
             DefendBot.Game = defend.Result;
 
-            if (AttackStep != null) AttackStep(attack.Result);
-            if (DefendStep != null) DefendStep(defend.Result);
+            AttackStep?.Invoke(attack.Result);
+            DefendStep?.Invoke(defend.Result);
 
             Game = attack.Result;
 
@@ -75,10 +75,13 @@ namespace app
             AttackBot.Game = attack.Result;
             DefendBot.Game = defend.Result;
 
-            if (AttackStep != null) AttackStep(attack.Result);
-            if (DefendStep != null) DefendStep(defend.Result);
+            AttackStep?.Invoke(attack.Result);
+            DefendStep?.Invoke(defend.Result);
+
+            Game = attack.Result;
 
             return attack.Result;
         }
+
     }
 }

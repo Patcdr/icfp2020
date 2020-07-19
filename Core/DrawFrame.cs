@@ -43,19 +43,5 @@ namespace Core
             MaxY = maxY;
         }
 
-        // Returns a new DrawFrame that is the union of this and the other
-        public DrawFrame Overlay(DrawFrame other)
-        {
-            var union = new List<Point>();
-            union.AddRange(Points);
-            union.AddRange(other.Points);
-
-            return new DrawFrame(union,
-                Math.Min(MinX, other.MinX),
-                Math.Max(MaxX, other.MaxX),
-                Math.Min(MinY, other.MinY),
-                Math.Max(MaxY, other.MaxY));
-        }
-
     }
 }

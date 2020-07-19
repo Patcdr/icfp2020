@@ -72,15 +72,17 @@ namespace Squigglr
             string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
             sender = new Sender(serverUrl, playerKey);
-            interactor = new Interactor(sender);
+            HeadToHeadStrategy strategy = new HeadToHeadStrategy(sender);
 
-            var gInterface = new UIInteractor(interactor);
+            var gInterface = new GameStateGraphics(strategy);
+            gInterface.StartGame();
 
-            actionHandler = new ActionHandler(gInterface);
+            //actionHandler = new ActionHandler(gInterface);
 
             frame = new Frame(gInterface);
 
             // Fast forward
+            /*
             frame.AdvanceMany(new List<IntPoint>()
             {
                 new IntPoint(0, 0),
@@ -116,6 +118,7 @@ namespace Squigglr
                 new IntPoint(0, 0),
                 new IntPoint(0, 0),
             });
+            */
 
             Render();
         }
@@ -251,43 +254,8 @@ namespace Squigglr
                 case Key.Up: Scaler.ShiftView(vertical: true); Update(); break;
                 case Key.Left: Scaler.ShiftView(horizontal: true); Update(); break;
                 case Key.Right: Scaler.ShiftView(horizontal: false); Update(); break;
-                case Key.N: frame.StartGame(); Render(); break;
-                case Key.A: RunAttackAI(); Render(); break;
-                case Key.D: RunDefendAI(); Render(); break;
-                case Key.R: StepGame(); Render(); break;
                 case Key.Z: frame.Undo(); Render(); break;
             }
-        }
-
-        HeadToHeadStrategy strat;
-        public void StepGame()
-        {
-            if (strat == null)
-            {
-                strat = new HeadToHeadStrategy(sender, "DontDieAI", "DontDieAI");
-                strat.Start();
-            }
-            else {
-                strat.TakeStep();
-            }
-            frame.Show(strat.AttackBot.Frames);
-            Render();
-        }
-
-        private void RunDefendAI() {}
-        private void RunAttackAI()
-        {
-            frame.StartGame();
-            frame.Advance(new IntPoint(44, 00));
-            /*
-            var strategy = new HeadToHeadStrategy(sender, (GameState state) => {
-                if (state != null) frame.SetState(state);
-            });
-            strategy.AttackStep = (Value state) => {
-                if (state != null) frame.SetState(state);
-            };
-            strategy.Run();
-            */
         }
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
