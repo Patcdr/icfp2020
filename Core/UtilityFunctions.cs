@@ -139,6 +139,69 @@ namespace Core
 
             return new DrawFrame(points);
         }
+        public static void PrettyPrint(Value list, String filename)
+        {
+            Tuple<string, object> rec(Value thing, string prefix)
+            {
+                if (thing is ConsIntermediate2)
+                {
+                    var car = thing.Invoke(TrueVal, null);
+                    var cdr = thing.Invoke(FalseVal, null);
+                    if (car is Number && cdr is Number)
+                    {
+                        return new Tuple<string, object>(prefix + "r", new Tuple<long, long>(car.AsNumber(), cdr.AsNumber()));
+                    }
 
+                    var iter_prefix = prefix;
+                    List<Tuple<string, object>> ret = new List<Tuple<string, object>>();
+                    foreach (Value val in UtilityFunctions.ListAsEnumerable(thing, null))
+                    {
+                        ret.Add(rec(val, iter_prefix + "a"));
+                        iter_prefix += "d";
+                    }
+                    return new Tuple<string, object>(prefix + "r", ret);
+                }
+                else if (thing is Number)
+                {
+                    return new Tuple<string, object>(prefix + "r", thing.AsNumber());
+                }
+                else if (thing == Nil)
+                {
+                    return new Tuple<string, object>(prefix + "r", null);
+                }
+                throw new Exception("The hell is this?");
+            }
+
+            string rec2(Tuple<string, object> tup, int level)
+            {
+                var x = tup.Item2;
+                var prefix = tup.Item1;
+                string indent = "".PadLeft(level * 4, ' ');
+                if (x is long)
+                    return indent + x.ToString() + " #" + prefix + "\n";
+                else if (x is Tuple<long, long>)
+                {
+                    var y = x as Tuple<long, long>;
+                    return indent + $"({y.Item1}, {y.Item2})" + " #" + prefix + "\n";
+                }
+                else if (x is List<Tuple<string, object>>)
+                {
+                    string acccc = indent + "[" + " #" + prefix + "\n"; ;
+                    foreach (Tuple<string, object> i in (List<Tuple<string, object>>)x)
+                    {
+                        acccc += rec2(i, level + 1);
+                    }
+                    return acccc + indent + "]\n";
+                }
+                else if (x == null)
+                {
+                    return indent + "Nil" + " #" + prefix + "\n";
+                }
+                throw new Exception("The hell is this?");
+            }
+
+            var x = rec(list, "c");
+            Console.WriteLine(rec2(x, 0));
+        }
     }
 }

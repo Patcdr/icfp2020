@@ -237,7 +237,7 @@ namespace Core
         /// </summary>
         public override Value Invoke(Node val, Dictionary<string, Node> environment)
         {
-            return val.Evaluate(environment).Invoke(EvaluationFunTime, environment);
+            return val.Evaluate(environment) == Library.Nil ? (Value)Library.TrueVal : Library.FalseVal;
         }
 
         public override string ToString()

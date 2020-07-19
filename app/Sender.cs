@@ -1,8 +1,10 @@
 ﻿using Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace app
@@ -46,6 +48,8 @@ namespace app
             var answer = NumberFunctions.Dem(content);
 
             // Console.WriteLine($"Received({player}): {answer}");
+
+            UtilityFunctions.PrettyPrint(answer, "");
 
             return answer;
         }
