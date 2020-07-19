@@ -11,31 +11,17 @@ namespace app
     {
         Random r = new Random();
         public DontDieRunner(Sender sender, long player = 0)
-            : base(sender, player)
+            : base(sender, player, 0, 8, 1)
         {
         }
 
-        public override void Start()
+        public override void Step()
         {
-            Join();
-
             if (IsDone) return;
 
-            Initialize(0, 8, 1);
+            //StartOrbitStrategy();
 
-            StartOrbitStrategy();
-
-            // Game loop
-            for (long i = State.CurrentTurn; i < State.TotalTurns; i++)
-            {
-                // Is the game over?
-                if (IsDone)
-                {
-                    return;
-                }
-
-                AvoidDeathStrategy();
-            }
+            AvoidDeathStrategy();
         }
 
         private void StartOrbitStrategy()

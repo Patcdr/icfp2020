@@ -10,22 +10,23 @@ namespace app
     public class PatRunner : BaseRunner
     {
         public PatRunner(Sender sender, long player=0)
-            : base(sender, player)
+            : base(sender, player, 0, 0, 1)
         {
         }
 
-        public override void Start()
+        private int burnSteps = 0;
+
+        public override void Step()
         {
-            Join();
-
-            if (IsDone) return;
-
-            Initialize(0, 0, 1);
-
-            var end = State.CurrentTurn + 6;
-            for (long i = State.CurrentTurn; i < end; i++)
+            // Is the game over?
+            if (IsDone)
             {
-                if (IsDone) return;
+                return;
+            }
+
+            if (burnSteps < 6)
+            {
+                burnSteps++;
 
                 var ship = State.GetMyFirstShip();
 
@@ -33,19 +34,10 @@ namespace app
                 var ninetyDegrees = new Point(opposite.Y, -opposite.X);
                 
                 Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
-                
-                //Console.WriteLine($"-- Turn {i} --");
-                //Console.WriteLine(State);
             }
-
-            for (long i = State.CurrentTurn; i < State.TotalTurns; i++)
+            else
             {
-                if (IsDone) return;
-
                 Command(Nil);
-
-                //Console.WriteLine($"-- Turn {i} --");
-                //Console.WriteLine(State);
             }
         }
     }

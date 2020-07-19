@@ -32,7 +32,7 @@ namespace app
         public GameState State { get; private set; }
 
         // Extract fuel from gamestate
-        protected bool IsDone => State.GameStateVal == 2;
+        public bool IsDone => State.GameStateVal == 2;
 
         protected Ship MyFirstShip => State.GetMyFirstShip();
         protected IEnumerable<Ship> MyShips => State.Ships.Where(x => x.PlayerID == State.PlayerId);
@@ -43,49 +43,50 @@ namespace app
         #endregion
 
         private readonly Sender Sender;
+        private readonly int initialLazers;
+        private readonly int initialCooling;
+        private readonly int initialShips;
 
-        public BaseRunner(Sender sender, long player = 0)
+        public BaseRunner(Sender sender, long player, int initialLazers, int initialCooling, int initialShips)
         {
+            if (initialShips < 1) throw new ArgumentException("initialShips must be at least 1");
+
+            this.initialLazers = initialLazers;
+            this.initialCooling = initialCooling;
+            this.initialShips = initialShips;
+
             this.Sender = sender;
             this.Player = new Number(player);
         }
-
-        public abstract void Start();
 
         public void SetPlayer(Number player)
         {
             Player = player;
         }
 
-        #region Interactions with Server (changes state)
-
-        protected void Join()
+        public void Join()
         {
-            State = new GameState(Sender.Send(new Value[] { JOIN, (Player), NilList }));
+            State = new GameState(Sender.Send(new Value[] { JOIN, Player, NilList }));
+
+            int health = (int)State.TotalPoints - (4 * initialLazers) - (12 * initialCooling) - (2 * initialShips);
+
+            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, initialLazers, initialCooling, initialShips }) }));
         }
 
-        protected void Initialize(int lazers, int cooling, int ships)
-        {
-            if (ships < 1) throw new ArgumentException("Ships must be at least 1");
-
-            int health = (int)State.TotalPoints - (4 * lazers) - (12 * cooling) - (2 * ships);
-
-            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, ships }) }));
-        }
-
-        protected void Command(params Value[] commands)
-        {
-            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }), State);
-        }
+        public abstract void Step();
 
         public Value Summarize()
         {
             return Sender.Send(new Value[] { SUMMARY, Player });
         }
 
-        #endregion
-
         #region Commands
+
+        protected void Command(params Value[] commands)
+        {
+            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }), State);
+        }
+
         protected Value Thrust(long shipId, Point vector)
         {
             return C(ACCELERATE, C(N(shipId), C(C(N(vector.X), N(vector.Y)), Nil)));

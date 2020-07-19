@@ -29,9 +29,17 @@ namespace app
                 var runner = new DoubleRunner(
                     new Sender(serverUrl, key),
                     new DontDieRunner(new Sender(serverUrl, key)),
-                    new DontDieRunner(new Sender(serverUrl, key))
-                );
-                runner.Start();
+                    new DontDieRunner(new Sender(serverUrl, key)));
+
+                var game = runner.Join();
+
+                for (long i = game.CurrentTurn; i < game.TotalTurns; i++)
+                {
+                    //Console.WriteLine(game);
+                    if (game.GameStateVal == 2) break;
+
+                    game = runner.Step();
+                }
 
                 var summary = runner.Attacker.Summarize();
                 Visualize(summary, runner.Attacker, runner.Defender);
@@ -39,7 +47,19 @@ namespace app
             else if (args.Length == 2)
             {
                 // Submission mode
-                new DontDieRunner(new Sender(serverUrl, key), long.Parse(key)).Start();
+                var agent = new DontDieRunner(new Sender(serverUrl, key), long.Parse(key));
+                agent.Join();
+
+                for (long i = agent.State.CurrentTurn; i < agent.State.TotalTurns; i++)
+                {
+                    // Is the game over?
+                    if (agent.IsDone)
+                    {
+                        break;
+                    }
+
+                    agent.Step();
+                }
             }
             else {
                 Console.Error.WriteLine("Invalid arguments");

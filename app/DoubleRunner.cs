@@ -25,10 +25,20 @@ namespace app
             Defender.SetPlayer((Number)UtilityFunctions.Addr("dadada", players));
         }
 
-        public GameState Start()
+        public GameState Join()
         {
-            var attack = Task.Factory.StartNew(Attacker.Start);
-            var defend = Task.Factory.StartNew(Defender.Start);
+            return WaitOnBoth(Attacker.Join, Defender.Join);
+        }
+
+        public GameState Step()
+        {
+            return WaitOnBoth(Attacker.Step, Defender.Step);
+        }
+
+        private GameState WaitOnBoth(Action atkAction, Action defAction)
+        {
+            var attack = Task.Factory.StartNew(atkAction);
+            var defend = Task.Factory.StartNew(defAction);
 
             attack.Wait();
             defend.Wait();
