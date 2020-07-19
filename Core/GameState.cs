@@ -58,22 +58,25 @@ namespace Core
         {
             this.server_state = server_state;
             this.GameStateVal = UtilityFunctions.Addr("car", server_state).AsNumber();
-            this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
-            this.PlayerId = UtilityFunctions.Addr("cddadar", server_state).AsNumber();
-            this.CurrentTurn = UtilityFunctions.Addr("cdddaar", server_state).AsNumber();
-            var cons = UtilityFunctions.Addr("cddadddar", server_state);
-            if (cons != Library.Nil)
+            if (GameStateVal == 1)
             {
-                this.ArenaSize = UtilityFunctions.Addr("car", cons).AsNumber();
-                this.StarSize = UtilityFunctions.Addr("cdar", cons).AsNumber();
-            }
+                this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
+                this.PlayerId = UtilityFunctions.Addr("cddadar", server_state).AsNumber();
+                this.CurrentTurn = UtilityFunctions.Addr("cdddaar", server_state).AsNumber();
+                var cons = UtilityFunctions.Addr("cddadddar", server_state);
+                if (cons != Library.Nil)
+                {
+                    this.ArenaSize = UtilityFunctions.Addr("car", cons).AsNumber();
+                    this.StarSize = UtilityFunctions.Addr("cdar", cons).AsNumber();
+                }
 
-            this.Ships = new List<Ship>();
+                this.Ships = new List<Ship>();
 
-            Value ships = UtilityFunctions.Addr("cdddaddar", server_state);
-            foreach (Value ship in UtilityFunctions.ListAsEnumerable(ships, null))
-            {
-                this.Ships.Add(new Ship(ship));
+                Value ships = UtilityFunctions.Addr("cdddaddar", server_state);
+                foreach (Value ship in UtilityFunctions.ListAsEnumerable(ships, null))
+                {
+                    this.Ships.Add(new Ship(ship));
+                }
             }
         }
 
