@@ -29,7 +29,7 @@ namespace app
                 var runner = new DoubleRunner(
                     new Sender(serverUrl, key),
                     new DontDieRunner(new Sender(serverUrl, key)),
-                    new PatRunner(new Sender(serverUrl, key))
+                    new DontDieRunner(new Sender(serverUrl, key))
                 );
                 var game = runner.Start();
                 Visualize(game, runner.Attacker.GetType().Name, runner.Defender.GetType().Name);

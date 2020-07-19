@@ -9,6 +9,7 @@ namespace app
 {
     public class DontDieRunner : BaseRunner
     {
+        Random r = new Random();
         public DontDieRunner(Sender sender, long player = 0)
             : base(sender, player)
         {
@@ -22,6 +23,8 @@ namespace app
 
             Initialize(0, 8, 1);
 
+            StartOrbitStrategy();
+
             // Game loop
             for (long i = State.CurrentTurn; i < State.TotalTurns; i++)
             {
@@ -31,49 +34,82 @@ namespace app
                     return;
                 }
 
-                Ship ship = State.GetMyFirstShip();
-                bool thrusted = false;
-
-                // If we would die by not thrusting
-                if (WillDieSoon(6, new Point(0, 0))) {
-                    foreach (Point p in ActionHandler.AllDirections)
-                    {
-                        // If thrusting would stop us from dying, do it!
-                        if (!WillDieSoon(6, p))
-                        {
-                            Command(Thrust(ship.ID, p));
-                            thrusted = true;
-                            break;
-                        }
-                    }
-                }
-                
-                if (!thrusted)
-                {
-                    Command();
-                }
+                AvoidDeathStrategy();
             }
         }
 
-        private bool WillDieSoon(int lookAheadTurns, Point thrust)
+        private void StartOrbitStrategy()
         {
-            for (int i = 1; i <= lookAheadTurns; i++)
+            var end = State.CurrentTurn + 6;
+            for (long i = State.CurrentTurn; i < end; i++)
             {
-                Point futureLocation = ShipPositionSimulator.FuturePosition(State.GetMyFirstShip(), i);
-                if (IsDeadLocation(futureLocation))
+                if (IsDone) return;
+
+                var ship = State.GetMyFirstShip();
+
+                var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
+                var ninetyDegrees = new Point(opposite.Y, -opposite.X);
+
+                Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
+
+                //Console.WriteLine($"-- Turn {i} --");
+                //Console.WriteLine(State);
+            }
+        }
+
+        private void AvoidDeathStrategy()
+        {
+            int lookaheadTurns = 8;
+            Ship ship = State.GetMyFirstShip();
+            bool thrusted = false;
+
+            // If we would die by not thrusting
+            if (TurnsTilDeath(lookaheadTurns, new Point(0, 0)) != int.MaxValue)
+            {
+                int longestLife = 0;
+                Point thrust = new Point(0, 0);
+                foreach (Point p in ActionHandler.AllDirections)
                 {
-                    return true;
+                    int currentLife = TurnsTilDeath(lookaheadTurns, p);
+                    if (currentLife > longestLife)
+                    {
+                        longestLife = currentLife;
+                        thrust = p;
+                    }
+                }
+
+                if (thrust != new Point(0, 0))
+                {
+                    Command(Thrust(ship.ID, thrust));
+                    thrusted = true;
                 }
             }
 
-            return false;
+            if (!thrusted)
+            {
+                // Note: this means I think I've got no way to live longer.
+                Command();
+            }
+        }
+
+        private int TurnsTilDeath(int lookAheadTurns, Point thrust)
+        {
+            for (int i = 1; i <= lookAheadTurns; i++)
+            {
+                Point futureLocation = ShipPositionSimulator.FuturePosition(State.GetMyFirstShip(), i, thrust);
+                if (IsDeadLocation(futureLocation))
+                {
+                    return i;
+                }
+            }
+
+            return int.MaxValue;
         }
 
         private bool IsDeadLocation(Point location)
         {
-            return Math.Abs(location.X) <= State.StarSize ||
+            return (Math.Abs(location.X) <= State.StarSize && Math.Abs(location.Y) <= State.StarSize) ||
                 Math.Abs(location.X) >= State.ArenaSize ||
-                Math.Abs(location.Y) <= State.StarSize ||
                 Math.Abs(location.Y) >= State.ArenaSize;
 
         }
