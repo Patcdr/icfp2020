@@ -57,7 +57,7 @@ namespace app
                 }
 
                 Console.WriteLine($"Turn {i}");
-                Game = Next();
+                Game = Next(null);
 
                 if (Step != null) Step(Game);
             }
@@ -85,6 +85,6 @@ namespace app
             Start(1, 1, 1, 1);
         }
 
-        public abstract Value Next();
+        public abstract Value Next(GameState state);
     }
 }

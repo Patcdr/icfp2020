@@ -18,7 +18,7 @@ namespace app
             base.Start(1, 1, 1, 1);
         }
 
-        public override Value Next()
+        public override Value Next(GameState next)
         {
             Game = Interactor.sender.Send(new Value[] {
                 CMD, Player, NilList

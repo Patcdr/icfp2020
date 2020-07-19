@@ -13,11 +13,11 @@ namespace app
         protected readonly Interactor interactor;
         protected Value state;
 
-        public ClickInteractor(Interactor interactor)
+        public ClickInteractor(Interactor interactor, IProtocol protocol, Value currentState)
         {
             this.interactor = interactor;
-            protocol = new GalaxyProtocol();
-            state = Nil;
+            this.protocol = protocol;
+            state = currentState;
         }
 
         public IList<DrawFrame> Click(Point p)

@@ -75,10 +75,10 @@ namespace app
             if (DefendStep != null) DefendStep(DefendBot.Game);
         }
 
-        public override Value Next()
+        public override Value Next(GameState state)
         {
-            var attackNext = Task.Factory.StartNew(() => AttackBot.Next());
-            var defendNext = Task.Factory.StartNew(() => DefendBot.Next());
+            var attackNext = Task.Factory.StartNew(() => AttackBot.Next(null));
+            var defendNext = Task.Factory.StartNew(() => DefendBot.Next(null));
             attackNext.Wait();
             defendNext.Wait();
 

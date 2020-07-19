@@ -15,7 +15,7 @@ namespace app
         private Result result;
         private readonly Stack<(Value state, Point p)> history = new Stack<(Value, Point)>();
 
-        public UIInteractor(Interactor interactor) : base(interactor)
+        public UIInteractor(Interactor interactor) : base(interactor, new GalaxyProtocol(), Nil)
         {
         }
 

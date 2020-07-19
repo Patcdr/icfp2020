@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Linq;
 
 namespace Core
 {
@@ -52,5 +53,14 @@ namespace Core
             }
         }
 
+        public Ship GetShipById(long shipId)
+        {
+            return Ships.Where(x => x.ID == shipId).First();
+        }
+
+        public Ship GetShipByPlayerId(long playerId)
+        {
+            return Ships.Where(x => x.PlayerID == playerId).First();
+        }
     }
 }

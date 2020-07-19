@@ -115,7 +115,7 @@ namespace app
             ConsoleDrawer.drawing = drawing;
         }
 
-        public override Value Next()
+        public override Value Next(GameState state)
         {
             return null;
         }
