@@ -23,6 +23,7 @@ namespace app
             Ship myShip = state.GetShipByPlayerId(1);
             handler.Thrust(state, myShip.ID, GetThrustDirection(myShip.Position));
 
+            Local = handler.GetCurrentState();
             return null;
         }
 

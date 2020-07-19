@@ -11,7 +11,7 @@ namespace app
     {
         protected readonly IProtocol protocol;
         protected readonly Interactor interactor;
-        protected Value state;
+        public Value state;
 
         public ClickInteractor(Interactor interactor, IProtocol protocol, Value currentState)
         {

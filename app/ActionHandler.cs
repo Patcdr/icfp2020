@@ -74,5 +74,10 @@ namespace Core
         {
             throw new NotImplementedException();
         }
+
+        public Value GetCurrentState()
+        {
+            return interactor.state;
+        }
     }
 }
