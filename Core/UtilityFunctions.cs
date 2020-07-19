@@ -99,6 +99,9 @@ namespace Core
             {
                 switch (c)
                 {
+                    case 'c':
+                    case 'r':
+                        break;
                     case 'a':
                         curr = curr.Invoke(TrueVal, env);
                         break;
