@@ -16,7 +16,7 @@ namespace app
             protocol = new GalaxyProtocol();
         }
 
-        public override void Execute()
+        public override void Start()
         {
             var points = new ConsIntermediate2[] {
                 new ConsIntermediate2(new Number(0), new Number(0)),  // galaxy 0 nil

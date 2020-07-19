@@ -1,4 +1,5 @@
 ﻿using Core;
+using static Core.Library;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,12 +10,48 @@ namespace app
     {
         protected Interactor Interactor { get; }
 
+        public Value Player;
+        public Value Game;
+
+        public static readonly Value NULL = new Number(0);
+        public static readonly Value ASK = new Number(1);
+        public static readonly Value JOIN = new Number(2);
+        public static readonly Value START = new Number(3);
+        public static readonly Value CMD = new Number(4);
+
+
+        public virtual bool IsStarted() { return Game.Cdr().Car().AsNumber() > 0; }
+        public virtual bool IsRunning() { return Game.Cdr().Car().AsNumber() == 1; }
+        public virtual bool IsFinished() { return Game.Cdr().Car().AsNumber() == 2; }
+
         public BaseInteractStrategy(Interactor interactor)
         {
             Interactor = interactor;
         }
 
-        public abstract void Execute();
+        public BaseInteractStrategy(Interactor interactor, Value player)
+        {
+            Interactor = interactor;
+            Player = player;
+        }
+
+        public virtual void Start(int a, int b, int c, int d)
+        {
+            Game = Interactor.sender.Send(new Value[] {
+                JOIN, Player, NilList
+            }, Player);
+
+            Game = Interactor.sender.Send(new Value[] {
+                START, Player, UtilityFunctions.MakeList(new int[] {
+                    a, b, c, d
+                })
+            }, Player);
+        }
+
+        public virtual void Start()
+        {
+            Start(1, 1, 1, 1);
+        }
 
         public abstract void Next();
     }

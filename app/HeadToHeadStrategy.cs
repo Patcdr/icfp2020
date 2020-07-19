@@ -10,21 +10,22 @@ namespace app
 {
     class HeadToHeadStrategy : BaseInteractStrategy
     {
-        // Sending:  (1 ,  (0 , nil) )
-        public static readonly Value NULL = new Number(0);
-        public static readonly Value ASK = new Number(1);
-        public static readonly Value JOIN = new Number(2);
-        public static readonly Value START = new Number(3);
-        public static readonly Value CMD = new Number(4);
+        GameInteractStrategy attackBot;
+        GameInteractStrategy defendBot;
 
-        BaseInteractStrategy attackBot;
-        BaseInteractStrategy defendBot;
+        public override bool IsStarted() { return attackBot.IsStarted() && defendBot.IsStarted(); }
+        public override bool IsRunning() { return attackBot.IsRunning() && defendBot.IsRunning(); }
+        public override bool IsFinished() { return attackBot.IsFinished() && defendBot.IsFinished(); }
 
-        public HeadToHeadStrategy(Interactor interactor) : base(interactor)
+        public HeadToHeadStrategy(Interactor interactor, string attackAI, string defendAI) : base(interactor)
         {
         }
 
-        public override void Execute()
+        public HeadToHeadStrategy(Interactor interactor) : this(interactor, "GameInteractStrategy", "GameInteractStrategy")
+        {
+        }
+
+        public override void Start()
         {
             var players = Interactor.sender.Send(new Value[] {
                 ASK, NULL
@@ -36,25 +37,17 @@ namespace app
             attackBot = new GameInteractStrategy(Interactor, attack);
             defendBot = new GameInteractStrategy(Interactor, defend);
 
-            var attackExecute = Task.Factory.StartNew(() => attackBot.Execute());
-            var defendExecute = Task.Factory.StartNew(() => defendBot.Execute());
+            var attackExecute = Task.Factory.StartNew(() => attackBot.Start());
+            var defendExecute = Task.Factory.StartNew(() => defendBot.Start());
 
             attackExecute.Wait();
             defendExecute.Wait();
-
-            // while (true)
-            for (var i = 0; i < 10; i++)
-            {
-                Console.ReadLine();
-                Next();
-            }
         }
 
         public override void Next()
         {
             var attackNext = Task.Factory.StartNew(() => attackBot.Next());
             var defendNext = Task.Factory.StartNew(() => defendBot.Next());
-
             attackNext.Wait();
             defendNext.Wait();
         }

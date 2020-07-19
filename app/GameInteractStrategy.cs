@@ -7,27 +7,15 @@ using static Core.Library;
 
 namespace app
 {
-    class GameInteractStrategy : HeadToHeadStrategy
+    class GameInteractStrategy : BaseInteractStrategy
     {
-        public Value Player;
-        public Value Game;
-
-        public GameInteractStrategy(Interactor interactor, Value player) : base(interactor)
+        public GameInteractStrategy(Interactor interactor, Value player) : base(interactor, player)
         {
-            Player = player;
         }
 
-        public override void Execute()
+        public override void Start()
         {
-            Game = Interactor.sender.Send(new Value[] {
-                JOIN, Player, NilList
-            }, Player);
-
-            Game = Interactor.sender.Send(new Value[] {
-                START, Player, UtilityFunctions.MakeList(new int[] {
-                    0, 0, 0, 0
-                })
-            }, Player);
+            base.Start(1, 1, 1, 1);
         }
 
         public override void Next()

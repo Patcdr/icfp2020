@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Core;
+using System;
+using static Core.Library;
 
 namespace app
 {
@@ -8,19 +10,49 @@ namespace app
         {
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
-            string apiKey = "463bf8217ff3469189e1d9d15f8a29ce";
+            string key = "463bf8217ff3469189e1d9d15f8a29ce";
 
-            if (args.Length == 2)
+            if (args.Length >= 2)
             {
                 serverUrl = args[0];
-                apiKey = args[1];
+                key = args[1];
             }
 
-            Sender sender = new Sender(serverUrl, apiKey);
+            Sender sender = new Sender(serverUrl, key);
             Interactor interactor = new Interactor(sender);
-            BaseInteractStrategy interactStrategy = new HeadToHeadStrategy(interactor);
 
-            interactStrategy.Execute();
+            BaseInteractStrategy interactStrategy;
+            if (args.Length == 0)
+            {
+                // Rumble mode with explicit bots
+                interactStrategy = new HeadToHeadStrategy(interactor);
+            }
+            else if (args.Length == 2)
+            {
+                // Submission mode
+                interactStrategy = new GameInteractStrategy(interactor, new Number(long.Parse(key)));
+            }
+            else if (args.Length == 4)
+            {
+                // Rumble mode with default bots
+                interactStrategy = new HeadToHeadStrategy(interactor, args[3], args[4]);
+            }
+            else {
+                Console.Error.WriteLine("Invalid arguments");
+                return -1;
+            }
+
+            interactStrategy.Start();
+
+            // Play 256 rounds or until the game is over.
+            for (var i = 0; i < 256; i++)
+            {
+                interactStrategy.Next();
+
+                if (!interactStrategy.IsRunning()) {
+                    break;
+                }
+            }
 
             // Needed for the rumbletron
             Console.Error.WriteLine($"SCORE: 1000");
