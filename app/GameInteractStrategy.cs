@@ -13,12 +13,12 @@ namespace app
         {
         }
 
-        public override Value Start()
+        public override GameState Start()
         {
             return base.Start(1, 1, 1, 1);
         }
 
-        public override Value Next(GameState next)
+        public override GameState Next(GameState next)
         {
             return Command(CMD, Player, NilList);
         }

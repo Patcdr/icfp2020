@@ -15,36 +15,22 @@ namespace app
         public GameInteractStrategy AttackBot;
         public GameInteractStrategy DefendBot;
 
-        public Action<Value> AttackStep;
-        public Action<Value> DefendStep;
+        public Action<GameState> AttackStep;
+        public Action<GameState> DefendStep;
 
         public override bool IsStarted() { return AttackBot.IsStarted() && DefendBot.IsStarted(); }
         public override bool IsRunning() { return AttackBot.IsRunning() && DefendBot.IsRunning(); }
         public override bool IsFinished() { return AttackBot.IsFinished() && DefendBot.IsFinished(); }
 
-
-        public HeadToHeadStrategy(Sender sender, Action<Value> step) :
-               this(sender, "GameInteractStrategy", "GameInteractStrategy", step)
-               {
-
-               }
-        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI) :
-               this(sender, attackAI, defendAI, null)
-        {}
-
-        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI, Action<Value> step) : base(sender)
+        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI) : base(sender)
         {
-            Step = step;
-
             AttackAI = "app." + attackAI;
             DefendAI = "app." + defendAI;
 
-            var players = Ask();
+            var players = Create();
 
-            if (Step != null) Step(players);
-
-            var attack = players.Car();
-            var defend = players.Cdr();
+            var attack = players.Item1;
+            var defend = players.Item2;
 
             AttackBot = (GameInteractStrategy)Activator.CreateInstance(
                 Type.GetType(AttackAI),
@@ -61,17 +47,16 @@ namespace app
         {
         }
 
-        public override Value Start()
+        public override GameState Start()
         {
-            var attack = Task<Value>.Factory.StartNew(AttackBot.Start);
-            var defend = Task<Value>.Factory.StartNew(DefendBot.Start);
+            var attack = Task<GameState>.Factory.StartNew(AttackBot.Start);
+            var defend = Task<GameState>.Factory.StartNew(DefendBot.Start);
             attack.Wait();
             defend.Wait();
 
             AttackBot.Game = attack.Result;
             DefendBot.Game = defend.Result;
 
-            if (Step != null) Step(attack.Result);
             if (AttackStep != null) AttackStep(attack.Result);
             if (DefendStep != null) DefendStep(defend.Result);
 
@@ -80,10 +65,10 @@ namespace app
             return attack.Result;
         }
 
-        public override Value Next(GameState state)
+        public override GameState Next(GameState state)
         {
-            var attack = Task<Value>.Factory.StartNew(() => {return AttackBot.Next(state); });
-            var defend = Task<Value>.Factory.StartNew(() => {return DefendBot.Next(state); });
+            var attack = Task<GameState>.Factory.StartNew(() => {return AttackBot.Next(state); });
+            var defend = Task<GameState>.Factory.StartNew(() => {return DefendBot.Next(state); });
             attack.Wait();
             defend.Wait();
 

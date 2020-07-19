@@ -3,33 +3,30 @@ using static Core.Library;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace app
 {
     public abstract class BaseInteractStrategy
     {
-        public Interactor Interactor { get; }
-        public readonly IProtocol Protocol;
-
-        public Action<Value> Step;
-
-        public Value Player;
-        public Value Game;
-        public Value Local;
+        public Sender Sender { get; }
+        public Value Player { get; }
+        public GameState Game { get; set; }
         public IList<DrawFrame> Frames;
         public int PlayerId;
 
         public static readonly Value NULL = new Number(0);
-        public static readonly Value ASK = new Number(1);
+        public static readonly Value CREATE = new Number(1);
         public static readonly Value JOIN = new Number(2);
         public static readonly Value START = new Number(3);
         public static readonly Value CMD = new Number(4);
 
 
-        public virtual bool IsStarted() { return Game.Cdr().Car().AsNumber() > 0; }
-        public virtual bool IsRunning() { return Game.Cdr().Car().AsNumber() == 1; }
-        public virtual bool IsFinished() { return Game.Cdr().Car().AsNumber() == 2; }
-        public Value Turn { get { return UtilityFunctions.Addr("dddaa", Game); } }
+        public virtual bool IsStarted() { return Game.GameStateVal > 0; }
+        public virtual bool IsRunning() { return Game.GameStateVal == 1; }
+        public virtual bool IsFinished() { return Game.GameStateVal == 2; }
+        public long Turn { get { return Game.CurrentTurn; } }
 
         public BaseInteractStrategy(Sender sender) : this(sender, null, 0)
         {
@@ -37,10 +34,8 @@ namespace app
 
         public BaseInteractStrategy(Sender sender, Value player, int playerId)
         {
-            Interactor = new Interactor(sender);
+            Sender = sender;
             Player = player;
-            Protocol = new GalaxyProtocol();
-            Boot();
             PlayerId = playerId;
         }
 
@@ -51,101 +46,67 @@ namespace app
             // Play 256 rounds or until the game is over.
             for (var i = 0; i < 256; i++)
             {
-                Console.WriteLine($"Turn {Turn} {Game}");
+                Console.WriteLine($"Turn {Turn}");
+                Console.WriteLine(Game);
 
                 if (!IsRunning()) {
                     Console.WriteLine("Game OVER!");
                     return i;
                 }
 
-                Game = Next(new GameState(Game));
-
-                if (Step != null) Step(Game);
+                Game = Next(Game);
             }
             return 256;
         }
 
         public virtual IList<DrawFrame> TakeStep()
         {
-            Game = Next(new GameState(Game));
+            Game = Next(Game);
             return Frames;
         }
 
-        public virtual Value Start(int a, int b, int c, int d)
+        public virtual GameState Start(int a, int b, int c, int d)
         {
-            Game = JoinInteract();
+            Game = Join();
 
-            Game = StartInteract(a, b, c, d);
+            var vals = new Value[] { new Number(a), new Number(b), new Number(c), new Number(d) };
+            var gameState = Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(vals) });
 
-            if (Step != null) Step(Game);
-
-            return Game;
+            return new GameState(gameState);
         }
 
-        public virtual Value Start()
+        public virtual GameState Start()
         {
             // TODO: Be smarter about choosing values
             return Start(1, 1, 1, 1);
         }
 
-        public abstract Value Next(GameState state);
+        public abstract GameState Next(GameState state);
 
-        public Value Ask()
+        // Returns (player1Key, player2Key)
+        public Tuple<Value, Value> Create()
         {
-            Interact(36, 0);
-            Interact(44, 0);
-            return C(
-                UtilityFunctions.Addr("dadddadaada", Local),
-                UtilityFunctions.Addr("dadddadadada", Local)
+            // CREATE
+            var createResponse = Sender.Send(new Value[] { CREATE, new Number(0) });
+
+            return new Tuple<Value, Value>(
+                UtilityFunctions.Addr("cdaadar", createResponse),
+                UtilityFunctions.Addr("cdadadar", createResponse)
             );
         }
 
-        public Value JoinInteract()
+        public GameState Join()
         {
-            Interact(36, 0);
-            Interact(27, 0);
-            Local = UtilityFunctions.Replace("cdadar", Local, Player);
-            return Interact(27, 0);
+            // JOIN
+            var gameState = Sender.Send(new Value[] { JOIN, Player, NilList });
+            return new GameState(gameState);
         }
 
-        public Value StartInteract(int a, int b, int c, int d)
+        public GameState Command(params Value[] command)
         {
-            Local = UtilityFunctions.Replace("cdaddaar", Local, N(a));
-            Local = UtilityFunctions.Replace("cdaddadar", Local, N(b));
-            Local = UtilityFunctions.Replace("cdaddaddar", Local, N(c));
-            Local = UtilityFunctions.Replace("cdaddadddar", Local, N(d));
-
-            Interact(76, -19);
-            Interact(76, 19);
-
-            return Interactor.LastResponse;
+            var gameState = Sender.Send(command, Player);
+            return new GameState(gameState);
         }
 
-        public Value Command(params Value[] command)
-        {
-            var result = Interactor.sender.Send(command, Player);
-            return Interact(result);
-        }
-
-        public Value Interact(int x, int y)
-        {
-            return Interact(C(N(x), N(y)));
-        }
-
-        public Value Interact(Value next)
-        {
-            Console.WriteLine("Next: " + next);
-            var result = Interactor.Interact(Protocol, Local, next);
-            Local = result.NewState;
-            Frames = result.MultiDrawResult;
-            // UtilityFunctions.PrettyPrint(Local, null);
-            return Interactor.LastResponse;
-        }
-
-        private void Boot() {
-            Local = C(N(5), C(C(N(2), C(N(0), C(Nil, C(Nil, C(Nil, C(Nil, C(Nil, C(N(38273), Nil)))))))), C(N(9), C(Nil, Nil))));
-        }
-        Value C(Value a, Value b) { return new ConsIntermediate2(a, b); }
-        Value N(int a) { return new Number(a); }
     }
 }

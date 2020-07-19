@@ -279,14 +279,15 @@ namespace Squigglr
         {
             frame.StartGame();
             frame.Advance(new IntPoint(44, 00));
-
-            var strategy = new HeadToHeadStrategy(sender, (Value state) => {
+            /*
+            var strategy = new HeadToHeadStrategy(sender, (GameState state) => {
                 if (state != null) frame.SetState(state);
             });
             strategy.AttackStep = (Value state) => {
                 if (state != null) frame.SetState(state);
             };
             strategy.Run();
+            */
         }
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)

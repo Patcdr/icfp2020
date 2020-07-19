@@ -39,6 +39,11 @@ namespace Core
             this.Cooling = UtilityFunctions.Addr("cddar", props).AsNumber();
             this.Babies = UtilityFunctions.Addr("cdddar", props).AsNumber();
         }
+
+        public override string ToString()
+        {
+            return $"Ship[ PlayerId={PlayerID}, ID={ID}, Position={Position}, Velocity={Velocity}, Health={Health}, Lazers={Lazers}, Cooling={Cooling}, Babies={Babies} ]";
+        }
     }
 
 
@@ -94,6 +99,21 @@ namespace Core
         public Ship GetShipByPlayerId(long playerId)
         {
             return Ships.Where(x => x.PlayerID == playerId).First();
+        }
+
+        public override string ToString()
+        {
+            string str = $"GameState [ PlayerId={PlayerId}, TotalTurns={TotalTurns}, CurrentTurn={CurrentTurn}, GameStateVal={GameStateVal}, ArenaSize={ArenaSize}, StarSize={StarSize}, TotalPoints={TotalPoints} ]";
+            
+            if (Ships != null)
+            {
+                foreach (Ship ship in Ships)
+                {
+                    str += $"\n{ship}";
+                }
+            }
+
+            return str;
         }
     }
 }

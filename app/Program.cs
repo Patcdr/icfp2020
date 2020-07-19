@@ -27,7 +27,7 @@ namespace app
             BaseInteractStrategy strategy;
             if (args.Length == 0)
             {
-                // Rumble mode with explicit bots
+                // Rumble mode with default bots
                 strategy = new HeadToHeadStrategy(sender);
             }
             else if (args.Length == 2)
@@ -35,12 +35,10 @@ namespace app
                 // Submission mode
                 new PatRunner(sender, long.Parse(key)).Start();
                 return 0;
-                strategy = new DontDieAI(sender, new Number(long.Parse(key)), -1);
-                //strategy = new GameInteractStrategy(sender, new Number(long.Parse(key)), -1);
             }
             else if (args.Length == 4)
             {
-                // Rumble mode with default bots
+                // Rumble mode with given bots
                 strategy = new HeadToHeadStrategy(sender, args[3], args[4]);
             }
             else {
