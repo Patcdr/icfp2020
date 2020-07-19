@@ -45,7 +45,8 @@ namespace app
                 var ship = gameState.GetShipByPlayerId(gameState.PlayerId);
 
                 var opposite = new Point(Math.Sign(ship.Position.X)*-1, Math.Sign(ship.Position.Y)*-1);
-                gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, opposite)) }));
+                var ninetyDegrees = new Point(opposite.Y, -opposite.X);
+                gameState = new GameState(sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(Thrust(gameState.GetShipByPlayerId(gameState.PlayerId).ID, ninetyDegrees)) }));
 
             }
 
