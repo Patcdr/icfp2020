@@ -66,6 +66,8 @@ namespace Squigglr
                 new IntPoint(0, 0),
                 new IntPoint(0, 0),
                 new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
 
                 new IntPoint(8, 4),
                 new IntPoint(2, -8),
@@ -75,7 +77,20 @@ namespace Squigglr
                 new IntPoint(9, -3),
                 new IntPoint(-4, 10),
                 new IntPoint(1, 4),
-                new IntPoint(-3, 20)
+                new IntPoint(-3, 20),
+
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
             });
 
             Render();
@@ -166,6 +181,7 @@ namespace Squigglr
                 case Key.Up: Scaler.ShiftView(vertical: true); Update(); break;
                 case Key.Left: Scaler.ShiftView(horizontal: true); Update(); break;
                 case Key.Right: Scaler.ShiftView(horizontal: false); Update(); break;
+                case Key.N: frame.Restart(); Render(); break;
                 case Key.Z: frame.Undo(); Render(); break;
             }
         }
