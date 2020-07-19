@@ -20,7 +20,7 @@ namespace app
 
             if (IsDone) return;
 
-            Initialize((int)State.TotalPoints - 98, 0, 8, 1);
+            Initialize(0, 8, 1);
 
             // Game loop
             for (long i = State.CurrentTurn; i < State.TotalTurns; i++)
@@ -38,7 +38,7 @@ namespace app
                 {
                     int xDir = ship.Position.X > 0 ? -1 : 1;
                     int yDir = ship.Position.Y > 0 ? -1 : 1;
-                    Command(UtilityFunctions.MakeList(Thrust(ship.ID, new Point(xDir, yDir))));
+                    Command(Thrust(ship.ID, new Point(xDir, yDir)));
                 }
                 else
                 {
@@ -46,12 +46,12 @@ namespace app
                     if (Math.Abs(ship.Position.X) > Math.Abs(ship.Position.Y))
                     {
                         int yDir = ship.Position.Y > 0 ? -1 : 1;
-                        Command(UtilityFunctions.MakeList(Thrust(ship.ID, new Point(0, yDir))));
+                        Command(Thrust(ship.ID, new Point(0, yDir)));
                     }
                     else
                     {
                         int yDir = ship.Position.Y > 0 ? -1 : 1;
-                        Command(UtilityFunctions.MakeList(Thrust(ship.ID, new Point(0, yDir))));
+                        Command(Thrust(ship.ID, new Point(0, yDir)));
                     }
                 }
             }

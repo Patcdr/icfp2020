@@ -47,9 +47,13 @@ namespace app
             State = new GameState(Sender.Send(new Value[] { JOIN, (Player), NilList }));
         }
 
-        protected void Initialize(int health, int lazers, int cooling, int babies)
+        protected void Initialize(int lazers, int cooling, int ships)
         {
-            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, babies }) }));
+            if (ships < 1) throw new ArgumentException("Ships must be at least 1");
+
+            int health = (int)State.TotalPoints - (4 * lazers) - (12 * cooling) - (2 * ships);
+
+            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, ships }) }));
         }
 
         protected void Command(params Value[] commands)

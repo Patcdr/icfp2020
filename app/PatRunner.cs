@@ -20,7 +20,7 @@ namespace app
 
             if (IsDone) return;
 
-            Initialize((int)State.TotalPoints - 3, 0, 0, 1);
+            Initialize(0, 0, 1);
 
             var end = State.CurrentTurn + 6;
             for (long i = State.CurrentTurn; i < end; i++)
