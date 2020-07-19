@@ -15,12 +15,14 @@ namespace app
         public static readonly Value START = new Number(3);
         public static readonly Value CMD = new Number(4);
 
-        protected Sender sender;
         protected Number Player;
+        protected GameState State;
+
+        private Sender Sender;
 
         public BaseRunner(Sender sender, long player = 0)
         {
-            this.sender = sender;
+            this.Sender = sender;
             this.Player = new Number(player);
         }
 
@@ -31,24 +33,22 @@ namespace app
             Player = player;
         }
 
-        protected GameState Join()
+        // Extract fuel from gamestate
+        protected bool IsDone { get { return State.GameStateVal == 2; } }
+
+        protected void Join()
         {
-            var gameState = new GameState(sender.Send(new Value[] { JOIN, (Player), NilList }));
-
-            // Extract fuel from gamestate
-            if (gameState.GameStateVal == 2) return null;
-
-            return gameState;
+            State = new GameState(Sender.Send(new Value[] { JOIN, (Player), NilList }));
         }
 
-        protected GameState Initialize(int health, int lazers, int cooling, int babies)
+        protected void Initialize(int health, int lazers, int cooling, int babies)
         {
-            return new GameState(sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, babies }) }));
+            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, babies }) }));
         }
 
-        protected GameState Command(Value commands)
+        protected void Command(Value commands)
         {
-            return new GameState(sender.Send(new Value[] { CMD, Player, commands }));
+            State = new GameState(Sender.Send(new Value[] { CMD, Player, commands }));
         }
 
         protected Value C(Value a, Value b) { return new ConsIntermediate2(a, b); }
