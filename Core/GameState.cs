@@ -20,8 +20,8 @@ namespace Core
 
         public Ship(Value ship)
         {
-            this.Position = ToPoint(UtilityFunctions.Addr("cddar", ship));
-            this.Velocity = ToPoint(UtilityFunctions.Addr("cdddar", ship));
+            this.Position = ToPoint(UtilityFunctions.Addr("caddar", ship));
+            this.Velocity = ToPoint(UtilityFunctions.Addr("cadddar", ship));
 
         }
     }
@@ -32,7 +32,7 @@ namespace Core
         public readonly long TotalTurns;
         public readonly long CurrentTurn;
         public readonly long GameStateVal;
-        public readonly List<List<Ship>> Ships;
+        public readonly List<Ship> Ships;
 
 
         public GameState(Value server_state)
@@ -40,19 +40,12 @@ namespace Core
             this.GameStateVal = UtilityFunctions.Addr("car", server_state).AsNumber();
             this.TotalTurns = UtilityFunctions.Addr("cddaar", server_state).AsNumber();
             this.CurrentTurn = UtilityFunctions.Addr("cdddaar", server_state).AsNumber();
-            this.Ships = new List<List<Ship>>();
+            this.Ships = new List<Ship>();
 
-            Value players = UtilityFunctions.Addr("cdddaddar", server_state);
-            foreach (Value player in UtilityFunctions.ListAsEnumerable(players, null))
+            Value ships = UtilityFunctions.Addr("cdddaddar", server_state);
+            foreach (Value ship in UtilityFunctions.ListAsEnumerable(ships, null))
             {
-                if (player == Library.Nil) break;
-                List<Ship> playerShips = new List<Ship>();
-                foreach (Value ship in UtilityFunctions.ListAsEnumerable(player, null))
-                {
-                    if (ship == Library.Nil) break;
-                    playerShips.Add(new Ship(ship));
-                }
-                this.Ships.Add(playerShips);
+                this.Ships.Add(new Ship(ship));
             }
         }
 
