@@ -39,15 +39,6 @@ namespace Squigglr
             Render();
         }
 
-        public void AdvanceMany(List<IntPoint> pList)
-        {
-            foreach (var p in pList)
-            {
-                points = gInterface.AdvanceState(p);
-            }
-            Render();
-        }
-
         public void Undo()
         {
             points = gInterface.UndoState();

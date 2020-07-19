@@ -13,7 +13,7 @@ namespace app
     public class GameStateGraphics : GraphicsInterface
     {
         private readonly BaseInteractStrategy strategy;
-        private GameState gameState;
+        public GameState GameState { get; private set; }
 
         public GameStateGraphics(BaseInteractStrategy strategy)
         {
@@ -22,14 +22,14 @@ namespace app
 
         public Dictionary<Point, byte> AdvanceState(Point p)
         {
-            gameState = strategy.Next(gameState);
-            return GameStateToFrame(gameState);
+            GameState = strategy.Next(GameState);
+            return GameStateToFrame(GameState);
         }
 
         public Dictionary<Point, byte> StartGame()
         {
-            gameState = strategy.Start();
-            return GameStateToFrame(gameState);
+            GameState = strategy.Start();
+            return GameStateToFrame(GameState);
         }
 
         public Dictionary<Point, byte> SetState(Value s)
@@ -85,7 +85,7 @@ namespace app
             return CreateFrame(GameStateToDrawFrames(gameState));
         }
 
-        private IList<DrawFrame> GameStateToDrawFrames(GameState gameState)
+        private static IList<DrawFrame> GameStateToDrawFrames(GameState gameState)
         {
             var foregroundPoints = new List<Point>();
             var backgroundPoints = new List<Point>();
@@ -95,7 +95,14 @@ namespace app
             {
                 foreach (var ship in gameState.Ships)
                 {
-                    foregroundPoints.Add(ship.Position);
+                    Point p = ship.Position;
+
+                    // Draw as a small X
+                    foregroundPoints.Add(p);
+                    foregroundPoints.Add(new Point(p.X + 1, p.Y + 1));
+                    foregroundPoints.Add(new Point(p.X - 1, p.Y + 1));
+                    foregroundPoints.Add(new Point(p.X + 1, p.Y - 1));
+                    foregroundPoints.Add(new Point(p.X - 1, p.Y - 1));
                 }
             }
 

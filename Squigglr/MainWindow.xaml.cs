@@ -29,16 +29,18 @@ namespace Squigglr
         private readonly Rectangle MouseHover;
         private readonly TextBlock OffScreen;
         private readonly TextBlock CurrentPosition;
+        private readonly TextBlock Turn;
+        private readonly TextBlock Ship;
+        private int selectedShipId;
+        private readonly IList<TextBlock> shipIndicators = new List<TextBlock>();
+
         private int OffScreenCount = 0;
         private readonly Frame frame;
 
         private readonly Rectangle MeasureStartingLocationBlock;
         private IntPoint? measureStartingLocationPoint;
 
-        Sender sender;
-        Interactor interactor;
-        private ActionHandler actionHandler;
-        private bool isTargettingLaser = false;
+        private GameStateGraphics gInterface;
 
         public MainWindow()
         {
@@ -53,14 +55,24 @@ namespace Squigglr
             OffScreen = new TextBlock();
             OffScreen.Text = "Offscreen Count Estimate: N/A";
             OffScreen.Foreground = new SolidColorBrush(Colors.Yellow);
-            Canvas.SetLeft(OffScreen, 10);
-            Canvas.SetTop(OffScreen, 10);
+            Canvas.SetLeft(OffScreen, 80);
+            Canvas.SetTop(OffScreen, 0);
             OffScreen.Visibility = Visibility.Hidden;
 
             CurrentPosition = new TextBlock();
             CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
-            Canvas.SetLeft(OffScreen, 10);
-            Canvas.SetTop(OffScreen, 25);
+            Canvas.SetLeft(CurrentPosition, 0);
+            Canvas.SetTop(CurrentPosition, 0);
+
+            Turn = new TextBlock();
+            Turn.Foreground = new SolidColorBrush(Colors.Yellow);
+            Canvas.SetLeft(Turn, 0);
+            Canvas.SetTop(Turn, 15);
+
+            Ship = new TextBlock();
+            Ship.Foreground = new SolidColorBrush(Colors.Yellow);
+            Canvas.SetLeft(Ship, 0);
+            Canvas.SetTop(Ship, 30);
 
             MeasureStartingLocationBlock = new Rectangle();
             Scaler.ResizeRectangle(MeasureStartingLocationBlock);
@@ -71,54 +83,13 @@ namespace Squigglr
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
             string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
-            sender = new Sender(serverUrl, playerKey);
+            Sender sender = new Sender(serverUrl, playerKey);
             HeadToHeadStrategy strategy = new HeadToHeadStrategy(sender);
 
-            var gInterface = new GameStateGraphics(strategy);
+            gInterface = new GameStateGraphics(strategy);
             gInterface.StartGame();
 
-            //actionHandler = new ActionHandler(gInterface);
-
             frame = new Frame(gInterface);
-
-            // Fast forward
-            /*
-            frame.AdvanceMany(new List<IntPoint>()
-            {
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-
-                new IntPoint(8, 4),
-                new IntPoint(2, -8),
-                new IntPoint(3, 6),
-                new IntPoint(0, -14),
-                new IntPoint(-4, 10),
-                new IntPoint(9, -3),
-                new IntPoint(-4, 10),
-                new IntPoint(1, 4),
-                new IntPoint(-3, 20),
-
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-            });
-            */
 
             Render();
         }
@@ -126,6 +97,7 @@ namespace Squigglr
         public void Render()
         {
             canvas.Children.Clear();
+            shipIndicators.Clear();
 
             OffScreenCount = 0;
 
@@ -164,6 +136,8 @@ namespace Squigglr
 
             canvas.Children.Add(CurrentPosition);
             canvas.Children.Add(MeasureStartingLocationBlock);
+
+            RenderGameState();
         }
 
         public void Update()
@@ -193,23 +167,49 @@ namespace Squigglr
             {
                 OffScreen.Visibility = Visibility.Hidden;
             }
+
+            RenderGameState();
+        }
+
+        private void RenderGameState()
+        {
+            GameState gameState = gInterface.GameState;
+
+            foreach(var si in shipIndicators)
+            {
+                canvas.Children.Remove(si);
+            }
+
+            foreach (var ship in gameState.Ships)
+            {
+                bool isAttacker = (ship.PlayerID == gameState.PlayerId && gameState.IsAttacker);
+
+                TextBlock shipIndicator = new TextBlock();
+                shipIndicator.Foreground = new SolidColorBrush(isAttacker ? Colors.Red : Colors.Green);
+                shipIndicator.Text = $"{ship.ID}";
+
+                Point p = Scaler.Convert(ship.Position);
+                Canvas.SetLeft(shipIndicator, p.X - 2);
+                Canvas.SetTop(shipIndicator, p.Y + 3);
+
+                canvas.Children.Add(shipIndicator);
+                shipIndicators.Add(shipIndicator);
+            }
+
+            canvas.Children.Remove(Turn);
+            Turn.Text = $"Turn: {gameState.CurrentTurn} of {gameState.TotalTurns}";
+            canvas.Children.Add(Turn);
+
+            canvas.Children.Remove(Ship);
+            Ship.Text = $"Ship: {gameState.Ships[0].Role}\n{gameState.Ships[0].Position}";
+            canvas.Children.Add(Ship);
         }
 
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IntPoint p = Scaler.Convert(e.GetPosition(canvas));
-
-            if (isTargettingLaser)
-            {
-                actionHandler.Laser(null, 0, p);
-                isTargettingLaser = false;
-                MouseHover.Fill = MouseHoverBrush;
-            }
-            else
-            {
-                frame.Advance(p);
-                Render();
-            }
+            frame.Advance(p);
+            Render();
         }
 
         /// <summary>
@@ -276,130 +276,8 @@ namespace Squigglr
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Click = Send Point\n" +
-                            "Scroll = Zoom\n" +
-                            "Arrow Keys = Pan\n" +
-                            "N = Open New Game\n" +
-                            "Z = Undo\n");
+            MessageBox.Show("Click = Step\n");
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "SavedClicks"; // Default file name
-            dlg.DefaultExt = ".saves"; // Default file extension
-            dlg.Filter = "Saves (.saves)|*.saves"; // Filter files by extension
-
-            // Show save file dialog box
-            bool? result = dlg.ShowDialog();
-
-            // Process save file dialog box results
-            if (result == true)
-            {
-                // Save document
-                string filename = dlg.FileName;
-
-                frame.Save(filename);
-                MessageBox.Show("Saved");
-            }
-        }
-
-        private void LoadButton_Click(object sender, RoutedEventArgs e)
-        {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "SavedClicks";
-            dlg.DefaultExt = ".saves";
-            dlg.Filter = "Saves (.saves)|*.saves";
-
-            bool? result = dlg.ShowDialog();
-
-            if (result == true)
-            {
-                string filename = dlg.FileName;
-
-                frame.Load(filename);
-                Render();
-            }
-        }
-
-        private void CalibrateButton_Click(object sender, RoutedEventArgs e)
-        {
-            frame.AdvanceMany(new List<IntPoint>()
-            {
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-                new IntPoint(0, 0),
-
-                new IntPoint(8, 4),
-                new IntPoint(2, -8),
-                new IntPoint(3, 6),
-                new IntPoint(0, -14),
-                new IntPoint(-4, 10),
-                new IntPoint(9, -3),
-                new IntPoint(-4, 10),
-                new IntPoint(1, 4)
-            });
-
-            Render();
-            CalibrateButton.Visibility = Visibility.Hidden;
-        }
-
-        #region UI ship driving
-        private void ExplodeButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Explode(new GameState(interactor.LastResponse), 0);
-        }
-
-        private void UpLeftButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpLeftDirection);
-        }
-
-        private void UpButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpDirection);
-        }
-
-        private void UpRightButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.UpRightDirection);
-        }
-
-        private void RightButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.RightDirection);
-        }
-
-        private void DownRightButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownRightDirection);
-        }
-
-        private void DownButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownDirection);
-        }
-
-        private void DownLeftButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.DownLeftDirection);
-        }
-
-        private void LeftButton_Click(object sender, RoutedEventArgs e)
-        {
-            actionHandler.Thrust(new GameState(interactor.LastResponse), 0, ActionHandler.LeftDirection);
-        }
-        private void LaserButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Toggle us into laser mode.
-            isTargettingLaser = true;
-            MouseHover.Fill = new SolidColorBrush(Colors.Red);
-        }
-
-        #endregion
     }
 }
