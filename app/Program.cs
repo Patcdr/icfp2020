@@ -18,6 +18,8 @@ namespace app
                 key = args[1];
             }
 
+            Console.Error.WriteLine($"Running against {serverUrl} as {key}. {args.Length}");
+
             Sender sender = new Sender(serverUrl, key);
             Interactor interactor = new Interactor(sender);
 
