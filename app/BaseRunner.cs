@@ -18,6 +18,7 @@ namespace app
         public static readonly Value ACCELERATE = new Number(0);
         public static readonly Value DETONATE = new Number(1);
         public static readonly Value SHOOT = new Number(2);
+        public static readonly Value SPLIT = new Number(3);
 
         protected Number Player { get; private set; }
         protected GameState State { get; private set; }
@@ -78,6 +79,12 @@ namespace app
         protected Value Shoot(long shipId, Point vector, long hamburger)
         {
             return C(SHOOT, C(N(shipId), C(C(N(vector.X), N(vector.Y)), C(N(hamburger), Nil))));
+        }
+
+        //Split: [3, ship_id, (fuel, hamburger, cooling, babies)] (Properties are given in a nil-terminated list and are 0, 1, 2, 4, 8, or 16.)
+        protected Value Split(long shipId, int fuel, int hamburger, int cooling, int babies)
+        {
+            return C(SPLIT, C(N(shipId), UtilityFunctions.MakeList(new int[] { fuel, hamburger, cooling, babies })));
         }
 
         #endregion
