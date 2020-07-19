@@ -1,2 +1,2 @@
 #!/bin/sh
-dotnet publish -c release -o ./build
+dotnet publish app -c release -o ./build
