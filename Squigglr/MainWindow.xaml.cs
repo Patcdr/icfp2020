@@ -254,8 +254,24 @@ namespace Squigglr
                 case Key.N: frame.StartGame(); Render(); break;
                 case Key.A: RunAttackAI(); Render(); break;
                 case Key.D: RunDefendAI(); Render(); break;
+                case Key.R: StepGame(); Render(); break;
                 case Key.Z: frame.Undo(); Render(); break;
             }
+        }
+
+        BaseInteractStrategy strat;
+        public void StepGame()
+        {
+            if (strat == null)
+            {
+                strat = new HeadToHeadStrategy(sender, "DontDieAI", "DontDieAI");
+                strat.Start();
+            }
+            else {
+                strat.TakeStep();
+            }
+            frame.Show(strat.Frames);
+            Render();
         }
 
         private void RunDefendAI() {}
@@ -264,7 +280,7 @@ namespace Squigglr
             frame.StartGame();
             frame.Advance(new IntPoint(44, 00));
 
-            var strategy = new HeadToHeadStrategy(interactor, (Value state) => {
+            var strategy = new HeadToHeadStrategy(sender, (Value state) => {
                 if (state != null) frame.SetState(state);
             });
             strategy.AttackStep = (Value state) => {

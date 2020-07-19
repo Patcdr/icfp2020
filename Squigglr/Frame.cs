@@ -33,6 +33,12 @@ namespace Squigglr
             Render();
         }
 
+        public void Show(IList<DrawFrame> frames)
+        {
+            points = gInterface.CreateFrame(frames);
+            Render();
+        }
+
         public void AdvanceMany(List<IntPoint> pList)
         {
             foreach (var p in pList)

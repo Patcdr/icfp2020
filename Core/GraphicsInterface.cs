@@ -13,5 +13,6 @@ namespace Core
         public void SaveClicks(string fileName = null);
         public Dictionary<Point, byte> LoadClicks(string fileName = null);
         public Dictionary<Point, byte> StartGame();
+        public Dictionary<Point, byte> CreateFrame(IList<DrawFrame> frames);
     }
 }

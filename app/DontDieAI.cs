@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace app
 {
-    public class DontDieAI : BaseInteractStrategy
+    public class DontDieAI : GameInteractStrategy
     {
         private ActionHandler handler;
         private List<Tuple<double, double>> unitVectors;
 
-        public DontDieAI(Sender sender) : base(sender)
+        public DontDieAI(Sender sender, Value player) : base(sender, player)
         {
             handler = new ActionHandler(new ClickInteractor(Interactor, Protocol, Local));
             unitVectors = ActionHandler.AllDirections.Select(x => ScaleToUnitLength(x)).ToList();

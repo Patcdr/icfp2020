@@ -16,6 +16,7 @@ namespace app
         public Value Player;
         public Value Game;
         public Value Local;
+        public IList<DrawFrame> Frames;
 
         public static readonly Value NULL = new Number(0);
         public static readonly Value ASK = new Number(1);
@@ -62,6 +63,12 @@ namespace app
             return 256;
         }
 
+        public virtual IList<DrawFrame> TakeStep()
+        {
+            Game = Next(new GameState(Game));
+            return Frames;
+        }
+
         public virtual Value Start(int a, int b, int c, int d)
         {
             var player = Command(JOIN, Player, NilList);
@@ -106,8 +113,10 @@ namespace app
         public Value Interact(Value next)
         {
             Console.WriteLine("Next: " + next);
-            Local = Interactor.Interact(Protocol, Local, next).NewState;
-            UtilityFunctions.PrettyPrint(Local, null);
+            var result = Interactor.Interact(Protocol, Local, next);
+            Local = result.NewState;
+            Frames = result.MultiDrawResult;
+            // UtilityFunctions.PrettyPrint(Local, null);
             return Interactor.LastResponse;
         }
 
