@@ -55,7 +55,7 @@ namespace app
                     return i;
                 }
 
-                Game = Next(null);
+                Game = Next(new GameState(Game));
 
                 if (Step != null) Step(Game);
             }
@@ -95,20 +95,20 @@ namespace app
         public Value Command(params Value[] command)
         {
             var result = Interactor.sender.Send(command, Player);
-            Interact(result);
-            return result;
+            return Interact(result);
         }
 
-        public void Interact(int x, int y)
+        public Value Interact(int x, int y)
         {
-            Interact(C(N(x), N(y)));
+            return Interact(C(N(x), N(y)));
         }
 
-        public void Interact(Value next)
+        public Value Interact(Value next)
         {
             Console.WriteLine("Next: " + next);
             Local = Interactor.Interact(Protocol, Local, next).NewState;
             UtilityFunctions.PrettyPrint(Local, null);
+            return Interactor.LastResponse;
         }
 
         private void Boot() {
