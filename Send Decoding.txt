@@ -12,3 +12,7 @@ Laser (as list): [2, 0, (48, 0), 86]
 Birth: (4 ,  (4340898303670741092 ,  ( ( (3 ,  (0 ,  ( (8 ,  (0 ,  (8 ,  (1 , nil) ) ) )  , nil) ) )  , nil)  , nil) ) ) 
 Birth: (3 ,  (0 ,  ( (8 ,  (0 ,  (8 ,  (1 , nil) ) ) )  , nil) ) )
 Birth (as list): [3, 0, [8, 0, 8, 1]]
+
+sender.Send(new ConsIntermediate2(new Number(4), new ConsIntermediate2(new Number(1976368908906266192), new ConsIntermediate2(UtilityFunctions.MakeList(UtilityFunctions.MakeList(new Number(1), new Number(0))), Nil))))
+
+sender.Send(new ConsIntermediate2(new Core.Number(4), new ConsIntermediate2(new Core.Number(1976368908906266192), new ConsIntermediate2(UtilityFunctions.MakeList(UtilityFunctions.MakeList(new Core.Number(1), new Core.Number(0))), Library.Nil))))
