@@ -49,7 +49,7 @@ namespace app
 
             Console.WriteLine($"Received({player}): {answer}");
 
-            UtilityFunctions.PrettyPrint(answer, "");
+            UtilityFunctions.PrettyPrint(answer);
 
             return answer;
         }

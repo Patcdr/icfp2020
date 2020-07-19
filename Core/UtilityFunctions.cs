@@ -170,7 +170,7 @@ namespace Core
 
             return new DrawFrame(points);
         }
-        public static void PrettyPrint(Value list, String filename=null)
+        public static string PrettyPrint(Value list, bool compact=false)
         {
             Tuple<string, object> rec(Value thing, string prefix)
             {
@@ -209,30 +209,34 @@ namespace Core
                 var prefix = tup.Item1;
                 string indent = "".PadLeft(level * 4, ' ');
                 if (x is long)
-                    return indent + x.ToString() + " #" + prefix + "\n";
+                {
+                    return (compact ? "" : indent) + x.ToString() + (compact ? "," : " #" + prefix) + "\n";
+                }
                 else if (x is Tuple<long, long>)
                 {
                     var y = x as Tuple<long, long>;
-                    return indent + $"({y.Item1}, {y.Item2})" + " #" + prefix + "\n";
+                    return (compact ? "" : indent) + $"({y.Item1}, {y.Item2})" +(compact ? "," : " #" + prefix) + "\n";
                 }
                 else if (x is List<Tuple<string, object>>)
                 {
-                    string acccc = indent + "[" + " #" + prefix + "\n"; ;
+                    string acccc = (compact ? "" : indent) + "[" + (compact ? "" : " #" + prefix) + "\n"; ;
                     foreach (Tuple<string, object> i in (List<Tuple<string, object>>)x)
                     {
                         acccc += rec2(i, level + 1);
                     }
-                    return acccc + indent + "]\n";
+                    return acccc + (compact ? "" : indent) + "],\n";
                 }
                 else if (x == null)
                 {
-                    return indent + "Nil" + " #" + prefix + "\n";
+                    return (compact ? "" : indent + "Nil" + " #" + prefix) + "\n";
                 }
                 throw new Exception("The hell is this?");
             }
 
             var x = rec(list, "c");
-            Console.WriteLine(rec2(x, 0));
+            var s = rec2(x, 0);
+            if (!compact) Console.WriteLine(s);
+            return s;
         }
     }
 }
