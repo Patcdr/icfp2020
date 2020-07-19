@@ -9,7 +9,7 @@ namespace app
 {
     public class GameInteractStrategy : BaseInteractStrategy
     {
-        public GameInteractStrategy(Interactor interactor, Value player) : base(interactor, player)
+        public GameInteractStrategy(Sender sender, Value player) : base(sender, player)
         {
         }
 

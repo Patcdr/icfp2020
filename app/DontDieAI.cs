@@ -11,9 +11,9 @@ namespace app
         private ActionHandler handler;
         private List<Tuple<double, double>> unitVectors;
 
-        public DontDieAI(Interactor interactor) : base(interactor)
+        public DontDieAI(Sender sender) : base(sender)
         {
-            handler = new ActionHandler(new ClickInteractor(interactor, Protocol, Local));
+            handler = new ActionHandler(new ClickInteractor(Interactor, Protocol, Local));
             unitVectors = ActionHandler.AllDirections.Select(x => ScaleToUnitLength(x)).ToList();
         }
 

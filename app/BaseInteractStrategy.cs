@@ -29,13 +29,13 @@ namespace app
         public virtual bool IsFinished() { return Game.Cdr().Car().AsNumber() == 2; }
         public Value Turn { get { return UtilityFunctions.Addr("dddaa", Game); } }
 
-        public BaseInteractStrategy(Interactor interactor) : this(interactor, null)
+        public BaseInteractStrategy(Sender sender) : this(sender, null)
         {
         }
 
-        public BaseInteractStrategy(Interactor interactor, Value player)
+        public BaseInteractStrategy(Sender sender, Value player)
         {
-            Interactor = interactor;
+            Interactor = new Interactor(sender);
             Player = player;
             Protocol = new GalaxyProtocol();
             Boot();

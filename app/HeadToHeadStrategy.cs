@@ -23,16 +23,16 @@ namespace app
         public override bool IsFinished() { return AttackBot.IsFinished() && DefendBot.IsFinished(); }
 
 
-        public HeadToHeadStrategy(Interactor interactor, Action<Value> step) :
-               this(interactor, "GameInteractStrategy", "GameInteractStrategy", step)
+        public HeadToHeadStrategy(Sender sender, Action<Value> step) :
+               this(sender, "GameInteractStrategy", "GameInteractStrategy", step)
                {
 
                }
-        public HeadToHeadStrategy(Interactor interactor, string attackAI, string defendAI) :
-               this(interactor, attackAI, defendAI, null)
+        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI) :
+               this(sender, attackAI, defendAI, null)
         {}
 
-        public HeadToHeadStrategy(Interactor interactor, string attackAI, string defendAI, Action<Value> step) : base(interactor)
+        public HeadToHeadStrategy(Sender sender, string attackAI, string defendAI, Action<Value> step) : base(sender)
         {
             Step = step;
 
@@ -57,7 +57,7 @@ namespace app
             );
         }
 
-        public HeadToHeadStrategy(Interactor interactor) : this(interactor, "GameInteractStrategy", "GameInteractStrategy")
+        public HeadToHeadStrategy(Sender sender) : this(sender, "GameInteractStrategy", "GameInteractStrategy")
         {
         }
 

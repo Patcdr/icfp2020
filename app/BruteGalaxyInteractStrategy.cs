@@ -11,7 +11,7 @@ namespace app
     {
         private readonly IProtocol protocol;
 
-        public BruteGalaxyInteractStrategy(Interactor interactor) : base(interactor)
+        public BruteGalaxyInteractStrategy(Sender sender) : base(sender)
         {
             protocol = new GalaxyProtocol();
         }
