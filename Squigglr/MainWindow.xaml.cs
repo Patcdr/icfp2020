@@ -14,7 +14,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using app;
-using Core;
 using IntPoint = System.Drawing.Point;
 
 namespace Squigglr
@@ -24,10 +23,10 @@ namespace Squigglr
     /// </summary>
     public partial class MainWindow : Window
     {
-        GraphicsInterface gInterface;
-        private Dictionary<IntPoint, byte> currentFrame;
         private readonly Rectangle MouseHover;
+        private readonly TextBlock OffScreen;
         private int OffScreenCount = 0;
+        private readonly Frame frame;
 
         public MainWindow()
         {
@@ -35,8 +34,16 @@ namespace Squigglr
             canvas.Background = new SolidColorBrush(Colors.Black);
             Scaler.ResizeWindow(window.DesiredSize);
 
-            MouseHover = CreateRectangle(new IntPoint(0, 0), 255);
+            MouseHover = new Rectangle();
+            Scaler.ResizeRectangle(MouseHover);
             MouseHover.Fill = new SolidColorBrush(Colors.Green);
+
+            OffScreen = new TextBlock();
+            OffScreen.Text = "Offscreen Count Estimate: N/A";
+            OffScreen.Foreground = new SolidColorBrush(Colors.Yellow);
+            Canvas.SetLeft(OffScreen, 10);
+            Canvas.SetTop(OffScreen, 10);
+            OffScreen.Visibility = Visibility.Hidden;
 
             // Default to the test server
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
@@ -44,116 +51,122 @@ namespace Squigglr
 
             Sender sender = new Sender(serverUrl, playerKey);
             Interactor interactor = new Interactor(sender);
-            gInterface = new UIInteractor(interactor);
-            RenderFrame(GetFrame(new IntPoint(0, 0)));
+
+            var gInterface = new UIInteractor(interactor);
+
+            frame = new Frame(gInterface);
 
             // Fast forward
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(8, 4));
-            GetFrame(new IntPoint(2, -8));
-            GetFrame(new IntPoint(3, 6));
-            GetFrame(new IntPoint(0, -14));
-            GetFrame(new IntPoint(-4, 10));
-            GetFrame(new IntPoint(9, -3));
-            GetFrame(new IntPoint(-4, 10));
-            GetFrame(new IntPoint(1, 4));
-            GetFrame(new IntPoint(-3, 20));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            RenderFrame(currentFrame);
+            frame.AdvanceMany(new List<IntPoint>()
+            {
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+
+                new IntPoint(8, 4),
+                new IntPoint(2, -8),
+                new IntPoint(3, 6),
+                new IntPoint(0, -14),
+                new IntPoint(-4, 10),
+                new IntPoint(9, -3),
+                new IntPoint(-4, 10),
+                new IntPoint(1, 4),
+                new IntPoint(-3, 20)
+            });
+
+            Render();
         }
 
-        public Dictionary<IntPoint, byte> GetFrame(IntPoint p)
-        {
-            currentFrame = gInterface.AdvanceState(p);
-            return currentFrame;
-        }
-
-        public void RenderFrame(Dictionary<IntPoint, byte> frame)
+        public void Render()
         {
             canvas.Children.Clear();
+
             OffScreenCount = 0;
 
-            foreach (var pair in frame)
+            foreach (var rect in frame.Rects)
             {
-                canvas.Children.Add(CreateRectangle(pair.Key, pair.Value));
+                double x = Canvas.GetLeft(rect);
+                double y = Canvas.GetTop(rect);
+
+                if (x < 0 || x >= window.ActualWidth ||
+                    y < 0 || y >= window.ActualHeight)
+                {
+                    OffScreenCount++;
+                }
+
+                canvas.Children.Add(rect);
             }
 
             canvas.Children.Add(MouseHover);
 
             if (OffScreenCount > 0)
             {
-                var textBlock = new TextBlock();
-                textBlock.Text = "Offscreen Count Estimate: " + OffScreenCount;
-                textBlock.Foreground = new SolidColorBrush(Colors.Yellow);
-                Canvas.SetLeft(textBlock, 10);
-                Canvas.SetTop(textBlock, 10);
-                canvas.Children.Add(textBlock);
+                OffScreen.Text = "Offscreen Count Estimate: " + OffScreenCount;
+                OffScreen.Visibility = Visibility.Visible;
+                canvas.Children.Add(OffScreen);
+            }
+            else
+            {
+                OffScreen.Visibility = Visibility.Hidden;
+                canvas.Children.Add(OffScreen);
             }
         }
 
-        public Rectangle CreateRectangle(IntPoint p, byte color)
+        public void Update()
         {
-            var c = Color.FromRgb(color, color, color);
+            frame.Update();
 
-            var r = new Rectangle();
+            OffScreenCount = 0;
 
-            Scaler.ResizeRectangle(r);
-            r.Fill = new SolidColorBrush(c);
-
-            Point drawingPoint = Scaler.Convert(p);
-            Canvas.SetLeft(r, drawingPoint.X);
-            Canvas.SetTop(r, drawingPoint.Y);
-
-            if (drawingPoint.X < 0 || drawingPoint.X >= window.ActualWidth ||
-                drawingPoint.Y < 0 || drawingPoint.Y >= window.ActualHeight)
+            foreach (var rect in frame.Rects)
             {
-                OffScreenCount++;
+                double x = Canvas.GetLeft(rect);
+                double y = Canvas.GetTop(rect);
+
+                if (x < 0 || x >= window.ActualWidth ||
+                    y < 0 || y >= window.ActualHeight)
+                {
+                    OffScreenCount++;
+                }
             }
 
-            return r;
+            if (OffScreenCount > 0)
+            {
+                OffScreen.Text = "Offscreen Count Estimate: " + OffScreenCount;
+                OffScreen.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                OffScreen.Visibility = Visibility.Hidden;
+            }
         }
 
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IntPoint p = Scaler.Convert(e.GetPosition(canvas));
-            RenderFrame(GetFrame(p));
+            frame.Advance(p);
+            Render();
         }
 
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Scaler.ResizeWindow(e.NewSize);
-            RenderFrame(currentFrame);
+            Update();
         }
 
         private void window_KeyDown(object sender, KeyEventArgs e)
         {
             switch(e.Key)
             {
-                case Key.Down: Scaler.ShiftView(vertical: false); RenderFrame(currentFrame); break;
-                case Key.Up: Scaler.ShiftView(vertical: true); RenderFrame(currentFrame); break;
-                case Key.Left: Scaler.ShiftView(horizontal: true); RenderFrame(currentFrame); break;
-                case Key.Right: Scaler.ShiftView(horizontal: false); RenderFrame(currentFrame); break;
-                case Key.Z: currentFrame = gInterface.UndoState(); RenderFrame(currentFrame); break;
-                case Key.N: currentFrame = gInterface.StartGame(); RenderFrame(currentFrame); break;
+                case Key.Down: Scaler.ShiftView(vertical: false); Update(); break;
+                case Key.Up: Scaler.ShiftView(vertical: true); Update(); break;
+                case Key.Left: Scaler.ShiftView(horizontal: true); Update(); break;
+                case Key.Right: Scaler.ShiftView(horizontal: false); Update(); break;
+                case Key.Z: frame.Undo(); Render(); break;
             }
         }
 
@@ -169,7 +182,7 @@ namespace Squigglr
         {
             Scaler.Zoom(e.Delta > 0);
             Scaler.ResizeRectangle(MouseHover);
-            RenderFrame(currentFrame);
+            Update();
         }
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
@@ -197,7 +210,7 @@ namespace Squigglr
                 // Save document
                 string filename = dlg.FileName;
 
-                gInterface.SaveClicks(filename);
+                frame.Save(filename);
                 MessageBox.Show("Saved");
             }
         }
@@ -215,31 +228,34 @@ namespace Squigglr
             {
                 string filename = dlg.FileName;
 
-                currentFrame = gInterface.LoadClicks(filename);
-                RenderFrame(currentFrame);
+                frame.Load(filename);
+                Render();
             }
         }
 
         private void CalibrateButton_Click(object sender, RoutedEventArgs e)
         {
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
-            GetFrame(new IntPoint(0, 0));
+            frame.AdvanceMany(new List<IntPoint>()
+            {
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
+                new IntPoint(0, 0),
 
-            GetFrame(new IntPoint(8, 4));
-            GetFrame(new IntPoint(2, -8));
-            GetFrame(new IntPoint(3, 6));
-            GetFrame(new IntPoint(0, -14));
-            GetFrame(new IntPoint(-4, 10));
-            GetFrame(new IntPoint(9, -3));
-            GetFrame(new IntPoint(-4, 10));
-            currentFrame = GetFrame(new IntPoint(1, 4));
-
-            RenderFrame(currentFrame);
+                new IntPoint(8, 4),
+                new IntPoint(2, -8),
+                new IntPoint(3, 6),
+                new IntPoint(0, -14),
+                new IntPoint(-4, 10),
+                new IntPoint(9, -3),
+                new IntPoint(-4, 10),
+                new IntPoint(1, 4)
+            });
+            
+            Render();
             CalibrateButton.Visibility = Visibility.Hidden;
         }
     }
