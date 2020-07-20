@@ -27,11 +27,11 @@ namespace app
             else if (!State.IsAttacker || 
                 State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() > 1)
             {
-                AvoidDeathStrategy();
+                SeekOrRun(false);
             }
             else
             {
-                GetCloseAndMurderThem();
+                SeekOrRun(true);
             }
         }
 
@@ -43,7 +43,7 @@ namespace app
             Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
         }
 
-        private void GetCloseAndMurderThem()
+        private void SeekOrRun(bool isAttacker)
         {
             int lookaheadTurns = 32;
             Ship ship = State.GetMyFirstShip();
@@ -106,13 +106,18 @@ namespace app
 
             // Foreach of our paths
             //   Score them based on which one gets closest to the enemy soonest.
-            int bestScore = int.MaxValue;
+            int bestScore = isAttacker ? int.MaxValue : int.MinValue;
             Tuple<int, Point, List<Point>> bestPlan = null;
             foreach (var deathAndPath in nonDyingPaths)
             {
                 var distanceAndTurn = ClosestDistanceAndTurn(deathAndPath.Item3, enemyPositions);
                 int score = distanceAndTurn.Item1 + distanceAndTurn.Item2;
-                if (score < bestScore)
+                if (isAttacker && score < bestScore)
+                {
+                    bestScore = score;
+                    bestPlan = deathAndPath;
+                }
+                else if (!isAttacker && score > bestScore)
                 {
                     bestScore = score;
                     bestPlan = deathAndPath;
@@ -126,7 +131,8 @@ namespace app
             }
 
             if (bestPlan.Item3[0] == enemyPositions[0] &&
-                State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() == 1)
+                State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() == 1 &&
+                isAttacker)
             {
                 commands.Add(Detonate(ship.ID));
             }
