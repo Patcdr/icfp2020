@@ -12,6 +12,7 @@
     <ItemGroup>
       <Reference Include="AWSSDK.S3"><HintPath>./AWSSDK.S3.dll</HintPath></Reference>
       <Reference Include="AWSSDK"><HintPath>./AWSSDK.Core.dll</HintPath></Reference>
+      <Reference Include="OptimizedPriorityQueue"><HintPath>./Priority Queue.dll</HintPath></Reference>
     </ItemGroup>
 
 </Project>
