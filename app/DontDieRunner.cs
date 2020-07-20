@@ -60,10 +60,11 @@ namespace app
 
             // Simulate the enemy's position into the future, save all positions
             // TODO: Deal with all enemy ships.
+            Ship enemy = State.Ships.Where(x => x.PlayerID != State.PlayerId).First();
             List<Point> quantumPositions = ShipPositionSimulator.FuturePositionList(
-                State.Ships.Where(x => x.PlayerID != State.PlayerId).First(),
+                enemy,
                 lookaheadTurns,
-                new Point(0, 0));
+                enemy.Thrust);
             var thrustCount = 1;
 
             void rec(List<Point> moves, int max=1)
@@ -203,8 +204,7 @@ namespace app
             Ship ship = State.GetMyFirstShip();
 
             // If we're not too hot
-            // TODO: Less conservative value.
-            if (ship.Heat > 0)
+            if (ship.Heat > 64)
             {
                 return;
             }
@@ -215,7 +215,7 @@ namespace app
             Point closestShip = new Point(0, 0);
             foreach (Ship s in State.Ships.Where(x => x.PlayerID != State.PlayerId))
             {
-                Point enemyPosition = ShipPositionSimulator.FuturePosition(s, 1);
+                Point enemyPosition = ShipPositionSimulator.FuturePosition(s, 1, s.Thrust);
                 int distance = ManhattanDistance(enemyPosition, expectedPosition);
                 if (distance < closestDistance)
                 {
