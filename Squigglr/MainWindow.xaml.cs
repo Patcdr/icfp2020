@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using app;
 using IntPoint = System.Drawing.Point;
 using Core;
+using System.Threading;
 
 namespace Squigglr
 {
@@ -27,19 +28,19 @@ namespace Squigglr
         private static readonly SolidColorBrush MouseHoverBrush = new SolidColorBrush(Colors.Green);
 
         private readonly Rectangle MouseHover;
-        private readonly TextBlock OffScreen;
         private readonly TextBlock CurrentPosition;
         private readonly TextBlock Turn;
         private readonly TextBlock Ship;
         private int selectedShipId;
 
-        private int OffScreenCount = 0;
-        private readonly Frame frame;
-
         private readonly Rectangle MeasureStartingLocationBlock;
         private IntPoint? measureStartingLocationPoint;
 
-        private GameStateGraphics gInterface;
+        private DoubleRunner runner;
+        private GameState gameState;
+
+        private bool running;
+        private Task continuousRunner;
 
         public MainWindow()
         {
@@ -50,13 +51,6 @@ namespace Squigglr
             MouseHover = new Rectangle();
             Scaler.ResizeRectangle(MouseHover);
             MouseHover.Fill = MouseHoverBrush;
-
-            OffScreen = new TextBlock();
-            OffScreen.Text = "Offscreen Count Estimate: N/A";
-            OffScreen.Foreground = new SolidColorBrush(Colors.Yellow);
-            Canvas.SetLeft(OffScreen, 80);
-            Canvas.SetTop(OffScreen, 0);
-            OffScreen.Visibility = Visibility.Hidden;
 
             CurrentPosition = new TextBlock();
             CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
@@ -82,17 +76,12 @@ namespace Squigglr
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
             string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
-            Sender sender = new Sender(serverUrl, playerKey);
-
-            var runner = new DoubleRunner(
+            runner = new DoubleRunner(
                     new Sender(serverUrl, playerKey),
                     new DontDieRunner(new Sender(serverUrl, playerKey)),
                     new DontDieRunner(new Sender(serverUrl, playerKey)));
 
-            gInterface = new GameStateGraphics(runner);
-            gInterface.StartGame();
-
-            frame = new Frame(gInterface);
+            gameState = runner.Join();
 
             Render();
         }
@@ -101,71 +90,30 @@ namespace Squigglr
         {
             canvas.Children.Clear();
 
-            OffScreenCount = 0;
-
-            foreach (var rect in frame.Rects)
-            {
-                double x = Canvas.GetLeft(rect);
-                double y = Canvas.GetTop(rect);
-
-                if (x < 0 || x >= window.ActualWidth ||
-                    y < 0 || y >= window.ActualHeight)
-                {
-                    OffScreenCount++;
-                }
-
-                canvas.Children.Add(rect);
-            }
-
-            foreach (var label in frame.NumberOverlays.Values)
-            {
-                canvas.Children.Add(label);
-            }
-
             canvas.Children.Add(MouseHover);
-
-            if (OffScreenCount > 0)
-            {
-                OffScreen.Text = "Offscreen Count Estimate: " + OffScreenCount;
-                OffScreen.Visibility = Visibility.Visible;
-                canvas.Children.Add(OffScreen);
-            }
-            else
-            {
-                OffScreen.Visibility = Visibility.Hidden;
-                canvas.Children.Add(OffScreen);
-            }
 
             canvas.Children.Add(CurrentPosition);
             canvas.Children.Add(MeasureStartingLocationBlock);
 
-            RenderGameState();
-        }
-
-        public void Update()
-        {
-            Render();
-        }
-
-        private void RenderGameState()
-        {
-            GameState gameState = gInterface.GameState;
-
-            //DrawRectangle(0, 0, gameState.StarSize, 128);
+            // Render the GameState
+            FillRectangle(0, 0, gameState.StarSize, Colors.DarkGray);
+            DrawRectangle(0, 0, gameState.ArenaSize, Colors.DarkGray);
 
             foreach (var ship in gameState.Ships)
             {
+                int x = ship.Position.X;
+                int y = ship.Position.Y;
                 bool isAttacker = (ship.PlayerID == gameState.PlayerId && gameState.IsAttacker);
+                Color color = (isAttacker ? Colors.Red : Colors.Green);
 
-                TextBlock shipIndicator = new TextBlock();
-                shipIndicator.Foreground = new SolidColorBrush(isAttacker ? Colors.Red : Colors.Green);
-                shipIndicator.Text = $"{ship.ID}";
+                // Draw pixelized X
+                FillRectangle(x, y, 1, color);
+                FillRectangle(x - 1, y + 1, 1, color);
+                FillRectangle(x - 1, y - 1, 1, color);
+                FillRectangle(x + 1, y + 1, 1, color);
+                FillRectangle(x + 1, y - 1, 1, color);
 
-                Point p = Scaler.Convert(ship.Position);
-                Canvas.SetLeft(shipIndicator, p.X - 2);
-                Canvas.SetTop(shipIndicator, p.Y + 3);
-
-                canvas.Children.Add(shipIndicator);
+                DrawText(x, y + 2, color, $"{ship.ID}");
 
                 /*
                 Line line = new Line();
@@ -188,27 +136,88 @@ namespace Squigglr
             canvas.Children.Add(Ship);
         }
 
-        private void DrawRectangle(long x, long y, long radius, byte color)
+        private void DrawText(long x, long y, Color color, String text, bool center = true)
         {
-            var c = Color.FromRgb(color, color, color);
+            TextBlock textBlock = new TextBlock();
+            textBlock.Foreground = new SolidColorBrush(color);
+            textBlock.Text = text;
 
+            if (center)
+            {
+                textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+            }
+
+            Point p = Scaler.Convert(new IntPoint((int)x, (int)y));
+            Canvas.SetLeft(textBlock, p.X);
+            Canvas.SetTop(textBlock, p.Y);
+
+            canvas.Children.Add(textBlock);
+        }
+
+        private void DrawRectangle(long x, long y, long size, Color color)
+        {
             var r = new Rectangle();
 
-            Scaler.ResizeRectangle(r, radius);
-            r.Fill = new SolidColorBrush(c);
+            Scaler.ResizeRectangle(r, size);
+            r.Stroke = new SolidColorBrush(color);
+            r.Fill = null;
 
-            Point drawingPoint = Scaler.Convert(new IntPoint((int)x, (int)y));
-            Canvas.SetLeft(r, drawingPoint.X - radius);
-            Canvas.SetTop(r, drawingPoint.Y - radius);
+            Point drawingPoint = Scaler.Convert(new IntPoint((int)(x - size / 2), (int)(y - size / 2)));
+            Canvas.SetLeft(r, drawingPoint.X);
+            Canvas.SetTop(r, drawingPoint.Y);
 
             canvas.Children.Add(r);
         }
 
+        private void FillRectangle(long x, long y, long size, Color color)
+        {
+            var r = new Rectangle();
+
+            Scaler.ResizeRectangle(r, size);
+            r.Fill = new SolidColorBrush(color);
+
+            Point drawingPoint = Scaler.Convert(new IntPoint((int)(x - size / 2), (int)(y - size / 2)));
+            Canvas.SetLeft(r, drawingPoint.X);
+            Canvas.SetTop(r, drawingPoint.Y);
+
+            canvas.Children.Add(r);
+        }
+
+        private void StepOne()
+        {
+            gameState = runner.Step();
+            Render();
+        }
+
+        private void ToggleRun()
+        {
+            if (running)
+            {
+                running = false;
+
+                if (continuousRunner != null)
+                {
+                    continuousRunner.Wait();
+                }
+            }
+            else
+            {
+                running = true;
+
+                continuousRunner = Task.Factory.StartNew(() =>
+                {
+                    while (running)
+                    {
+                        Dispatcher.Invoke(StepOne);
+                        Thread.Sleep(100);
+                    }
+                });
+            }
+        }
+
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            IntPoint p = Scaler.Convert(e.GetPosition(canvas));
-            frame.Advance(p);
-            Render();
+            //IntPoint p = Scaler.Convert(e.GetPosition(canvas));
         }
 
         /// <summary>
@@ -242,18 +251,19 @@ namespace Squigglr
         private void window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Scaler.ResizeWindow(e.NewSize);
-            Update();
+            Render();
         }
 
         private void window_KeyDown(object sender, KeyEventArgs e)
         {
             switch(e.Key)
             {
-                case Key.Down: Scaler.ShiftView(vertical: false); Update(); break;
-                case Key.Up: Scaler.ShiftView(vertical: true); Update(); break;
-                case Key.Left: Scaler.ShiftView(horizontal: true); Update(); break;
-                case Key.Right: Scaler.ShiftView(horizontal: false); Update(); break;
-                case Key.Z: frame.Undo(); Render(); break;
+                case Key.Down: Scaler.ShiftView(vertical: false); Render(); break;
+                case Key.Up: Scaler.ShiftView(vertical: true); Render(); break;
+                case Key.Left: Scaler.ShiftView(horizontal: true); Render(); break;
+                case Key.Right: Scaler.ShiftView(horizontal: false); Render(); break;
+                case Key.Space: StepOne(); break;
+                case Key.R: ToggleRun(); break;
             }
         }
 
@@ -270,12 +280,12 @@ namespace Squigglr
         {
             Scaler.Zoom(e.Delta > 0);
             Scaler.ResizeRectangle(MouseHover);
-            Update();
+            Render();
         }
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Click = Step\n");
+            MessageBox.Show("Spacebar = Step\nR = Run/Pause");
         }
 
     }

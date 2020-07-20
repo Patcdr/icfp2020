@@ -7,6 +7,7 @@ using static Core.Library;
 using Core;
 using static app.Interactor;
 using System.IO;
+using Microsoft.VisualBasic;
 
 namespace app
 {
@@ -23,13 +24,13 @@ namespace app
         public Dictionary<Point, byte> AdvanceState(Point p)
         {
             GameState = runner.Step();
-            return GameStateToFrame(GameState);
+            return new Dictionary<Point, byte>();
         }
 
         public Dictionary<Point, byte> StartGame()
         {
             GameState = runner.Join();
-            return GameStateToFrame(GameState);
+            return new Dictionary<Point, byte>();
         }
 
         public Dictionary<Point, byte> SetState(Value s)
@@ -78,55 +79,6 @@ namespace app
             }
 
             return frame;
-        }
-
-        private Dictionary<Point, byte> GameStateToFrame(GameState gameState)
-        {
-            return CreateFrame(GameStateToDrawFrames(gameState));
-        }
-
-        private static IList<DrawFrame> GameStateToDrawFrames(GameState gameState)
-        {
-            var foregroundPoints = new List<Point>();
-            var backgroundPoints = new List<Point>();
-
-            // Draw ships
-            if (gameState.Ships != null)
-            {
-                foreach (var ship in gameState.Ships)
-                {
-                    Point p = ship.Position;
-
-                    // Draw as a small X
-                    foregroundPoints.Add(p);
-                    foregroundPoints.Add(new Point(p.X + 1, p.Y + 1));
-                    foregroundPoints.Add(new Point(p.X - 1, p.Y + 1));
-                    foregroundPoints.Add(new Point(p.X + 1, p.Y - 1));
-                    foregroundPoints.Add(new Point(p.X - 1, p.Y - 1));
-                }
-            }
-
-            // Draw star
-            int halfStarSize = (int)gameState.StarSize / 2;
-            for (int x = -halfStarSize; x < halfStarSize; x++)
-            {
-                for (int y = -halfStarSize; y < halfStarSize; y++)
-                {
-                    backgroundPoints.Add(new Point(x, y));
-                }
-            }
-
-            // Draw border around arena
-            int halfArenaSize = (int)gameState.ArenaSize / 2;
-            for (int i = -halfArenaSize; i < halfArenaSize; i++)
-            {
-                backgroundPoints.Add(new Point(i, -halfArenaSize));
-                backgroundPoints.Add(new Point(i, halfArenaSize));
-                backgroundPoints.Add(new Point(-halfArenaSize, i));
-                backgroundPoints.Add(new Point(halfArenaSize, i));
-            }
-
-            return new List<DrawFrame> { new DrawFrame(foregroundPoints), new DrawFrame(backgroundPoints) };
         }
     }
 }
