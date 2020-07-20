@@ -51,7 +51,7 @@ namespace app
 
             if (StartOrbitStrategy(ship)) return;
             if (StarStrategy(ship)) return;
-            if (SeekOrRun(ship, !State.IsAttacker)) return;
+            if (SeekOrRun(ship, State.IsAttacker)) return;
         }
 
         private bool StartOrbitStrategy(Ship ship)
@@ -332,9 +332,9 @@ namespace app
             }
 
             // If we're not on a baby (pos and velocity) and our orbit is stable, give birth!
-            bool onBaby = 
+            bool onBaby =
                 State.Ships.Any(
-                    x => x.Position == ship.Position && 
+                    x => x.Position == ship.Position &&
                     x.Velocity == ship.Velocity &&
                     x.ID != ship.ID);
             if (!onBaby && IsStableOrbit(ship))
