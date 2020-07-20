@@ -42,6 +42,8 @@ namespace Squigglr
         private bool running;
         private Task continuousRunner;
 
+        private bool autoZooming;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -86,6 +88,11 @@ namespace Squigglr
 
             canvas.Children.Add(CurrentPosition);
             canvas.Children.Add(MeasureStartingLocationBlock);
+
+            if (autoZooming)
+            {
+                AutoZoom();
+            }
 
             // Render the GameState
             FillRectangle(0, 0, gameState.StarSize, Colors.DarkGray);
@@ -144,6 +151,62 @@ namespace Squigglr
                     DrawText(0, 4, Colors.Red, "Attacker (Red) Wins");
                 }
             }
+        }
+
+        private void AutoZoom()
+        {
+            // Figure out autozoom stuff
+            (Size viewportSize, IntPoint viewportCenter) viewportSizeAndCenter = ComputeViewportCenter(gameState.Ships);
+            // Scale things as necessary
+            Size currentSize = Scaler.CurrentSize;
+            // Use the biggest ratio between width/height as new scale
+            Size desiredSize = viewportSizeAndCenter.viewportSize;
+            double desiredXScale = currentSize.Width / desiredSize.Width;
+            double desiredYScale = currentSize.Height / desiredSize.Height;
+            double desiredScale = Math.Min(desiredYScale, desiredXScale);
+            Scaler.ZoomAbsolute(desiredScale);
+            // Move center
+            Scaler.ShiftViewAbsolute(viewportSizeAndCenter.viewportCenter);
+        }
+
+        private (Size viewportSize, IntPoint viewportCenter) ComputeViewportCenter(List<Ship> gameStateShips)
+        {
+            // Find bounding box surrounding min x, min y and max x, max y
+            IntPoint minXminY = new IntPoint(Int32.MaxValue, Int32.MaxValue);
+            IntPoint maxXmaxY = new IntPoint(Int32.MinValue, Int32.MinValue);
+            foreach (Ship s in gameStateShips)
+            {
+                IntPoint pos = s.Position;
+                if (pos.X < minXminY.X)
+                {
+                    minXminY.X = pos.X;
+                }
+                if (pos.Y < minXminY.Y)
+                {
+                    minXminY.Y = pos.Y;
+                }
+
+                if (pos.X > maxXmaxY.X)
+                {
+                    maxXmaxY.X = pos.X;
+                }
+
+                if (pos.Y > maxXmaxY.Y)
+                {
+                    maxXmaxY.Y = pos.Y;
+                }
+            }
+
+            // Add some padding around it so that we don't potentially cut off random stuff
+            minXminY.X -= 20;
+            minXminY.Y -= 20;
+            maxXmaxY.X += 20;
+            maxXmaxY.Y += 20;
+
+            Size viewportSize = new Size(maxXmaxY.X - minXminY.X, maxXmaxY.Y - minXminY.Y);
+            // Might be off by half a pixel. Oh well.
+            IntPoint centerPoint = new IntPoint((int)(minXminY.X + viewportSize.Width / 2), (int)(minXminY.Y + viewportSize.Height / 2));
+            return (viewportSize, centerPoint);
         }
 
         private void RenderCommands(Value value)
@@ -396,7 +459,13 @@ namespace Squigglr
                 case Key.Right: Scaler.ShiftView(horizontal: false); Render(); break;
                 case Key.Space: StepOne(); break;
                 case Key.R: ToggleRun(); break;
+                case Key.Z: ToggleAutoZoom(); break;
             }
+        }
+
+        private void ToggleAutoZoom()
+        {
+            autoZooming = !autoZooming;
         }
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)

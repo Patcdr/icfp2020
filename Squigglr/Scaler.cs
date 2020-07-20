@@ -15,6 +15,8 @@ namespace Squigglr
         private static int PanShiftWidth = 0;
         private static int PanShiftHeight = 0;
 
+        public static Size CurrentSize => new Size(RealWidth, RealHeight);
+
         public static Point ConvertGridToScreen(double x, double y)
         {
             return new Point(x * Scale + RealWidth / 2 - Scale / 2 + PanShiftWidth * Scale,
@@ -52,6 +54,16 @@ namespace Squigglr
             }
         }
 
+        /// <summary>
+        /// Shifts the view so that PanShiftHeight/Width are set directly to the X/Y of centerPoint
+        /// </summary>
+        /// <param name="centerPoint"></param>
+        public static void ShiftViewAbsolute(IntPoint centerPoint)
+        {
+            PanShiftHeight = -centerPoint.Y;
+            PanShiftWidth = -centerPoint.X;
+        }
+
         public static void Zoom(bool isIn)
         {
             Scale += isIn ? 0.5 : -0.5;
@@ -60,6 +72,16 @@ namespace Squigglr
             {
                 Scale = 0.2;
             }
+        }
+
+        public static void ZoomAbsolute(double scaleFactor)
+        {
+            if (scaleFactor < 0.2)
+            {
+                scaleFactor = 0.2;
+            }
+
+            Scale = scaleFactor;
         }
     }
 }
