@@ -9,7 +9,9 @@ namespace Squigglr
 {
     public static class Scaler
     {
-        public static double Scale = 2.2;
+        public static readonly double DefaultScale = 2.2;
+
+        public static double Scale = DefaultScale;
         private static double RealWidth = 0;
         private static double RealHeight = 0;
         private static int PanShiftWidth = 0;

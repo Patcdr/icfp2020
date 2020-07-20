@@ -155,6 +155,14 @@ namespace Squigglr
 
         private void AutoZoom()
         {
+            // If the game's over, just set everything to default zoom/viewport.
+            if (gameState.GameStateVal != 1)
+            {
+                Scaler.ZoomAbsolute(Scaler.DefaultScale);
+                Scaler.ShiftViewAbsolute(new IntPoint(0, 0));
+                return;
+            }
+
             // Figure out autozoom stuff
             (Size viewportSize, IntPoint viewportCenter) viewportSizeAndCenter = ComputeViewportCenter(gameState.Ships);
             // Scale things as necessary
