@@ -98,11 +98,13 @@ namespace Squigglr
                 RenderCommands(player2Sender.LastSentValue);
             }
 
+            bool defendersExist = false;
             foreach (var ship in gameState.Ships)
             {
                 int x = ship.Position.X;
                 int y = ship.Position.Y;
                 bool isAttacker = (ship.PlayerID == gameState.PlayerId && gameState.IsAttacker);
+                defendersExist = defendersExist || !isAttacker;
                 Color color = (isAttacker ? Colors.Red : Colors.Green);
 
                 // Draw pixelized X
@@ -127,6 +129,21 @@ namespace Squigglr
             // Draw mouse hover
             FillRectangle(mousePosition.X, mousePosition.Y, 0.5, Colors.Yellow);
             CurrentPosition.Text = $"({mousePosition.X}, {mousePosition.Y})";
+
+            // Draw Game over
+            if (gameState.GameStateVal != 1)
+            {
+                DrawText(0, 0, Colors.Red, "GAME OVER");
+
+                if (defendersExist)
+                {
+                    DrawText(0, 4, Colors.Red, "Defender (Green) Wins");
+                }
+                else
+                {
+                    DrawText(0, 4, Colors.Red, "Attacker (Red) Wins");
+                }
+            }
         }
 
         private void RenderCommands(Value value)
@@ -285,7 +302,14 @@ namespace Squigglr
 
         private void StepOne()
         {
+            if (gameState.GameStateVal != 1)
+            {
+                running = false;
+                return;
+            }
+
             gameState = runner.Step();
+
             Render();
         }
 
