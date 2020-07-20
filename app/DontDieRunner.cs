@@ -282,10 +282,10 @@ namespace app
 
         private int TurnsTilDeath(Ship ship, int lookAheadTurns, Point thrust)
         {
+            List<Point> futureLocations = ShipPositionSimulator.FuturePositionList(ship, lookAheadTurns, thrust);
             for (int i = 1; i <= lookAheadTurns; i++)
             {
-                Point futureLocation = ShipPositionSimulator.FuturePosition(ship, i, thrust);
-                if (IsDeadLocation(futureLocation))
+                if (IsDeadLocation(futureLocations[i]))
                 {
                     return i;
                 }
