@@ -15,6 +15,8 @@ namespace app
         private readonly string playerKey;
         private readonly HttpClient httpClient;
 
+        public Value LastSentValue { get; private set; }
+
         public Sender(string serverUrl, string playerKey)
         {
             this.serverUrl = serverUrl;
@@ -33,6 +35,8 @@ namespace app
 
         public Value Send(Value statement, Value player=null)
         {
+            LastSentValue = statement;
+
             Console.WriteLine($"Sending({player}): {statement}");
 
             var signal = NumberFunctions.Mod(statement, null);

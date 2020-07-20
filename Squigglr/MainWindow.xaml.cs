@@ -37,6 +37,8 @@ namespace Squigglr
 
         private DoubleRunner runner;
         private GameState gameState;
+        private Sender player1Sender;
+        private Sender player2Sender;
 
         private bool running;
         private Task continuousRunner;
@@ -71,10 +73,12 @@ namespace Squigglr
             string serverUrl = "https://icfpc2020-api.testkontur.ru";
             string playerKey = "463bf8217ff3469189e1d9d15f8a29ce";
 
+            player1Sender = new Sender(serverUrl, playerKey);
+            player2Sender = new Sender(serverUrl, playerKey);
             runner = new DoubleRunner(
                     new Sender(serverUrl, playerKey),
-                    new DontDieRunner(new Sender(serverUrl, playerKey)),
-                    new DontDieRunner(new Sender(serverUrl, playerKey)));
+                    new DontDieRunner(player1Sender),
+                    new DontDieRunner(player2Sender));
 
             gameState = runner.Join();
 
@@ -91,6 +95,13 @@ namespace Squigglr
             // Render the GameState
             FillRectangle(0, 0, gameState.StarSize, Colors.DarkGray);
             DrawRectangle(0, 0, gameState.ArenaSize, Colors.DarkGray);
+
+            // Render commands
+            if (gameState.GameStateVal == 1)
+            {
+                RenderCommands(player1Sender.LastSentValue);
+                RenderCommands(player2Sender.LastSentValue);
+            }
 
             foreach (var ship in gameState.Ships)
             {
@@ -124,7 +135,60 @@ namespace Squigglr
             CurrentPosition.Text = $"({mousePosition.X}, {mousePosition.Y})";
         }
 
-        private void DrawText(int x, int y, Color color, String text, bool center = true)
+        private void RenderCommands(Value value)
+        {
+            long sendType = UtilityFunctions.Addr("car", value).AsNumber();
+
+            // Only type 4 is commands
+            if (sendType != 4)
+            {
+                return;
+            }
+
+            var ships = new Dictionary<long, Ship>();
+            foreach(var ship in gameState.Ships)
+            {
+                ships[ship.ID] = ship;
+            }
+
+            var commands = UtilityFunctions.Addr("cddar", value);
+
+            foreach (var command in UtilityFunctions.ListAsEnumerable(commands, null))
+            {
+                long code = UtilityFunctions.Addr("car", command).AsNumber();
+                long shipId = UtilityFunctions.Addr("cdar", command).AsNumber();
+                Ship ship = ships[shipId];
+
+                // Thrust
+                if (code == 0)
+                {
+                    var vector = UtilityFunctions.Addr("cddar", command);
+                    int vx = ship.Position.X + (int)vector.Car().AsNumber() * 5;
+                    int vy = ship.Position.Y + (int)vector.Cdr().AsNumber() * 5;
+
+                    DrawLine(ship.Position.X, ship.Position.Y, vx, vy, Colors.DarkSlateGray);
+                }
+                // Explode
+                else if (code == 1)
+                {
+                    DrawCircle(ship.Position.X, ship.Position.Y, 4, Colors.OrangeRed);
+                    DrawCircle(ship.Position.X, ship.Position.Y, 5, Colors.OrangeRed);
+                    DrawCircle(ship.Position.X, ship.Position.Y, 6, Colors.OrangeRed);
+                }
+                // Lazer
+                else if (code == 2)
+                {
+                    var target = UtilityFunctions.Addr("cddar", command);
+                    int tx = (int)target.Car().AsNumber();
+                    int ty = (int)target.Cdr().AsNumber();
+
+                    DrawLine(ship.Position.X, ship.Position.Y, tx, ty, Colors.Crimson);
+                }
+            }
+
+        }
+
+        private void DrawText(int x, int y, Color color, string text, bool center = true)
         {
             TextBlock textBlock = new TextBlock();
             textBlock.Foreground = new SolidColorBrush(color);
@@ -163,6 +227,22 @@ namespace Squigglr
 
             Scaler.ResizeRectangle(r, radius * 2);
             r.Fill = new SolidColorBrush(color);
+
+            Point drawingPoint = Scaler.ConvertGridToScreen(x - radius, y - radius);
+            Canvas.SetLeft(r, drawingPoint.X);
+            Canvas.SetTop(r, drawingPoint.Y);
+
+            canvas.Children.Add(r);
+        }
+
+        private void DrawCircle(long x, long y, double radius, Color color)
+        {
+            var r = new Ellipse();
+            r.Width = Scaler.Scale * radius * 2;
+            r.Height = Scaler.Scale * radius * 2;
+
+            r.Stroke = new SolidColorBrush(color);
+            r.StrokeThickness = 1;
 
             Point drawingPoint = Scaler.ConvertGridToScreen(x - radius, y - radius);
             Canvas.SetLeft(r, drawingPoint.X);
