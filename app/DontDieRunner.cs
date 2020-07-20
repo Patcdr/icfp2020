@@ -61,7 +61,8 @@ namespace app
         private void AttackStrategy(Ship ship)
         {
 
-            if (SevenTenSplit(ship, 3)) return;
+            if (SevenTenSplit(ship, 1)) return;
+            if (BabyBumRush(ship)) return;
             if (StarStrategy(ship)) return;
             if (SeekOrRun(ship, State.IsAttacker)) return;
         }
@@ -388,7 +389,7 @@ namespace app
                 State.Ships.Any(
                     x => x.Position == ship.Position &&
                     x.Velocity == ship.Velocity &&
-                    x.ID < ship.ID);
+                    x.ID > ship.ID);
             if (!onBaby && IsStableOrbit(ship))
             {
                 if (!State.IsAttacker)
@@ -449,15 +450,9 @@ namespace app
             return TimeToLive(ship, new Point(0, 0)) == int.MaxValue;
         }
 
-        private void BabyBumRush(Ship ship)
+        private bool BabyBumRush(Ship ship)
         {
-            // Wait a turn (in some fashion) to see which way they go.
-            if (State.CurrentTurn == 0)
-            {
-                return;
-            }
-
-            if (State.CurrentTurn < 3)
+            if (State.CurrentTurn < 6)
             {
                 Ship enemyShip = State.GetOpponentFirstShip();
                 Point predictedThrust = enemyShip.Thrust;
@@ -469,29 +464,44 @@ namespace app
 
                 List<Point> predictedPath = ShipPositionSimulator.FuturePositionList(enemyShip, (int)State.TotalTurns, predictedThrusts);
 
-                SeekPositionList(ship, predictedPath, true, true);
-            }
-            else
-            {
-                SeekOrRun(ship, true, true);
+                Point thrust = GetThrustToMeetEnemy(ship, predictedPath);
+
+                if (thrust != Point.Empty)
+                {
+                    LatentCommand(Thrust(ship.ID, thrust));
+                }
+
+                return true;
             }
 
-            // Rush to meet them. ???
-            return;
+            return false;
         }
 
-        public Point GetThrustToMeetEnemy(List<Point> expectedPositions)
+        private Point GetThrustToMeetEnemy(Ship us, List<Point> expectedEnemyPositions)
         {
-            for (int i = 0; i < expectedPositions.Count; i++)
-            {
-                // Can we reach expectedPositions[i] in time?
-                // BFS or A*
+            int bestScore = int.MaxValue;
+            Point bestThrust = Point.Empty;
+
+            foreach (Point thrust in ShipPositionSimulator.CheatThrustsWithOrigin) {
+                List<Point> expectedUsPositions = ShipPositionSimulator.FuturePositionList(us, (int)State.TotalTurns, thrust);
+
+                if (expectedEnemyPositions.Count != expectedUsPositions.Count) throw new Exception();
+
+                for (int i = 0; i < expectedUsPositions.Count; i++)
+                {
+                    int score = SpaceTimeDistance(expectedUsPositions[i], expectedEnemyPositions[i], i);
+                    if (score < bestScore)
+                    {
+                        bestScore = score;
+                        bestThrust = thrust;
+                    }
+                }
             }
 
-            return Point.Empty;
+            return bestThrust;
         }
 
-        public int SpaceTimeDistance(Point ourLocation, Point theirLocation, int turns)
+        private int SpaceTimeDistance(Point ourLocation, Point theirLocation, int turns)
         {
             return ManhattanDistance(ourLocation, theirLocation) + turns;
         }

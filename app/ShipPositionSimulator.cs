@@ -139,22 +139,6 @@ namespace app
     public class ShipPositionSimulator
     {
         public static Point[] Thrusts = new Point[] {
-            // new Point(-2, -2),
-            // new Point(-2, -1),
-            // new Point(-2, 0),
-            // new Point(-2, 1),
-            // new Point(-2, 2),
-            // new Point(-1, -2),
-            // new Point(-1, 2),
-            // new Point(0, -2),
-            // new Point(0, 2),
-            // new Point(1, 2),
-            // new Point(1, -2),
-            // new Point(2, -2),
-            // new Point(2, -1),
-            // new Point(2, 0),
-            // new Point(2, 1),
-            // new Point(2, 2),
 
             new Point(-1, -1),
             new Point(-1, 0),
@@ -166,6 +150,63 @@ namespace app
             new Point(1, 1),
         };
 
+        public static Point[] CheatThrusts = new Point[] {
+            new Point(-2, -2),
+            new Point(-2, -1),
+            new Point(-2, 0),
+            new Point(-2, 1),
+            new Point(-2, 2),
+            new Point(-1, -2),
+            new Point(-1, 2),
+            new Point(0, -2),
+            new Point(0, 2),
+            new Point(1, 2),
+            new Point(1, -2),
+            new Point(2, -2),
+            new Point(2, -1),
+            new Point(2, 0),
+            new Point(2, 1),
+            new Point(2, 2),
+
+            new Point(-1, -1),
+            new Point(-1, 0),
+            new Point(-1, 1),
+            new Point(0, -1),
+            new Point(0, 1),
+            new Point(1, -1),
+            new Point(1, 0),
+            new Point(1, 1),
+            };
+
+        public static Point[] CheatThrustsWithOrigin = new Point[] {
+            new Point(-2, -2),
+            new Point(-2, -1),
+            new Point(-2, 0),
+            new Point(-2, 1),
+            new Point(-2, 2),
+            new Point(-1, -2),
+            new Point(-1, 2),
+            new Point(0, -2),
+            new Point(0, 2),
+            new Point(1, 2),
+            new Point(1, -2),
+            new Point(2, -2),
+            new Point(2, -1),
+            new Point(2, 0),
+            new Point(2, 1),
+            new Point(2, 2),
+
+            new Point(-1, -1),
+            new Point(-1, 0),
+            new Point(-1, 1),
+            new Point(0, -1),
+            new Point(0, 1),
+            new Point(1, -1),
+            new Point(1, 0),
+            new Point(1, 1),
+
+            new Point(0,0)
+            };
         public static Point FuturePosition(Ship ship, int numTurns, Point thrust)
         {
             return FuturePositionList(ship, numTurns, thrust).Last();
