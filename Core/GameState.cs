@@ -16,6 +16,11 @@ namespace Core
         public readonly long Role;
 
         public readonly Point Position;
+
+        public Point NextPosition()
+        {
+            return new Point(Position.X + Velocity.X, Position.Y + Velocity.Y);
+        }
         public readonly Point Velocity;
         public readonly Point Thrust;
 

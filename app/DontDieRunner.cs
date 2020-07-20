@@ -74,7 +74,7 @@ namespace app
 
             foreach (Ship enemy in State.GetTheirShips())
             {
-                if (SquareDistance(ship.Position, enemy.Position) < 10)
+                if (SquareDistance(ship.NextPosition(), enemy.NextPosition()) < 5)
                 {
                     LatentCommand(Detonate(ship.ID));
                     return true;
