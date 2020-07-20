@@ -27,7 +27,7 @@ namespace app
         {
             if (isAttacker)
             {
-                return (0, 8, MaxShips);
+                return (0, 2, MaxShips);
             }
 
             return (0, 8, MaxShips);
