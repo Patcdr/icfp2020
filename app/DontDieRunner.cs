@@ -170,13 +170,13 @@ namespace app
 
             // If we're not too hot
             // TODO: Less conservative value.
-            if (ship.Heat != 0)
+            if (ship.Heat > 16)
             {
                 return;
             }
 
             // And there's an enemy ship close enough
-            int maxDistance = 30;
+            int maxDistance = 40;
             int closestDistance = int.MaxValue;
             Point closestShip = new Point(0, 0);
             foreach (Ship s in State.Ships.Where(x => x.PlayerID != State.PlayerId))
