@@ -208,7 +208,7 @@ namespace app
         private void ConsiderShootingLaser(Ship ship, Point expectedPosition)
         {
             // If we're not too hot
-            if (ship.Heat > 64)
+            if (ship.Heat > 80)
             {
                 return;
             }
