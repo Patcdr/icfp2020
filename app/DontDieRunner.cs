@@ -20,7 +20,7 @@ namespace app
         {
             if (isAttacker)
             {
-                return (64, 10, 1);
+                return (32, 10, 1);
             }
 
             return (0, 10, 1);
