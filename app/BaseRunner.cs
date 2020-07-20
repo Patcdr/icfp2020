@@ -33,6 +33,8 @@ namespace app
         public Number Player { get; private set; }
         public GameState State { get; private set; }
 
+        public List<Value> LatentCommands = new List<Value>();
+
         // Extract fuel from gamestate
         public bool IsDone => State.GameStateVal == 2;
 
@@ -83,7 +85,18 @@ namespace app
 
         protected void Command(params Value[] commands)
         {
-            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }), State);
+            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(commands) }, Player), State);
+        }
+
+        protected void LatentCommand(Value command)
+        {
+            LatentCommands.Add(command);
+        }
+
+        protected void LatentSend()
+        {
+            State = new GameState(Sender.Send(new Value[] { CMD, Player, UtilityFunctions.MakeList(LatentCommands) }, Player), State);
+            LatentCommands.Clear();
         }
 
         protected Value Thrust(long shipId, Point vector)
@@ -102,9 +115,9 @@ namespace app
         }
 
         //Split: [3, ship_id, (fuel, hamburger, cooling, babies)] (Properties are given in a nil-terminated list and are 0, 1, 2, 4, 8, or 16.)
-        protected Value Split(long shipId, int fuel, int hamburger, int cooling, int babies)
+        protected Value Split(long shipId, int fuel, int lazers, int cooling, int babies)
         {
-            return C(SPLIT, C(N(shipId), C(UtilityFunctions.MakeList(new int[] { fuel, hamburger, cooling, babies }), Nil)));
+            return C(SPLIT, C(N(shipId), C(UtilityFunctions.MakeList(new int[] { fuel, lazers, cooling, babies }), Nil)));
         }
 
         #endregion

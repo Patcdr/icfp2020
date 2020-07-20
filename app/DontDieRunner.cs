@@ -11,6 +11,8 @@ namespace app
     public class DontDieRunner : BaseRunner
     {
         Random r = new Random();
+        int MaxShips = 1;
+
         public DontDieRunner(Sender sender, long player = 0)
             : base(sender, player)
         {
@@ -20,44 +22,54 @@ namespace app
         {
             if (isAttacker)
             {
-                return (64, 10, 1);
+                return (64, 16, 1);
             }
 
-            return (0, 10, 1);
+            return (0, 16, MaxShips);
         }
 
-        public override void Step()
+        public override void Step() {
+            foreach (Ship ship in State.GetMyShips())
+            {
+                ShipStep(ship);
+            }
+            LatentSend();
+        }
+
+        public void ShipStep(Ship ship)
         {
             if (IsDone) return;
 
             if (State.CurrentTurn < 6)
             {
-                StartOrbitStrategy();
+                StartOrbitStrategy(ship);
+            }
+            else if (!State.IsAttacker && State.MyShipCount() < MaxShips)
+            {
+                StarStrategy(ship);
             }
             // TODO: THIS IS TERRIBLE.  We should not act like a defender if there's more than one enemy.
             else if (!State.IsAttacker ||
                 State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() > 1)
             {
-                SeekOrRun(false);
+                SeekOrRun(ship, false);
             }
             else
             {
-                SeekOrRun(true);
+                SeekOrRun(ship, true);
             }
         }
 
-        private void StartOrbitStrategy()
+        private void StartOrbitStrategy(Ship ship)
         {
-            var ship = State.GetMyFirstShip();
             var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
             var ninetyDegrees = new Point(opposite.Y, -opposite.X);
-            Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
+            LatentCommand(Thrust(ship.ID, ninetyDegrees));
         }
 
-        private void SeekOrRun(bool isAttacker)
+        private void SeekOrRun(Ship ship, bool isAttacker)
         {
             int lookaheadTurns = 32;
-            Ship ship = State.GetMyFirstShip();
 
             // Simulate the enemy's position into the future, save all positions
             // TODO: Deal with all enemy ships.
@@ -108,7 +120,7 @@ namespace app
                 new Tuple<Point, List<Point>>(
                     new Point(0, 0),
                     ShipPositionSimulator.FuturePositionList(
-                        State.GetMyFirstShip(),
+                        ship,
                         lookaheadTurns,
                         new Point(0, 0))));
             foreach (Point dir in ActionHandler.AllDirections)
@@ -117,7 +129,7 @@ namespace app
                     new Tuple<Point, List<Point>>(
                         dir,
                         ShipPositionSimulator.FuturePositionList(
-                            State.GetMyFirstShip(),
+                            ship,
                             lookaheadTurns,
                             dir)));
             }
@@ -146,7 +158,7 @@ namespace app
                 deathTurnAndPaths.Where(x => x.Item1 >= deathHorizon).ToList();
             if (nonDyingPaths.Count == 0)
             {
-                AvoidDeathStrategy();
+                AvoidDeathStrategy(ship);
                 return;
             }
 
@@ -171,39 +183,27 @@ namespace app
             }
 
             // Pick the thrust that's highest scored!
-            List<Value> commands = new List<Value>();
             Point expectedPosition = ship.Position;
             if (bestPlan.Item2 != new Point(0, 0) && ship.Health > 0) {
                 expectedPosition = new Point(expectedPosition.X - bestPlan.Item2.X, expectedPosition.Y - bestPlan.Item2.Y);
-                commands.Add(Thrust(ship.ID, bestPlan.Item2));
+                LatentCommand(Thrust(ship.ID, bestPlan.Item2));
             }
 
             if (bestPlan.Item3[0] == quantumPositions[0] &&
                 State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() == 1 &&
                 isAttacker)
             {
-                commands.Add(Detonate(ship.ID));
+                LatentCommand(Detonate(ship.ID));
             }
 
             if (isAttacker)
             {
-                ConsiderShootingLaser(commands, expectedPosition);
-            }
-
-            if (commands.Count > 0)
-            {
-                Command(commands.ToArray());
-            }
-            else
-            {
-                Command();
+                ConsiderShootingLaser(ship, expectedPosition);
             }
         }
 
-        private void ConsiderShootingLaser(List<Value> commands, Point expectedPosition)
+        private void ConsiderShootingLaser(Ship ship, Point expectedPosition)
         {
-            Ship ship = State.GetMyFirstShip();
-
             // If we're not too hot
             if (ship.Heat > 64)
             {
@@ -228,7 +228,7 @@ namespace app
             // FIRE TEH LZER
             if (closestDistance < maxDistance)
             {
-                commands.Add(Shoot(ship.ID, closestShip, ship.Lazers));
+                LatentCommand(Shoot(ship.ID, closestShip, ship.Lazers));
             }
         }
 
@@ -254,20 +254,18 @@ namespace app
             return new Tuple<int, int>(closestDistance, closestTurn);
         }
 
-        private void AvoidDeathStrategy()
+        private void AvoidDeathStrategy(Ship ship)
         {
             int lookaheadTurns = 15;
-            Ship ship = State.GetMyFirstShip();
-            bool thrusted = false;
 
             // If we would die by not thrusting
-            if (TurnsTilDeath(lookaheadTurns, new Point(0, 0)) != int.MaxValue)
+            if (TurnsTilDeath(ship, lookaheadTurns, new Point(0, 0)) != int.MaxValue)
             {
                 int longestLife = 0;
                 Point thrust = new Point(0, 0);
                 foreach (Point p in ActionHandler.AllDirections)
                 {
-                    int currentLife = TurnsTilDeath(lookaheadTurns, p);
+                    int currentLife = TurnsTilDeath(ship, lookaheadTurns, p);
                     if (currentLife > longestLife)
                     {
                         longestLife = currentLife;
@@ -277,23 +275,16 @@ namespace app
 
                 if (thrust != new Point(0, 0))
                 {
-                    Command(Thrust(ship.ID, thrust));
-                    thrusted = true;
+                    LatentCommand(Thrust(ship.ID, thrust));
                 }
-            }
-
-            if (!thrusted)
-            {
-                // Note: this means I think I've got no way to live longer.
-                Command();
             }
         }
 
-        private int TurnsTilDeath(int lookAheadTurns, Point thrust)
+        private int TurnsTilDeath(Ship ship, int lookAheadTurns, Point thrust)
         {
             for (int i = 1; i <= lookAheadTurns; i++)
             {
-                Point futureLocation = ShipPositionSimulator.FuturePosition(State.GetMyFirstShip(), i, thrust);
+                Point futureLocation = ShipPositionSimulator.FuturePosition(ship, i, thrust);
                 if (IsDeadLocation(futureLocation))
                 {
                     return i;
@@ -303,9 +294,8 @@ namespace app
             return int.MaxValue;
         }
 
-        private void HoverOnStartStrategy()
+        private void HoverOnStartStrategy(Ship ship)
         {
-            Ship ship = State.GetMyFirstShip();
             Point thrust = new Point(0, 0);
 
             // Am I on a diagonal?
@@ -330,7 +320,12 @@ namespace app
                 }
             }
 
-            Command(Thrust(ship.ID, thrust));
+            LatentCommand(Thrust(ship.ID, thrust));
+        }
+
+        private void StarStrategy(Ship ship)
+        {
+            LatentCommand(Split(ship.ID, (int)ship.Health / 2, (int)ship.Lazers / 2, (int)ship.Cooling / 2, (int)ship.Babies / 2));
         }
     }
 }

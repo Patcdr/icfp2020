@@ -134,6 +134,15 @@ namespace Core
             return Ships.Where(x => x.PlayerID == PlayerId).First();
         }
 
+        public IEnumerable<Ship> GetMyShips()
+        {
+            return Ships.Where(x => x.PlayerID == PlayerId);
+        }
+        public long MyShipCount()
+        {
+            return GetMyShips().Count();
+        }
+
         public Ship GetOpponentFirstShip()
         {
             return Ships.Where(x => x.PlayerID != PlayerId).First();
