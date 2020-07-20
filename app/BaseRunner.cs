@@ -24,6 +24,8 @@ namespace app
         public static readonly Value SHOOT = new Number(2);
         public static readonly Value SPLIT = new Number(3);
 
+        public static readonly Value MAGIC = new Number(192496425430);
+
         #endregion
 
         #region Properties
@@ -59,7 +61,7 @@ namespace app
 
         public void Join()
         {
-            State = new GameState(Sender.Send(new Value[] { JOIN, Player, NilList }));
+            State = new GameState(Sender.Send(new Value[] { JOIN, Player, UtilityFunctions.MakeList(MAGIC) }));
 
             var ( lazers, cooling, ships ) = GetInitialValues(State.IsAttacker);
 
