@@ -137,7 +137,7 @@ namespace app
             // Pick the thrust that's highest scored!
             List<Value> commands = new List<Value>();
             Point expectedPosition = ship.Position;
-            if (bestPlan.Item2 != new Point(0, 0)) {
+            if (bestPlan.Item2 != new Point(0, 0) && ship.Health > 0) {
                 expectedPosition = new Point(expectedPosition.X - bestPlan.Item2.X, expectedPosition.Y - bestPlan.Item2.Y);
                 commands.Add(Thrust(ship.ID, bestPlan.Item2));
             }
