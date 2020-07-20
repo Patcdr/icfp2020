@@ -131,7 +131,9 @@ namespace app
 
             // Pick the thrust that's highest scored!
             List<Value> commands = new List<Value>();
-            if (bestPlan.Item2 != new Point(0, 0)) { 
+            Point expectedPosition = ship.Position;
+            if (bestPlan.Item2 != new Point(0, 0)) {
+                expectedPosition = new Point(expectedPosition.X - bestPlan.Item2.X, expectedPosition.Y - bestPlan.Item2.Y);
                 commands.Add(Thrust(ship.ID, bestPlan.Item2));
             }
 
@@ -142,6 +144,11 @@ namespace app
                 commands.Add(Detonate(ship.ID));
             }
 
+            if (isAttacker)
+            {
+                ConsiderShootingLaser(commands, expectedPosition);
+            }
+
             if (commands.Count > 0)
             {
                 Command(commands.ToArray());
@@ -149,6 +156,39 @@ namespace app
             else
             {
                 Command();
+            }
+        }
+
+        private void ConsiderShootingLaser(List<Value> commands, Point expectedPosition)
+        {
+            Ship ship = State.GetMyFirstShip();
+
+            // If we're not too hot
+            // TODO: Less conservative value.
+            if (ship.Heat != 0)
+            {
+                return;
+            }
+
+            // And there's an enemy ship close enough
+            int maxDistance = 30;
+            int closestDistance = int.MaxValue;
+            Point closestShip = new Point(0, 0);
+            foreach (Ship s in State.Ships.Where(x => x.PlayerID != State.PlayerId))
+            {
+                Point enemyPosition = new Point(s.Position.X + s.Velocity.X, s.Position.Y + s.Velocity.Y);
+                int distance = ManhattanDistance(enemyPosition, expectedPosition);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestShip = enemyPosition;
+                }
+            }
+
+            // FIRE TEH LZER
+            if (closestDistance < maxDistance)
+            {
+                commands.Add(Shoot(ship.ID, closestShip, ship.Lazers));
             }
         }
 
