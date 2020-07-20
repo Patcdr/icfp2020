@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Core;
 using static Core.Library;
@@ -154,7 +155,7 @@ namespace app
 
             // Filter out the paths that would lead to death sooner than 15 turns.  If none exist, then try the avoid
             // death strategy.
-            int DeathHorizon = LookaheadTurns;
+            int DeathHorizon = 15;
             List<Tuple<int, Point, List<Point>>> nonDyingPaths =
                 deathTurnAndPaths.Where(x => x.Item1 >= DeathHorizon).ToList();
             if (nonDyingPaths.Count == 0)
@@ -235,16 +236,21 @@ namespace app
             }
         }
 
-        private Tuple<int, int> ClosestDistanceAndTurn(IEnumerable<Point> path1, IEnumerable<Point> path2)
+        private Tuple<int, int> ClosestDistanceAndTurn(IEnumerable<Point> us, IEnumerable<Point> them)
         {
-            var list1 = new List<Point>(path1);
-            var list2 = new List<Point>(path2);
+            var usList = new List<Point>(us);
+            var themList = new List<Point>(them);
 
             int closestDistance = int.MaxValue;
             int closestTurn = -1;
-            for (int i = 0; i < list1.Count(); i++)
+            for (int i = 0; i < usList.Count(); i++)
             {
-                int distance = ManhattanDistance(list1[i], list2[Math.Min(i, list2.Count - 1)]);
+                if (IsDeadLocation(usList[i]))
+                {
+                    break;
+                }
+
+                int distance = ManhattanDistance(usList[i], themList[Math.Min(i, themList.Count - 1)]);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
@@ -410,6 +416,29 @@ namespace app
         private bool IsStableOrbit(Ship ship)
         {
             return TimeToLive(ship, new Point(0, 0)) == int.MaxValue;
+        }
+
+        private bool BabyBumRush(Ship ship)
+        {
+            // Wait a turn (in some fashion) to see which way they go.
+            // Rush to meet them. ???
+            return false;
+        }
+
+        public Point GetThrustToMeetEnemy(List<Point> expectedPositions)
+        {
+            for (int i = 0; i < expectedPositions.Count; i++)
+            {
+                // Can we reach expectedPositions[i] in time?
+                // BFS or A*
+            }
+
+            return Point.Em;
+        }
+
+        public int SpaceTimeDistance(Point ourLocation, Point theirLocation, int turns)
+        {
+            return ManhattanDistance(ourLocation, theirLocation) + turns;
         }
 
         private Point BabyMama(Point origin, int index)
