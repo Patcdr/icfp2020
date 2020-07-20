@@ -24,7 +24,9 @@ namespace app
         public static readonly Value SHOOT = new Number(2);
         public static readonly Value SPLIT = new Number(3);
 
-        public static readonly Value MAGIC = new Number(192496425430);
+        public static readonly Value GIANTPENTIUMHEATSINK = new Number(192496425430);
+        public static readonly Value THRUSTVECTORINGOWNSTHESKIES = new Number(103652820);
+
 
         #endregion
 
@@ -63,7 +65,7 @@ namespace app
 
         public void Join()
         {
-            State = new GameState(Sender.Send(new Value[] { JOIN, Player, UtilityFunctions.MakeList(MAGIC) }));
+            State = new GameState(Sender.Send(new Value[] { JOIN, Player, UtilityFunctions.MakeList(GIANTPENTIUMHEATSINK, THRUSTVECTORINGOWNSTHESKIES) }));
 
             var ( lazers, cooling, ships ) = GetInitialValues(State.IsAttacker);
 
