@@ -49,8 +49,7 @@ namespace app
                 StarStrategy(ship);
             }
             // TODO: THIS IS TERRIBLE.  We should not act like a defender if there's more than one enemy.
-            else if (!State.IsAttacker ||
-                State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() > 1)
+            else if (!State.IsAttacker)
             {
                 SeekOrRun(ship, false);
             }
