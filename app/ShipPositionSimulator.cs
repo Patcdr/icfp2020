@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 
 namespace app
@@ -10,6 +11,12 @@ namespace app
     {
         public static Point FuturePosition(Ship ship, int numTurns, Point thrust)
         {
+            return FuturePositionList(ship, numTurns, thrust).Last();
+        }
+
+        public static List<Point> FuturePositionList(Ship ship, int numTurns, Point thrust)
+        {
+            List<Point> positions = new List<Point>();
             Point currentVelocity = new Point(ship.Velocity.X - thrust.X, ship.Velocity.Y - thrust.Y);
             Point currentPosition = ship.Position;
             for (int i = 0; i < numTurns; i++)
@@ -17,9 +24,10 @@ namespace app
                 Point gravity = Gravity(currentPosition);
                 currentVelocity = new Point(currentVelocity.X + gravity.X, currentVelocity.Y + gravity.Y);
                 currentPosition = new Point(currentPosition.X + currentVelocity.X, currentPosition.Y + currentVelocity.Y);
+                positions.Add(currentPosition);
             }
 
-            return currentPosition;
+            return positions;
         }
 
         public static Point FuturePosition(Ship ship, int numTurns)

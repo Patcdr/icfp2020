@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using Core;
 using static Core.Library;
@@ -23,9 +24,14 @@ namespace app
             {
                 StartOrbitStrategy();
             }
-            else
+            else if (!State.IsAttacker || 
+                State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() > 1)
             {
                 AvoidDeathStrategy();
+            }
+            else
+            {
+                GetCloseAndMurderThem();
             }
         }
 
@@ -35,6 +41,131 @@ namespace app
             var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
             var ninetyDegrees = new Point(opposite.Y, -opposite.X);
             Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
+        }
+
+        private void GetCloseAndMurderThem()
+        {
+            int lookaheadTurns = 32;
+            Ship ship = State.GetMyFirstShip();
+
+            // Simulate the enemy's position into the future, save all positions
+            // TODO: Deal with all enemy ships.
+            List<Point> enemyPositions =
+                ShipPositionSimulator.FuturePositionList(
+                    State.Ships.Where(x => x.PlayerID != State.PlayerId).First(),
+                    lookaheadTurns,
+                    new Point(0, 0));
+
+            // Simulate our position given no thrust, and all possible thrusts.
+            List<Tuple<Point, List<Point>>> allPaths = new List<Tuple<Point, List<Point>>>();
+            allPaths.Add(
+                new Tuple<Point, List<Point>>(
+                    new Point(0, 0),
+                    ShipPositionSimulator.FuturePositionList(
+                        State.GetMyFirstShip(),
+                        lookaheadTurns,
+                        new Point(0, 0))));
+            foreach (Point dir in ActionHandler.AllDirections)
+            {
+                allPaths.Add(
+                    new Tuple<Point, List<Point>>(
+                        dir,
+                        ShipPositionSimulator.FuturePositionList(
+                            State.GetMyFirstShip(),
+                            lookaheadTurns,
+                            dir)));
+            }
+
+            // Figure out when we'd die along each of the paths.
+            List<Tuple<int, Point, List<Point>>> deathTurnAndPaths = new List<Tuple<int, Point, List<Point>>>();
+            foreach (var path in allPaths)
+            {
+                int deathTurn = int.MaxValue;
+                for (int i = 0; i < path.Item2.Count; i++)
+                {
+                    if (IsDeadLocation(path.Item2[i]))
+                    {
+                        deathTurn = i;
+                        break;
+                    }
+                }
+
+                deathTurnAndPaths.Add(new Tuple<int, Point, List<Point>>(deathTurn, path.Item1, path.Item2));
+            }
+
+            // Filter out the paths that would lead to death sooner than 15 turns.  If none exist, then try the avoid
+            // death strategy.
+            int deathHorizon = 15;
+            List<Tuple<int, Point, List<Point>>> nonDyingPaths =
+                deathTurnAndPaths.Where(x => x.Item1 >= deathHorizon).ToList();
+            if (nonDyingPaths.Count == 0)
+            {
+                AvoidDeathStrategy();
+                return;
+            }
+
+            // Foreach of our paths
+            //   Score them based on which one gets closest to the enemy soonest.
+            int bestScore = int.MaxValue;
+            Tuple<int, Point, List<Point>> bestPlan = null;
+            foreach (var deathAndPath in nonDyingPaths)
+            {
+                var distanceAndTurn = ClosestDistanceAndTurn(deathAndPath.Item3, enemyPositions);
+                int score = distanceAndTurn.Item1 + distanceAndTurn.Item2;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestPlan = deathAndPath;
+                }
+            }
+
+            // Pick the thrust that's highest scored!
+            List<Value> commands = new List<Value>();
+            if (bestPlan.Item2 != new Point(0, 0)) { 
+                commands.Add(Thrust(ship.ID, bestPlan.Item2));
+            }
+
+            if (bestPlan.Item3[0] == enemyPositions[0] &&
+                State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() == 1)
+            {
+                commands.Add(Detonate(ship.ID));
+            }
+
+            if (commands.Count > 0)
+            {
+                Command(commands.ToArray());
+            }
+            else
+            {
+                Command();
+            }
+        }
+
+        private Tuple<int, int> ClosestDistanceAndTurn(List<Point> path1, List<Point> path2)
+        {
+            if (path1.Count != path2.Count)
+            {
+                throw new Exception("I didn't write this to allow for different length paths.");
+            }
+
+            int closestDistance = int.MaxValue;
+            int closestTurn = -1;
+            for (int i = 0; i < path1.Count; i++)
+            {
+                int distance = ManhattanDistance(path1[i], path2[i]);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestTurn = i;
+                }
+            }
+
+            return new Tuple<int, int>(closestDistance, closestTurn);
+        }
+
+        private int ManhattanDistance(Point first, Point second)
+        {
+            return Math.Abs(first.X - second.X) + Math.Abs(first.Y - second.Y);
         }
 
         private void AvoidDeathStrategy()
@@ -55,19 +186,6 @@ namespace app
                     {
                         longestLife = currentLife;
                         thrust = p;
-                    }
-                    else if (currentLife == longestLife)
-                    {
-                        // If it's a tie, prefer the thrust that is most in the direction we're currently going.
-                        /*
-                        int bestDotProduct = ship.Velocity.X * thrust.X + ship.Velocity.Y * thrust.Y;
-                        int currentDotProduct = ship.Velocity.X * p.X + ship.Velocity.Y * p.Y;
-                        if (currentDotProduct > bestDotProduct)
-                        {
-                            longestLife = currentLife;
-                            thrust = p;
-                        }
-                        */
                     }
                 }
 
