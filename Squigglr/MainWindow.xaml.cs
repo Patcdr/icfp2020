@@ -115,7 +115,7 @@ namespace Squigglr
                 // Ship stats
                 Color statColor = Color.FromRgb(90, 90, 90);
                 DrawText(x, y + 3, statColor, $"{ship.ID}");
-                DrawText(x + 2, y, statColor, $"F:{ship.Health}\nL:{ship.Lazers}\nC:{ship.Cooling}", false);
+                DrawText(x + 2, y, statColor, $"F:{ship.Health}\nH:{ship.Heat}\nL:{ship.Lazers}\nC:{ship.Cooling}", false);
 
                 //DrawLine(x, y, 0, 0, Colors.Crimson);
             }
@@ -189,17 +189,18 @@ namespace Squigglr
                 CultureInfo.GetCultureInfo("en-us"),
                 FlowDirection.LeftToRight,
                 new Typeface("Courier New"),
-                10,
+                12,
                 new SolidColorBrush(color));
 
             TextBlock textBlock = new TextBlock();
             textBlock.IsHitTestVisible = false;
             textBlock.Foreground = new SolidColorBrush(color);
             textBlock.Text = text;
-            textBlock.FontSize = 10;
-            textBlock.LineHeight = 10;
+            textBlock.FontSize = 12;
+            textBlock.LineHeight = 12;
             textBlock.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;
             textBlock.FontFamily = new FontFamily("Courier New");
+            textBlock.FontWeight = FontWeights.Bold;
 
             if (center)
             {
