@@ -8,10 +8,10 @@ using static Core.Library;
 
 namespace app
 {
-    public class DontDieRunner : BaseRunner
+    public class DeathStarRunner : BaseRunner
     {
         Random r = new Random();
-        public DontDieRunner(Sender sender, long player = 0)
+        public DeathStarRunner(Sender sender, long player = 0)
             : base(sender, player)
         {
         }
@@ -20,7 +20,7 @@ namespace app
         {
             if (isAttacker)
             {
-                return (64, 10, 1);
+                return (96, 8, 1);
             }
 
             return (0, 10, 1);
@@ -34,15 +34,13 @@ namespace app
             {
                 StartOrbitStrategy();
             }
-            // TODO: THIS IS TERRIBLE.  We should not act like a defender if there's more than one enemy.
-            else if (!State.IsAttacker ||
-                State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() > 1)
+            else if (!State.IsAttacker)
             {
                 SeekOrRun(false);
             }
             else
             {
-                SeekOrRun(true);
+                EmpireRules();
             }
         }
 
@@ -52,6 +50,47 @@ namespace app
             var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
             var ninetyDegrees = new Point(opposite.Y, -opposite.X);
             Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
+        }
+
+        private void EmpireRules()
+        {
+            int lookaheadTurns = 15;
+            Ship ship = State.GetMyFirstShip();
+            List<Value> commands = new List<Value>();
+
+            // If we would die by not thrusting
+            Point thrust = new Point(0, 0);
+            if (TurnsTilDeath(lookaheadTurns, new Point(0, 0)) != int.MaxValue)
+            {
+                int longestLife = 0;
+                foreach (Point p in ActionHandler.AllDirections)
+                {
+                    int currentLife = TurnsTilDeath(lookaheadTurns, p);
+                    if (currentLife > longestLife)
+                    {
+                        longestLife = currentLife;
+                        thrust = p;
+                    }
+                }
+
+                if (thrust != new Point(0, 0))
+                {
+                    commands.Add(Thrust(ship.ID, thrust));
+                }
+            }
+
+            ConsiderShootingLaser(
+                commands, 
+                ShipPositionSimulator.FuturePosition(ship, 1, thrust));
+
+            if (commands.Count > 0)
+            {
+                Command(commands.ToArray());
+            }
+            else
+            {
+                Command();
+            }
         }
 
         private void SeekOrRun(bool isAttacker)
@@ -68,7 +107,7 @@ namespace app
                 enemy.Thrust);
             var thrustCount = 1;
 
-            void rec(List<Point> moves, int max=1)
+            void rec(List<Point> moves, int max = 1)
             {
                 if (moves.Count == max) return;
 
@@ -85,7 +124,8 @@ namespace app
                     {
                         quantumPositions = new List<Point>(enemyPositions);
                     }
-                    else {
+                    else
+                    {
                         for (var i = 0; i < enemyPositions.Count; i++)
                         {
                             quantumPositions[i] = new Point(
@@ -173,7 +213,8 @@ namespace app
             // Pick the thrust that's highest scored!
             List<Value> commands = new List<Value>();
             Point expectedPosition = ship.Position;
-            if (bestPlan.Item2 != new Point(0, 0) && ship.Health > 0) {
+            if (bestPlan.Item2 != new Point(0, 0) && ship.Health > 0)
+            {
                 expectedPosition = new Point(expectedPosition.X - bestPlan.Item2.X, expectedPosition.Y - bestPlan.Item2.Y);
                 commands.Add(Thrust(ship.ID, bestPlan.Item2));
             }
@@ -205,13 +246,13 @@ namespace app
             Ship ship = State.GetMyFirstShip();
 
             // If we're not too hot
-            if (ship.Heat > 64)
+            if (ship.Heat > 34)
             {
                 return;
             }
 
             // And there's an enemy ship close enough
-            int maxDistance = 40;
+            int maxDistance = 128;
             int closestDistance = int.MaxValue;
             Point closestShip = new Point(0, 0);
             foreach (Ship s in State.Ships.Where(x => x.PlayerID != State.PlayerId))
