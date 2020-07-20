@@ -140,6 +140,11 @@ namespace app
             return Math.Abs(first.X - second.X) + Math.Abs(first.Y - second.Y);
         }
 
+        protected int SquareDistance(Point first, Point second)
+        {
+            return Math.Abs(first.X - second.X) + Math.Abs(first.Y - second.Y);
+        }
+
         protected bool IsDeadLocation(Point location)
         {
             return (Math.Abs(location.X) <= State.StarSize && Math.Abs(location.Y) <= State.StarSize) ||

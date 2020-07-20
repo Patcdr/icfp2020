@@ -61,10 +61,27 @@ namespace app
         private void AttackStrategy(Ship ship)
         {
 
+            if (MaybeExplode(ship)) return;
             if (SevenTenSplit(ship, 1)) return;
             if (BabyBumRush(ship)) return;
             if (StarStrategy(ship)) return;
             if (SeekOrRun(ship, State.IsAttacker)) return;
+        }
+
+        private bool MaybeExplode(Ship ship)
+        {
+            int numShips = State.GetTheirShips().Count();
+
+            foreach (Ship enemy in State.GetTheirShips())
+            {
+                if (SquareDistance(ship.Position, enemy.Position) < 5)
+                {
+                    LatentCommand(Detonate(ship.ID));
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void DefenseStrategy(Ship ship)

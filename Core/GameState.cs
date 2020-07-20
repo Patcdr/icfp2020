@@ -138,6 +138,11 @@ namespace Core
         {
             return Ships.Where(x => x.PlayerID == PlayerId).OrderBy(x => x.ID);
         }
+
+        public IEnumerable<Ship> GetTheirShips()
+        {
+            return Ships.Where(x => x.PlayerID != PlayerId).OrderBy(x => x.ID);
+        }
         public long MyShipCount()
         {
             return GetMyShips().Count();
