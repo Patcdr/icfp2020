@@ -49,7 +49,7 @@ namespace app
                 return;
             }
 
-            if (StartOrbitStrategy(ship)) return;
+            if (SevenTenSplit(ship)) return;
             if (StarStrategy(ship)) return;
             if (SeekOrRun(ship, State.IsAttacker)) return;
         }
@@ -323,9 +323,31 @@ namespace app
             LatentCommand(Thrust(ship.ID, thrust));
         }
 
+
+        private bool SevenTenSplit(Ship ship)
+        {
+            // Split quick
+            if (State.IsAttacker || State.CurrentTurn > 5) return false;
+
+            // Split
+            if (MyShips.Count() == 1)
+            {
+                LatentCommand(Split(ship.ID, (int)ship.Health/2, (int)ship.Lazers/2, (int)ship.Cooling/2, (int)ship.Babies/2));
+                return true;
+            }
+
+            int index = MyAliveShips.ToList().IndexOf(ship);
+            var sign = (ship == MyFirstShip ? 1 : - 1);
+            var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
+            var ninetyDegrees = new Point(sign * opposite.Y * 2, -sign * opposite.X * 2);
+            LatentCommand(Thrust(ship.ID, ninetyDegrees));
+            return true;
+        }
+
+
         private bool StarStrategy(Ship ship)
         {
-            // If no eggs left or we're a defender, return false
+            // If no eggs left, return false
             if (State.IsAttacker || ship.Babies == 1)
             {
                 return false;
