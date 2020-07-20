@@ -28,7 +28,7 @@ namespace app
                 // Rumble mode with explicit bots
                 var runner = new DoubleRunner(
                     new Sender(serverUrl, key),
-                    new DeathStarRunner(new Sender(serverUrl, key)),
+                    new DontDieRunner(new Sender(serverUrl, key)),
                     new DontDieRunner(new Sender(serverUrl, key)));
 
                 var game = runner.Join();
@@ -47,7 +47,7 @@ namespace app
             else if (args.Length == 2)
             {
                 // Submission mode
-                var agent = new DeathStarRunner(new Sender(serverUrl, key), long.Parse(key));
+                var agent = new DontDieRunner(new Sender(serverUrl, key), long.Parse(key));
                 agent.Join();
 
                 for (long i = agent.State.CurrentTurn; i < agent.State.TotalTurns; i++)
