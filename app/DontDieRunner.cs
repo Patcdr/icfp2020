@@ -11,7 +11,11 @@ namespace app
     public class DontDieRunner : BaseRunner
     {
         Random r = new Random();
-        int MaxShips = 1;
+        public static readonly int MaxShips = 32;
+        public static readonly int LookaheadTurns = 32;
+
+        public int BabiesMade = 1;
+        public long MaxBabyTurn = 0;
 
         public DontDieRunner(Sender sender, long player = 0)
             : base(sender, player)
@@ -40,42 +44,30 @@ namespace app
         {
             if (IsDone) return;
 
-            if (State.CurrentTurn < 6)
-            {
-                StartOrbitStrategy(ship);
-            }
-            else if (!State.IsAttacker && State.MyShipCount() < MaxShips)
-            {
-                StarStrategy(ship);
-            }
-            // TODO: THIS IS TERRIBLE.  We should not act like a defender if there's more than one enemy.
-            else if (!State.IsAttacker)
-            {
-                SeekOrRun(ship, false);
-            }
-            else
-            {
-                SeekOrRun(ship, true);
-            }
+            if (StartOrbitStrategy(ship)) return;
+            if (StarStrategy(ship)) return;
+            if (SeekOrRun(ship, !State.IsAttacker)) return;
         }
 
-        private void StartOrbitStrategy(Ship ship)
+        private bool StartOrbitStrategy(Ship ship)
         {
+            if (State.CurrentTurn >= 6) return false;
+
             var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
             var ninetyDegrees = new Point(opposite.Y, -opposite.X);
             LatentCommand(Thrust(ship.ID, ninetyDegrees));
+
+            return true;
         }
 
-        private void SeekOrRun(Ship ship, bool isAttacker)
+        private bool SeekOrRun(Ship ship, bool towards)
         {
-            int lookaheadTurns = 32;
-
             // Simulate the enemy's position into the future, save all positions
             // TODO: Deal with all enemy ships.
             Ship enemy = State.Ships.Where(x => x.PlayerID != State.PlayerId).First();
             List<Point> quantumPositions = ShipPositionSimulator.FuturePositionList(
                 enemy,
-                lookaheadTurns,
+                LookaheadTurns,
                 enemy.Thrust);
             var thrustCount = 1;
 
@@ -89,7 +81,7 @@ namespace app
                     List<Point> enemyPositions =
                         ShipPositionSimulator.FuturePositionList(
                             State.Ships.Where(x => x.PlayerID != State.PlayerId).First(),
-                            lookaheadTurns,
+                            LookaheadTurns,
                             moves);
 
                     if (quantumPositions == null)
@@ -113,6 +105,11 @@ namespace app
             }
             rec(new List<Point>());
 
+            return SeekPositionList(ship, quantumPositions, towards);
+        }
+
+        private bool SeekPositionList(Ship ship, IEnumerable<Point> quantumPositions, bool towards)
+        {
             // Simulate our position given no thrust, and all possible thrusts.
             List<Tuple<Point, List<Point>>> allPaths = new List<Tuple<Point, List<Point>>>();
             allPaths.Add(
@@ -120,7 +117,7 @@ namespace app
                     new Point(0, 0),
                     ShipPositionSimulator.FuturePositionList(
                         ship,
-                        lookaheadTurns,
+                        LookaheadTurns,
                         new Point(0, 0))));
             foreach (Point dir in ActionHandler.AllDirections)
             {
@@ -129,7 +126,7 @@ namespace app
                         dir,
                         ShipPositionSimulator.FuturePositionList(
                             ship,
-                            lookaheadTurns,
+                            LookaheadTurns,
                             dir)));
             }
 
@@ -152,29 +149,29 @@ namespace app
 
             // Filter out the paths that would lead to death sooner than 15 turns.  If none exist, then try the avoid
             // death strategy.
-            int deathHorizon = 15;
+            int DeathHorizon = LookaheadTurns;
             List<Tuple<int, Point, List<Point>>> nonDyingPaths =
-                deathTurnAndPaths.Where(x => x.Item1 >= deathHorizon).ToList();
+                deathTurnAndPaths.Where(x => x.Item1 >= DeathHorizon).ToList();
             if (nonDyingPaths.Count == 0)
             {
                 AvoidDeathStrategy(ship);
-                return;
+                return true;
             }
 
             // Foreach of our paths
             //   Score them based on which one gets closest to the enemy soonest.
-            int bestScore = isAttacker ? int.MaxValue : int.MinValue;
+            int bestScore = towards ? int.MaxValue : int.MinValue;
             Tuple<int, Point, List<Point>> bestPlan = null;
             foreach (var deathAndPath in nonDyingPaths)
             {
                 var distanceAndTurn = ClosestDistanceAndTurn(deathAndPath.Item3, quantumPositions);
                 int score = distanceAndTurn.Item1 + distanceAndTurn.Item2;
-                if (isAttacker && score < bestScore)
+                if (towards && score < bestScore)
                 {
                     bestScore = score;
                     bestPlan = deathAndPath;
                 }
-                else if (!isAttacker && score > bestScore)
+                else if (!towards && score > bestScore)
                 {
                     bestScore = score;
                     bestPlan = deathAndPath;
@@ -188,17 +185,19 @@ namespace app
                 LatentCommand(Thrust(ship.ID, bestPlan.Item2));
             }
 
-            if (bestPlan.Item3[0] == quantumPositions[0] &&
+            if (bestPlan.Item3[0] == quantumPositions.First() &&
                 State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() == 1 &&
-                isAttacker)
+                towards)
             {
                 LatentCommand(Detonate(ship.ID));
             }
 
-            if (isAttacker)
+            if (towards)
             {
                 ConsiderShootingLaser(ship, expectedPosition);
             }
+
+            return true;
         }
 
         private void ConsiderShootingLaser(Ship ship, Point expectedPosition)
@@ -231,18 +230,16 @@ namespace app
             }
         }
 
-        private Tuple<int, int> ClosestDistanceAndTurn(List<Point> path1, List<Point> path2)
+        private Tuple<int, int> ClosestDistanceAndTurn(IEnumerable<Point> path1, IEnumerable<Point> path2)
         {
-            if (path1.Count != path2.Count)
-            {
-                throw new Exception("I didn't write this to allow for different length paths.");
-            }
+            var list1 = new List<Point>(path1);
+            var list2 = new List<Point>(path2);
 
             int closestDistance = int.MaxValue;
             int closestTurn = -1;
-            for (int i = 0; i < path1.Count; i++)
+            for (int i = 0; i < list1.Count(); i++)
             {
-                int distance = ManhattanDistance(path1[i], path2[i]);
+                int distance = ManhattanDistance(list1[i], list2[Math.Min(i, list2.Count - 1)]);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
@@ -255,16 +252,14 @@ namespace app
 
         private void AvoidDeathStrategy(Ship ship)
         {
-            int lookaheadTurns = 15;
-
             // If we would die by not thrusting
-            if (TurnsTilDeath(ship, lookaheadTurns, new Point(0, 0)) != int.MaxValue)
+            if (TurnsTilDeath(ship, new Point(0, 0)) != int.MaxValue)
             {
                 int longestLife = 0;
                 Point thrust = new Point(0, 0);
                 foreach (Point p in ActionHandler.AllDirections)
                 {
-                    int currentLife = TurnsTilDeath(ship, lookaheadTurns, p);
+                    int currentLife = TurnsTilDeath(ship, p);
                     if (currentLife > longestLife)
                     {
                         longestLife = currentLife;
@@ -279,10 +274,11 @@ namespace app
             }
         }
 
-        private int TurnsTilDeath(Ship ship, int lookAheadTurns, Point thrust)
+        private int TurnsTilDeath(Ship ship, Point thrust)
         {
-            List<Point> futureLocations = ShipPositionSimulator.FuturePositionList(ship, lookAheadTurns, thrust);
-            for (int i = 1; i <= lookAheadTurns; i++)
+            int a = LookaheadTurns;
+            List<Point> futureLocations = ShipPositionSimulator.FuturePositionList(ship, a, thrust);
+            for (int i = 0; i < futureLocations.Count; i++)
             {
                 if (IsDeadLocation(futureLocations[i]))
                 {
@@ -322,9 +318,36 @@ namespace app
             LatentCommand(Thrust(ship.ID, thrust));
         }
 
-        private void StarStrategy(Ship ship)
+        private bool StarStrategy(Ship ship)
         {
-            LatentCommand(Split(ship.ID, (int)ship.Health / 2, (int)ship.Lazers / 2, (int)ship.Cooling / 2, (int)ship.Babies / 2));
+            if (!State.IsAttacker && BabiesMade < MaxShips)
+            {
+                LatentCommand(Split(ship.ID, (int)ship.Health / 2, (int)ship.Lazers / 2, (int)ship.Cooling / 2, (int)ship.Babies / 2));
+                BabiesMade += 1;
+                if (BabiesMade == MaxShips) MaxBabyTurn = State.CurrentTurn;
+                return true;
+            }
+
+            if (MaxBabyTurn > 0 && State.CurrentTurn - MaxBabyTurn <= 10)
+            {
+                var index = new List<Ship>(State.GetMyShips()).IndexOf(ship);
+                return SeekPositionList(ship, new Point[] { BabyMama(MyFirstShip.Position, index) }, true);
+            }
+
+            return SeekOrRun(ship, false);
         }
+
+        private Point BabyMama(Point origin, int index)
+        {
+            var r_o = Math.Sqrt(origin.X * origin.X + origin.Y * origin.Y);
+            var a_o = Math.Atan((double)origin.Y / (double)origin.X);
+
+            var r = State.ArenaSize - index / 8 * (State.ArenaSize - State.StarSize) - 5;
+            var a = (index % 8 * (2 * Math.PI / 8) + a_o);
+
+            var cart = new Point((int)(r * Math.Cos(a)), (int)(r * Math.Sin(a)));
+            return cart;
+        }
+
     }
 }

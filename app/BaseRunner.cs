@@ -145,11 +145,8 @@ namespace app
                    Math.Abs(location.Y) >= State.ArenaSize;
         }
 
-        protected double Distance(long sourceShip=0, long destShip=1)
+        protected double Distance(Ship source, Ship dest)
         {
-            Ship source = State.GetShipById(sourceShip);
-            Ship dest = State.GetShipById(destShip);
-
             return Math.Sqrt(
                 Math.Abs((source.Position.X - dest.Position.X)) *
                 Math.Abs((source.Position.X - dest.Position.X)) +
