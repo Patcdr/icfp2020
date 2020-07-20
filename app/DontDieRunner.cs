@@ -11,7 +11,7 @@ namespace app
     public class DontDieRunner : BaseRunner
     {
         Random r = new Random();
-        public static readonly int MaxShips = 8;
+        public static readonly int MaxShips = 64;
         public static readonly int LookaheadTurns = 32;
 
         public int BabiesMade = 1;
@@ -26,10 +26,10 @@ namespace app
         {
             if (isAttacker)
             {
-                return (64, 16, 1);
+                return (32, 8, 1);
             }
 
-            return (0, 16, MaxShips);
+            return (0, 8, MaxShips);
         }
 
         public override void Step() {
@@ -43,6 +43,11 @@ namespace app
         public void ShipStep(Ship ship)
         {
             if (IsDone) return;
+
+            if (ship.Health == 0 && ship.Lazers == 0)
+            {
+                return;
+            }
 
             if (StartOrbitStrategy(ship)) return;
             if (StarStrategy(ship)) return;
@@ -320,21 +325,69 @@ namespace app
 
         private bool StarStrategy(Ship ship)
         {
-            if (!State.IsAttacker && BabiesMade < MaxShips)
+            // If no eggs left or we're a defender, return false
+            if (State.IsAttacker || ship.Babies == 1)
             {
-                LatentCommand(Split(ship.ID, (int)ship.Health / 2, (int)ship.Lazers / 2, (int)ship.Cooling / 2, (int)ship.Babies / 2));
-                BabiesMade += 1;
-                if (BabiesMade == MaxShips) MaxBabyTurn = State.CurrentTurn;
+                return false;
+            }
+
+            // If we're not on a baby (pos and velocity) and our orbit is stable, give birth!
+            bool onBaby = 
+                State.Ships.Any(
+                    x => x.Position == ship.Position && 
+                    x.Velocity == ship.Velocity &&
+                    x.ID != ship.ID);
+            if (!onBaby && IsStableOrbit(ship))
+            {
+                LatentCommand(Split(ship.ID, 0, 0, 0, 1));
                 return true;
             }
 
-            if (MaxBabyTurn > 0 && State.CurrentTurn - MaxBabyTurn <= 10)
+            // Otherwise, get to a (different) stable orbit.
+            LatentCommand(Thrust(ship.ID, GetStableOrbitThrust(ship)));
+            return true;
+        }
+
+        private Point GetStableOrbitThrust(Ship ship)
+        {
+            Point[] thrustVectors = ShipPositionSimulator.Thrusts;
+            int maxTurns = 0;
+            Point bestThrust = new Point(0, 0);
+            foreach (Point thrust in thrustVectors)
             {
-                var index = new List<Ship>(State.GetMyShips()).IndexOf(ship);
-                return SeekPositionList(ship, new Point[] { BabyMama(MyFirstShip.Position, index) }, true);
+                int ttl = TimeToLive(ship, thrust);
+                if (ttl == int.MaxValue)
+                {
+                    return thrust;
+                }
+                else if (ttl > maxTurns)
+                {
+                    maxTurns = ttl;
+                    bestThrust = thrust;
+                }
             }
 
-            return SeekOrRun(ship, false);
+            return bestThrust;
+        }
+
+        private int TimeToLive(Ship ship, Point thrust)
+        {
+            List<Point> positions =
+                ShipPositionSimulator.FuturePositionList(ship, 256 - (int)State.CurrentTurn, thrust);
+            for (int i = 0; i < positions.Count; i++)
+            {
+                if (IsDeadLocation(positions[i]))
+                {
+                    return i + 1;
+                }
+            }
+
+            return int.MaxValue;
+        }
+
+        private bool IsStableOrbit(Ship ship)
+        {
+            return TimeToLive(ship, new Point(0, 0)) == int.MaxValue;
         }
 
         private Point BabyMama(Point origin, int index)
