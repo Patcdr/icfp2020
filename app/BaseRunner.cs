@@ -43,18 +43,9 @@ namespace app
         #endregion
 
         private readonly Sender Sender;
-        private readonly int initialLazers;
-        private readonly int initialCooling;
-        private readonly int initialShips;
 
-        public BaseRunner(Sender sender, long player, int initialLazers, int initialCooling, int initialShips)
+        public BaseRunner(Sender sender, long player)
         {
-            if (initialShips < 1) throw new ArgumentException("initialShips must be at least 1");
-
-            this.initialLazers = initialLazers;
-            this.initialCooling = initialCooling;
-            this.initialShips = initialShips;
-
             this.Sender = sender;
             this.Player = new Number(player);
         }
@@ -64,13 +55,19 @@ namespace app
             Player = player;
         }
 
+        protected abstract (int lazers, int cooling, int ships) GetInitialValues(bool isAttacker);
+
         public void Join()
         {
             State = new GameState(Sender.Send(new Value[] { JOIN, Player, NilList }));
 
-            int health = (int)State.TotalPoints - (4 * initialLazers) - (12 * initialCooling) - (2 * initialShips);
+            var ( lazers, cooling, ships ) = GetInitialValues(State.IsAttacker);
+            
+            if (ships < 1) throw new ArgumentException("initial ships must be at least 1");
 
-            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, initialLazers, initialCooling, initialShips }) }));
+            int health = (int)State.TotalPoints - (4 * lazers) - (12 * cooling) - (2 * ships);
+
+            State = new GameState(Sender.Send(new Value[] { START, Player, UtilityFunctions.MakeList(new int[] { health, lazers, cooling, ships }) }));
         }
 
         public abstract void Step();
@@ -119,6 +116,18 @@ namespace app
         protected Point CreateVector(Point from, Point to)
         {
             return new Point(to.X - from.X, to.Y - from.Y);
+        }
+
+        protected int ManhattanDistance(Point first, Point second)
+        {
+            return Math.Abs(first.X - second.X) + Math.Abs(first.Y - second.Y);
+        }
+
+        protected bool IsDeadLocation(Point location)
+        {
+            return (Math.Abs(location.X) <= State.StarSize && Math.Abs(location.Y) <= State.StarSize) ||
+                   Math.Abs(location.X) >= State.ArenaSize ||
+                   Math.Abs(location.Y) >= State.ArenaSize;
         }
 
         #endregion

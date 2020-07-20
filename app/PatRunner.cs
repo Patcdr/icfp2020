@@ -10,8 +10,13 @@ namespace app
     public class PatRunner : BaseRunner
     {
         public PatRunner(Sender sender, long player=0)
-            : base(sender, player, 0, 0, 1)
+            : base(sender, player)
         {
+        }
+
+        protected override (int lazers, int cooling, int ships) GetInitialValues(bool isAttacker)
+        {
+            return (0, 0, 1);
         }
 
         private int burnSteps = 0;

@@ -12,8 +12,13 @@ namespace app
     {
         Random r = new Random();
         public DontDieRunner(Sender sender, long player = 0)
-            : base(sender, player, 0, 8, 1)
+            : base(sender, player)
         {
+        }
+
+        protected override (int lazers, int cooling, int ships) GetInitialValues(bool isAttacker)
+        {
+            return (0, 8, 1);
         }
 
         public override void Step()
@@ -169,11 +174,6 @@ namespace app
             return new Tuple<int, int>(closestDistance, closestTurn);
         }
 
-        private int ManhattanDistance(Point first, Point second)
-        {
-            return Math.Abs(first.X - second.X) + Math.Abs(first.Y - second.Y);
-        }
-
         private void AvoidDeathStrategy()
         {
             int lookaheadTurns = 15;
@@ -221,14 +221,6 @@ namespace app
             }
 
             return int.MaxValue;
-        }
-
-        private bool IsDeadLocation(Point location)
-        {
-            return (Math.Abs(location.X) <= State.StarSize && Math.Abs(location.Y) <= State.StarSize) ||
-                Math.Abs(location.X) >= State.ArenaSize ||
-                Math.Abs(location.Y) >= State.ArenaSize;
-
         }
 
         private void HoverOnStartStrategy()
