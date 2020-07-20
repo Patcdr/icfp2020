@@ -50,6 +50,22 @@ namespace app
                 return;
             }
 
+            if (State.IsAttacker)
+            {
+                AttackStrategy(ship);
+            } else {
+                DefenseStrategy(ship);
+            }
+        }
+
+        private void AttackStrategy(Ship ship)
+        {
+            //BabyBumRush(ship);
+            SeekOrRun(ship, State.IsAttacker, true);
+        }
+
+        private void DefenseStrategy(Ship ship)
+        {
             if (SevenTenSplit(ship)) return;
             if (StarStrategy(ship)) return;
             if (SeekOrRun(ship, State.IsAttacker)) return;
@@ -66,7 +82,8 @@ namespace app
             return true;
         }
 
-        private bool SeekOrRun(Ship ship, bool towards)
+        // TODO: Look into bum rush bug.
+        private bool SeekOrRun(Ship ship, bool towards, bool bumRush = false)
         {
             // Simulate the enemy's position into the future, save all positions
             // TODO: Deal with all enemy ships.
@@ -111,10 +128,10 @@ namespace app
             }
             rec(new List<Point>());
 
-            return SeekPositionList(ship, quantumPositions, towards);
+            return SeekPositionList(ship, quantumPositions, towards, bumRush);
         }
 
-        private bool SeekPositionList(Ship ship, IEnumerable<Point> quantumPositions, bool towards)
+        private bool SeekPositionList(Ship ship, IEnumerable<Point> quantumPositions, bool towards, bool bumRush)
         {
             // Simulate our position given no thrust, and all possible thrusts.
             List<Tuple<Point, List<Point>>> allPaths = new List<Tuple<Point, List<Point>>>();
@@ -155,7 +172,7 @@ namespace app
 
             // Filter out the paths that would lead to death sooner than 15 turns.  If none exist, then try the avoid
             // death strategy.
-            int DeathHorizon = 15;
+            int DeathHorizon = bumRush ? 2 : 15;
             List<Tuple<int, Point, List<Point>>> nonDyingPaths =
                 deathTurnAndPaths.Where(x => x.Item1 >= DeathHorizon).ToList();
             if (nonDyingPaths.Count == 0)
@@ -418,11 +435,35 @@ namespace app
             return TimeToLive(ship, new Point(0, 0)) == int.MaxValue;
         }
 
-        private bool BabyBumRush(Ship ship)
+        private void BabyBumRush(Ship ship)
         {
             // Wait a turn (in some fashion) to see which way they go.
+            if (State.CurrentTurn == 0)
+            {
+                return;
+            }
+
+            if (State.CurrentTurn < 3)
+            {
+                Ship enemyShip = State.GetOpponentFirstShip();
+                Point predictedThrust = enemyShip.Thrust;
+                List<Point> predictedThrusts = new List<Point>();
+                for (int i = 0; i < 3 - State.CurrentTurn; ++i)
+                {
+                    predictedThrusts.Add(predictedThrust);
+                }
+
+                List<Point> predictedPath = ShipPositionSimulator.FuturePositionList(enemyShip, (int)State.TotalTurns, predictedThrusts);
+
+                SeekPositionList(ship, predictedPath, true, true);
+            }
+            else
+            {
+                SeekOrRun(ship, true, true);
+            }
+
             // Rush to meet them. ???
-            return false;
+            return;
         }
 
         public Point GetThrustToMeetEnemy(List<Point> expectedPositions)
@@ -433,7 +474,7 @@ namespace app
                 // BFS or A*
             }
 
-            return Point.Em;
+            return Point.Empty;
         }
 
         public int SpaceTimeDistance(Point ourLocation, Point theirLocation, int turns)
