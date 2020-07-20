@@ -28,7 +28,7 @@ namespace app
                 // Rumble mode with explicit bots
                 var runner = new DoubleRunner(
                     new Sender(serverUrl, key),
-                    new DontDieRunner(new Sender(serverUrl, key)),
+                    new DeathStarRunner(new Sender(serverUrl, key)),
                     new DontDieRunner(new Sender(serverUrl, key)));
 
                 var game = runner.Join();
