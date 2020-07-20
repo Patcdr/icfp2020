@@ -39,7 +39,7 @@ namespace app
 
         private void AvoidDeathStrategy()
         {
-            int lookaheadTurns = 8;
+            int lookaheadTurns = 15;
             Ship ship = State.GetMyFirstShip();
             bool thrusted = false;
 
@@ -59,6 +59,7 @@ namespace app
                     else if (currentLife == longestLife)
                     {
                         // If it's a tie, prefer the thrust that is most in the direction we're currently going.
+                        /*
                         int bestDotProduct = ship.Velocity.X * thrust.X + ship.Velocity.Y * thrust.Y;
                         int currentDotProduct = ship.Velocity.X * p.X + ship.Velocity.Y * p.Y;
                         if (currentDotProduct > bestDotProduct)
@@ -66,6 +67,7 @@ namespace app
                             longestLife = currentLife;
                             thrust = p;
                         }
+                        */
                     }
                 }
 
