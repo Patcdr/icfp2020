@@ -11,7 +11,7 @@ namespace app
     public class DontDieRunner : BaseRunner
     {
         Random r = new Random();
-        public static readonly int MaxShips = 32;
+        public static readonly int MaxShips = 8;
         public static readonly int LookaheadTurns = 32;
 
         public int BabiesMade = 1;
@@ -119,7 +119,7 @@ namespace app
                         ship,
                         LookaheadTurns,
                         new Point(0, 0))));
-            foreach (Point dir in ActionHandler.AllDirections)
+            foreach (Point dir in ShipPositionSimulator.Thrusts)
             {
                 allPaths.Add(
                     new Tuple<Point, List<Point>>(
@@ -257,7 +257,7 @@ namespace app
             {
                 int longestLife = 0;
                 Point thrust = new Point(0, 0);
-                foreach (Point p in ActionHandler.AllDirections)
+                foreach (Point p in ShipPositionSimulator.Thrusts)
                 {
                     int currentLife = TurnsTilDeath(ship, p);
                     if (currentLife > longestLife)
