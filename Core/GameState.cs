@@ -22,6 +22,7 @@ namespace Core
         public readonly long Lazers;
         public readonly long Cooling;
         public readonly long Babies;
+        public readonly long Heat;
 
         private static Point ToPoint(Value point)
         {
@@ -42,6 +43,8 @@ namespace Core
             this.Lazers = UtilityFunctions.Addr("cdar", props).AsNumber();
             this.Cooling = UtilityFunctions.Addr("cddar", props).AsNumber();
             this.Babies = UtilityFunctions.Addr("cdddar", props).AsNumber();
+
+            this.Heat = UtilityFunctions.Addr("cadddddar", ship).AsNumber();
         }
 
         public override string ToString()
