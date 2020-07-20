@@ -18,6 +18,7 @@ using IntPoint = System.Drawing.Point;
 using Core;
 using System.Threading;
 using System.Printing;
+using System.Globalization;
 
 namespace Squigglr
 {
@@ -28,8 +29,6 @@ namespace Squigglr
     {
         private readonly TextBlock CurrentPosition;
         private readonly TextBlock Turn;
-        private readonly TextBlock Ship;
-        private int selectedShipId;
 
         private IntPoint mousePosition;
         private readonly Rectangle MeasureStartingLocationBlock;
@@ -48,6 +47,7 @@ namespace Squigglr
             InitializeComponent();
             canvas.Background = new SolidColorBrush(Colors.Black);
             Scaler.ResizeWindow(window.DesiredSize);
+            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
             CurrentPosition = new TextBlock();
             CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
@@ -58,11 +58,6 @@ namespace Squigglr
             Turn.Foreground = new SolidColorBrush(Colors.Yellow);
             Canvas.SetLeft(Turn, 0);
             Canvas.SetTop(Turn, 15);
-
-            Ship = new TextBlock();
-            Ship.Foreground = new SolidColorBrush(Colors.Yellow);
-            Canvas.SetLeft(Ship, 0);
-            Canvas.SetTop(Ship, 30);
 
             MeasureStartingLocationBlock = new Rectangle();
             Scaler.ResizeRectangle(MeasureStartingLocationBlock, 1);
@@ -117,7 +112,10 @@ namespace Squigglr
                 FillRectangle(x + 1, y + 1, 0.5, color);
                 FillRectangle(x + 1, y - 1, 0.5, color);
 
-                DrawText(x, y + 2, color, $"{ship.ID}");
+                // Ship stats
+                Color statColor = Color.FromRgb(90, 90, 90);
+                DrawText(x, y + 3, statColor, $"{ship.ID}");
+                DrawText(x + 2, y, statColor, $"F:{ship.Health}\nL:{ship.Lazers}\nC:{ship.Cooling}", false);
 
                 //DrawLine(x, y, 0, 0, Colors.Crimson);
             }
@@ -125,10 +123,6 @@ namespace Squigglr
             canvas.Children.Remove(Turn);
             Turn.Text = $"Turn: {gameState.CurrentTurn} of {gameState.TotalTurns}";
             canvas.Children.Add(Turn);
-
-            canvas.Children.Remove(Ship);
-            Ship.Text = $"Ship: {gameState.Ships[0].Role}\n{gameState.Ships[0].Position}";
-            canvas.Children.Add(Ship);
 
             // Draw mouse hover
             FillRectangle(mousePosition.X, mousePosition.Y, 0.5, Colors.Yellow);
@@ -190,18 +184,35 @@ namespace Squigglr
 
         private void DrawText(int x, int y, Color color, string text, bool center = true)
         {
+            FormattedText formattedText = new FormattedText(
+                text,
+                CultureInfo.GetCultureInfo("en-us"),
+                FlowDirection.LeftToRight,
+                new Typeface("Courier New"),
+                10,
+                new SolidColorBrush(color));
+
             TextBlock textBlock = new TextBlock();
+            textBlock.IsHitTestVisible = false;
             textBlock.Foreground = new SolidColorBrush(color);
             textBlock.Text = text;
+            textBlock.FontSize = 10;
+            textBlock.LineHeight = 10;
+            textBlock.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;
+            textBlock.FontFamily = new FontFamily("Courier New");
 
             if (center)
             {
-                textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                textBlock.TextAlignment = TextAlignment.Center;
+                Point p = Scaler.ConvertGridToScreen(x, y);
+                Canvas.SetLeft(textBlock, p.X - formattedText.Width / 2);
+                Canvas.SetTop(textBlock, p.Y - formattedText.Height / 2);
+            } else
+            {
+                Point p = Scaler.ConvertGridToScreen(x, y);
+                Canvas.SetLeft(textBlock, p.X);
+                Canvas.SetTop(textBlock, p.Y - formattedText.Height / 2);
             }
-
-            Point p = Scaler.ConvertGridToScreen(x, y);
-            Canvas.SetLeft(textBlock, p.X);
-            Canvas.SetTop(textBlock, p.Y);
 
             canvas.Children.Add(textBlock);
         }
@@ -209,6 +220,7 @@ namespace Squigglr
         private void DrawRectangle(long x, long y, double radius, Color color)
         {
             var r = new Rectangle();
+            r.IsHitTestVisible = false;
 
             Scaler.ResizeRectangle(r, radius * 2);
             r.Stroke = new SolidColorBrush(color);
@@ -224,6 +236,7 @@ namespace Squigglr
         private void FillRectangle(long x, long y, double radius, Color color)
         {
             var r = new Rectangle();
+            r.IsHitTestVisible = false;
 
             Scaler.ResizeRectangle(r, radius * 2);
             r.Fill = new SolidColorBrush(color);
@@ -238,6 +251,7 @@ namespace Squigglr
         private void DrawCircle(long x, long y, double radius, Color color)
         {
             var r = new Ellipse();
+            r.IsHitTestVisible = false;
             r.Width = Scaler.Scale * radius * 2;
             r.Height = Scaler.Scale * radius * 2;
 
@@ -257,6 +271,7 @@ namespace Squigglr
             Point p2 = Scaler.ConvertGridToScreen(x2, y2);
 
             Line line = new Line();
+            line.IsHitTestVisible = false;
             line.Stroke = new SolidColorBrush(color);
             line.StrokeThickness = 3;
             line.X1 = p1.X;
