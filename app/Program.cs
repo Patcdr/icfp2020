@@ -47,7 +47,7 @@ namespace app
             else if (args.Length == 2)
             {
                 // Submission mode
-                var agent = new DontDieRunner(new Sender(serverUrl, key), long.Parse(key));
+                var agent = new DeathStarRunner(new Sender(serverUrl, key), long.Parse(key));
                 agent.Join();
 
                 for (long i = agent.State.CurrentTurn; i < agent.State.TotalTurns; i++)
