@@ -19,28 +19,22 @@ namespace app
         {
             if (IsDone) return;
 
-            //StartOrbitStrategy();
-
-            AvoidDeathStrategy();
+            if (State.CurrentTurn < 6)
+            {
+                StartOrbitStrategy();
+            }
+            else
+            {
+                AvoidDeathStrategy();
+            }
         }
 
         private void StartOrbitStrategy()
         {
-            var end = State.CurrentTurn + 6;
-            for (long i = State.CurrentTurn; i < end; i++)
-            {
-                if (IsDone) return;
-
-                var ship = State.GetMyFirstShip();
-
-                var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
-                var ninetyDegrees = new Point(opposite.Y, -opposite.X);
-
-                Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
-
-                //Console.WriteLine($"-- Turn {i} --");
-                //Console.WriteLine(State);
-            }
+            var ship = State.GetMyFirstShip();
+            var opposite = new Point(Math.Sign(ship.Position.X) * -1, Math.Sign(ship.Position.Y) * -1);
+            var ninetyDegrees = new Point(opposite.Y, -opposite.X);
+            Command(Thrust(State.GetMyFirstShip().ID, ninetyDegrees));
         }
 
         private void AvoidDeathStrategy()
@@ -61,6 +55,17 @@ namespace app
                     {
                         longestLife = currentLife;
                         thrust = p;
+                    }
+                    else if (currentLife == longestLife)
+                    {
+                        // If it's a tie, prefer the thrust that is most in the direction we're currently going.
+                        int bestDotProduct = ship.Velocity.X * thrust.X + ship.Velocity.Y * thrust.Y;
+                        int currentDotProduct = ship.Velocity.X * p.X + ship.Velocity.Y * p.Y;
+                        if (currentDotProduct > bestDotProduct)
+                        {
+                            longestLife = currentLife;
+                            thrust = p;
+                        }
                     }
                 }
 
