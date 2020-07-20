@@ -27,7 +27,7 @@ namespace app
         {
             if (isAttacker)
             {
-                return (32, 8, 1);
+                return (0, 8, MaxShips);
             }
 
             return (0, 8, MaxShips);
@@ -60,13 +60,15 @@ namespace app
 
         private void AttackStrategy(Ship ship)
         {
-            //BabyBumRush(ship);
-            SeekOrRun(ship, State.IsAttacker, true);
+
+            if (SevenTenSplit(ship, 3)) return;
+            if (StarStrategy(ship)) return;
+            if (SeekOrRun(ship, State.IsAttacker)) return;
         }
 
         private void DefenseStrategy(Ship ship)
         {
-            if (SevenTenSplit(ship)) return;
+            if (SevenTenSplit(ship, 5)) return;
             if (StarStrategy(ship)) return;
             if (SeekOrRun(ship, State.IsAttacker)) return;
         }
@@ -217,7 +219,7 @@ namespace app
 
             if (towards)
             {
-                ConsiderShootingLaser(ship, expectedPosition);
+                //ConsiderShootingLaser(ship, expectedPosition);
             }
 
             return true;
@@ -347,10 +349,10 @@ namespace app
         }
 
 
-        private bool SevenTenSplit(Ship ship)
+        private bool SevenTenSplit(Ship ship, int boostTurns)
         {
             // Split quick
-            if (State.IsAttacker || State.CurrentTurn > 5) return false;
+            if (State.CurrentTurn > boostTurns) return false;
 
             // Split
             if (MyShips.Count() == 1)
@@ -371,9 +373,14 @@ namespace app
         private bool StarStrategy(Ship ship)
         {
             // If no eggs left, return false
-            if (State.IsAttacker || ship.Babies == 1)
+            if (ship.Babies == 1)
             {
                 return false;
+            }
+
+            if (State.IsAttacker)
+            {
+                ;
             }
 
             // If we're not on a baby (pos and velocity) and our orbit is stable, give birth!
@@ -381,10 +388,17 @@ namespace app
                 State.Ships.Any(
                     x => x.Position == ship.Position &&
                     x.Velocity == ship.Velocity &&
-                    x.ID != ship.ID);
+                    x.ID < ship.ID);
             if (!onBaby && IsStableOrbit(ship))
             {
-                LatentCommand(Split(ship.ID, 0, 0, 0, 1));
+                if (!State.IsAttacker)
+                {
+                    LatentCommand(Split(ship.ID, 0, 0, 0, 1));
+                }
+                else
+                {
+                    LatentCommand(Split(ship.ID, (int)ship.Health / 2, 0, 0, (int)ship.Babies / 2));
+                }
                 return true;
             }
 
