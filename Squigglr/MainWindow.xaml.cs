@@ -74,7 +74,7 @@ namespace Squigglr
             player2Sender = new Sender(serverUrl, playerKey);
             runner = new DoubleRunner(
                     new Sender(serverUrl, playerKey),
-                    new DeathStarRunner(player1Sender),
+                    new DontDieRunner(player1Sender),
                     new DontDieRunner(player2Sender));
 
             gameState = runner.Join();

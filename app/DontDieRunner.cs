@@ -373,7 +373,7 @@ namespace app
         private int TimeToLive(Ship ship, Point thrust)
         {
             List<Point> positions =
-                ShipPositionSimulator.FuturePositionList(ship, 256 - (int)State.CurrentTurn, thrust);
+                ShipPositionSimulator.FuturePositionList(ship, (int)State.TotalTurns - (int)State.CurrentTurn, thrust);
             for (int i = 0; i < positions.Count; i++)
             {
                 if (IsDeadLocation(positions[i]))
