@@ -20,7 +20,7 @@ namespace app
         {
             if (isAttacker)
             {
-                return (32, 10, 1);
+                return (64, 10, 1);
             }
 
             return (0, 10, 1);
@@ -170,7 +170,7 @@ namespace app
 
             // If we're not too hot
             // TODO: Less conservative value.
-            if (ship.Heat > 16)
+            if (ship.Heat > 0)
             {
                 return;
             }
@@ -181,7 +181,7 @@ namespace app
             Point closestShip = new Point(0, 0);
             foreach (Ship s in State.Ships.Where(x => x.PlayerID != State.PlayerId))
             {
-                Point enemyPosition = new Point(s.Position.X + s.Velocity.X, s.Position.Y + s.Velocity.Y);
+                Point enemyPosition = ShipPositionSimulator.FuturePosition(s, 1);
                 int distance = ManhattanDistance(enemyPosition, expectedPosition);
                 if (distance < closestDistance)
                 {
