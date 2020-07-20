@@ -124,7 +124,7 @@ namespace Squigglr
                 // Ship stats
                 Color statColor = Color.FromRgb(90, 90, 90);
                 DrawText(x, y + 3, statColor, $"{ship.ID}");
-                DrawText(x + 2, y, statColor, $"F:{ship.Health}\nH:{ship.Heat}\nL:{ship.Lazers}\nC:{ship.Cooling}", false);
+                DrawText(x + 2, y, statColor, $"F:{ship.Health}\nH:{ship.Heat}\nL:{ship.Lazers}\nC:{ship.Cooling}\nx5:{ship.X5}\nx6:{ship.X6}\nx7:{ship.X7}", false);
 
                 //DrawLine(x, y, 0, 0, Colors.Crimson);
             }

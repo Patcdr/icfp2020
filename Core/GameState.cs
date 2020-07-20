@@ -19,6 +19,11 @@ namespace Core
         public readonly Point Velocity;
         public readonly Point Thrust;
 
+        public readonly Value X4; // Appears to be the initial point allocation
+        public readonly Value X5;
+        public readonly Value X6;
+        public readonly Value X7;
+
         public readonly long Health;
         public readonly long Lazers;
         public readonly long Cooling;
@@ -38,6 +43,10 @@ namespace Core
             this.Role = UtilityFunctions.Addr("cadar", ship).AsNumber();
             this.Position = ToPoint(UtilityFunctions.Addr("caddar", ship));
             this.Velocity = ToPoint(UtilityFunctions.Addr("cadddar", ship));
+            this.X4 = UtilityFunctions.Addr("caddddar", ship);
+            this.X5 = UtilityFunctions.Addr("cadddddar", ship);
+            this.X6 = UtilityFunctions.Addr("caddddddar", ship);
+            this.X7 = UtilityFunctions.Addr("cadddddddar", ship);
             var props = UtilityFunctions.Addr("caddddar", ship);
 
             this.Health = UtilityFunctions.Addr("car", props).AsNumber();
