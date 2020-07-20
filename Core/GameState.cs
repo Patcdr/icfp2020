@@ -17,6 +17,7 @@ namespace Core
 
         public readonly Point Position;
         public readonly Point Velocity;
+        public readonly Point Thrust;
 
         public readonly long Health;
         public readonly long Lazers;
@@ -45,6 +46,17 @@ namespace Core
             this.Babies = UtilityFunctions.Addr("cdddar", props).AsNumber();
 
             this.Heat = UtilityFunctions.Addr("cadddddar", ship).AsNumber();
+            var commands = UtilityFunctions.Addr("cdar", ship);
+            foreach (var command in UtilityFunctions.ListAsEnumerable(commands, null))
+            {
+                if (command.Car().AsNumber() == 0 /* THRUST */)
+                {
+                    Thrust = new Point(
+                        (int)command.Cdr().Car().Car().AsNumber(),
+                        (int)command.Cdr().Car().Cdr().AsNumber()
+                    );
+                }
+            }
         }
 
         public override string ToString()
@@ -111,6 +123,11 @@ namespace Core
         public Ship GetMyFirstShip()
         {
             return Ships.Where(x => x.PlayerID == PlayerId).First();
+        }
+
+        public Ship GetOpponentFirstShip()
+        {
+            return Ships.Where(x => x.PlayerID != PlayerId).First();
         }
 
         public override string ToString()

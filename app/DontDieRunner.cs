@@ -34,7 +34,7 @@ namespace app
             {
                 StartOrbitStrategy();
             }
-            else if (!State.IsAttacker || 
+            else if (!State.IsAttacker ||
                 State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() > 1)
             {
                 SeekOrRun(false);
@@ -60,11 +60,45 @@ namespace app
 
             // Simulate the enemy's position into the future, save all positions
             // TODO: Deal with all enemy ships.
-            List<Point> enemyPositions =
-                ShipPositionSimulator.FuturePositionList(
-                    State.Ships.Where(x => x.PlayerID != State.PlayerId).First(),
-                    lookaheadTurns,
-                    new Point(0, 0));
+            List<Point> quantumPositions = ShipPositionSimulator.FuturePositionList(
+                State.Ships.Where(x => x.PlayerID != State.PlayerId).First(),
+                lookaheadTurns,
+                new Point(0, 0));
+            var thrustCount = 1;
+
+            void rec(List<Point> moves, int max=1)
+            {
+                if (moves.Count == max) return;
+
+                foreach (var thrust in ShipPositionSimulator.Thrusts)
+                {
+                    moves.Add(thrust);
+                    List<Point> enemyPositions =
+                        ShipPositionSimulator.FuturePositionList(
+                            State.Ships.Where(x => x.PlayerID != State.PlayerId).First(),
+                            lookaheadTurns,
+                            moves);
+
+                    if (quantumPositions == null)
+                    {
+                        quantumPositions = new List<Point>(enemyPositions);
+                    }
+                    else {
+                        for (var i = 0; i < enemyPositions.Count; i++)
+                        {
+                            quantumPositions[i] = new Point(
+                                (quantumPositions[i].X * thrustCount + enemyPositions[i].X) / (thrustCount + 1),
+                                (quantumPositions[i].Y * thrustCount + enemyPositions[i].Y) / (thrustCount + 1)
+                            );
+                        }
+                    }
+                    thrustCount += 1;
+
+                    rec(moves, max);
+                    moves.Remove(thrust);
+                }
+            }
+            rec(new List<Point>());
 
             // Simulate our position given no thrust, and all possible thrusts.
             List<Tuple<Point, List<Point>>> allPaths = new List<Tuple<Point, List<Point>>>();
@@ -120,7 +154,7 @@ namespace app
             Tuple<int, Point, List<Point>> bestPlan = null;
             foreach (var deathAndPath in nonDyingPaths)
             {
-                var distanceAndTurn = ClosestDistanceAndTurn(deathAndPath.Item3, enemyPositions);
+                var distanceAndTurn = ClosestDistanceAndTurn(deathAndPath.Item3, quantumPositions);
                 int score = distanceAndTurn.Item1 + distanceAndTurn.Item2;
                 if (isAttacker && score < bestScore)
                 {
@@ -142,7 +176,7 @@ namespace app
                 commands.Add(Thrust(ship.ID, bestPlan.Item2));
             }
 
-            if (bestPlan.Item3[0] == enemyPositions[0] &&
+            if (bestPlan.Item3[0] == quantumPositions[0] &&
                 State.Ships.Where(x => x.PlayerID != State.PlayerId).Count() == 1 &&
                 isAttacker)
             {

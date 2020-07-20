@@ -33,11 +33,11 @@ namespace app
             httpClient.Timeout = TimeSpan.FromDays(1);
         }
 
-        public Value Send(Value statement, Value player=null)
+        public Value Send(Value statement, Value player=null, bool print=true)
         {
             LastSentValue = statement;
 
-            //Console.WriteLine($"Sending({player}): {statement}");
+            if (print) Console.WriteLine($"Sending({player}): {statement}");
 
             var signal = NumberFunctions.Mod(statement, null);
             var requestContent = new StringContent(signal, Encoding.UTF8, MediaTypeNames.Text.Plain);
@@ -51,16 +51,16 @@ namespace app
             var content = response.Content.ReadAsStringAsync().Result;
             var answer = NumberFunctions.Dem(content);
 
-            //Console.WriteLine($"Received({player}): {answer}");
+            if (print) Console.WriteLine($"Received({player}): {answer}");
 
-            //UtilityFunctions.PrettyPrint(answer);
+            // if (print) UtilityFunctions.PrettyPrint(answer);
 
             return answer;
         }
 
-        public Value Send(Value[] statement, Value player=null)
+        public Value Send(Value[] statement, Value player=null, bool print=true)
         {
-            return Send(UtilityFunctions.MakeList(statement), player);
+            return Send(UtilityFunctions.MakeList(statement), player, print);
         }
 
         public Value Send(params Value[] statement)

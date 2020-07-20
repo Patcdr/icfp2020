@@ -62,7 +62,7 @@ namespace app
             State = new GameState(Sender.Send(new Value[] { JOIN, Player, NilList }));
 
             var ( lazers, cooling, ships ) = GetInitialValues(State.IsAttacker);
-            
+
             if (ships < 1) throw new ArgumentException("initial ships must be at least 1");
 
             int health = (int)State.TotalPoints - (4 * lazers) - (12 * cooling) - (2 * ships);
@@ -74,7 +74,7 @@ namespace app
 
         public Value Summarize()
         {
-            return Sender.Send(new Value[] { SUMMARY, Player });
+            return Sender.Send(new Value[] { SUMMARY, Player }, null, false);
         }
 
         #region Commands
@@ -128,6 +128,19 @@ namespace app
             return (Math.Abs(location.X) <= State.StarSize && Math.Abs(location.Y) <= State.StarSize) ||
                    Math.Abs(location.X) >= State.ArenaSize ||
                    Math.Abs(location.Y) >= State.ArenaSize;
+        }
+
+        protected double Distance(long sourceShip=0, long destShip=1)
+        {
+            Ship source = State.GetShipById(sourceShip);
+            Ship dest = State.GetShipById(destShip);
+
+            return Math.Sqrt(
+                Math.Abs((source.Position.X - dest.Position.X)) *
+                Math.Abs((source.Position.X - dest.Position.X)) +
+                Math.Abs((source.Position.Y - dest.Position.Y)) *
+                Math.Abs((source.Position.Y - dest.Position.Y))
+            );
         }
 
         #endregion
