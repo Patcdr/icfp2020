@@ -18,7 +18,12 @@ namespace app
 
         protected override (int lazers, int cooling, int ships) GetInitialValues(bool isAttacker)
         {
-            return (0, 8, 1);
+            if (isAttacker)
+            {
+                return (64, 10, 1);
+            }
+
+            return (0, 10, 1);
         }
 
         public override void Step()
