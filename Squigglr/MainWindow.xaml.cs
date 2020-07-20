@@ -17,6 +17,7 @@ using app;
 using IntPoint = System.Drawing.Point;
 using Core;
 using System.Threading;
+using System.Printing;
 
 namespace Squigglr
 {
@@ -25,14 +26,12 @@ namespace Squigglr
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly SolidColorBrush MouseHoverBrush = new SolidColorBrush(Colors.Green);
-
-        private readonly Rectangle MouseHover;
         private readonly TextBlock CurrentPosition;
         private readonly TextBlock Turn;
         private readonly TextBlock Ship;
         private int selectedShipId;
 
+        private IntPoint mousePosition;
         private readonly Rectangle MeasureStartingLocationBlock;
         private IntPoint? measureStartingLocationPoint;
 
@@ -47,10 +46,6 @@ namespace Squigglr
             InitializeComponent();
             canvas.Background = new SolidColorBrush(Colors.Black);
             Scaler.ResizeWindow(window.DesiredSize);
-
-            MouseHover = new Rectangle();
-            Scaler.ResizeRectangle(MouseHover);
-            MouseHover.Fill = MouseHoverBrush;
 
             CurrentPosition = new TextBlock();
             CurrentPosition.Foreground = new SolidColorBrush(Colors.Yellow);
@@ -68,7 +63,7 @@ namespace Squigglr
             Canvas.SetTop(Ship, 30);
 
             MeasureStartingLocationBlock = new Rectangle();
-            Scaler.ResizeRectangle(MeasureStartingLocationBlock);
+            Scaler.ResizeRectangle(MeasureStartingLocationBlock, 1);
             MeasureStartingLocationBlock.Fill = new SolidColorBrush(Colors.Red);
             MeasureStartingLocationBlock.Visibility = Visibility.Hidden;
 
@@ -90,8 +85,6 @@ namespace Squigglr
         {
             canvas.Children.Clear();
 
-            canvas.Children.Add(MouseHover);
-
             canvas.Children.Add(CurrentPosition);
             canvas.Children.Add(MeasureStartingLocationBlock);
 
@@ -107,24 +100,15 @@ namespace Squigglr
                 Color color = (isAttacker ? Colors.Red : Colors.Green);
 
                 // Draw pixelized X
-                FillRectangle(x, y, 1, color);
-                FillRectangle(x - 1, y + 1, 1, color);
-                FillRectangle(x - 1, y - 1, 1, color);
-                FillRectangle(x + 1, y + 1, 1, color);
-                FillRectangle(x + 1, y - 1, 1, color);
+                FillRectangle(x, y, 0.5, color);
+                FillRectangle(x - 1, y + 1, 0.5, color);
+                FillRectangle(x - 1, y - 1, 0.5, color);
+                FillRectangle(x + 1, y + 1, 0.5, color);
+                FillRectangle(x + 1, y - 1, 0.5, color);
 
                 DrawText(x, y + 2, color, $"{ship.ID}");
 
-                /*
-                Line line = new Line();
-                line.Stroke = new SolidColorBrush(Colors.Crimson);
-                line.StrokeThickness = 3;
-                line.X1 = p.X;
-                line.Y1 = p.Y;
-                line.X2 = 0;
-                line.Y2 = 0;
-                canvas.Children.Add(line);
-                */
+                //DrawLine(x, y, 0, 0, Colors.Crimson);
             }
 
             canvas.Children.Remove(Turn);
@@ -134,9 +118,13 @@ namespace Squigglr
             canvas.Children.Remove(Ship);
             Ship.Text = $"Ship: {gameState.Ships[0].Role}\n{gameState.Ships[0].Position}";
             canvas.Children.Add(Ship);
+
+            // Draw mouse hover
+            FillRectangle(mousePosition.X, mousePosition.Y, 0.5, Colors.Yellow);
+            CurrentPosition.Text = $"({mousePosition.X}, {mousePosition.Y})";
         }
 
-        private void DrawText(long x, long y, Color color, String text, bool center = true)
+        private void DrawText(int x, int y, Color color, String text, bool center = true)
         {
             TextBlock textBlock = new TextBlock();
             textBlock.Foreground = new SolidColorBrush(color);
@@ -147,40 +135,56 @@ namespace Squigglr
                 textBlock.HorizontalAlignment = HorizontalAlignment.Center;
             }
 
-            Point p = Scaler.Convert(new IntPoint((int)x, (int)y));
+            Point p = Scaler.ConvertGridToScreen(x, y);
             Canvas.SetLeft(textBlock, p.X);
             Canvas.SetTop(textBlock, p.Y);
 
             canvas.Children.Add(textBlock);
         }
 
-        private void DrawRectangle(long x, long y, long size, Color color)
+        private void DrawRectangle(long x, long y, double radius, Color color)
         {
             var r = new Rectangle();
 
-            Scaler.ResizeRectangle(r, size);
+            Scaler.ResizeRectangle(r, radius * 2);
             r.Stroke = new SolidColorBrush(color);
             r.Fill = null;
 
-            Point drawingPoint = Scaler.Convert(new IntPoint((int)(x - size / 2), (int)(y - size / 2)));
+            Point drawingPoint = Scaler.ConvertGridToScreen(x - radius, y - radius);
             Canvas.SetLeft(r, drawingPoint.X);
             Canvas.SetTop(r, drawingPoint.Y);
 
             canvas.Children.Add(r);
         }
 
-        private void FillRectangle(long x, long y, long size, Color color)
+        private void FillRectangle(long x, long y, double radius, Color color)
         {
             var r = new Rectangle();
 
-            Scaler.ResizeRectangle(r, size);
+            Scaler.ResizeRectangle(r, radius * 2);
             r.Fill = new SolidColorBrush(color);
 
-            Point drawingPoint = Scaler.Convert(new IntPoint((int)(x - size / 2), (int)(y - size / 2)));
+            Point drawingPoint = Scaler.ConvertGridToScreen(x - radius, y - radius);
             Canvas.SetLeft(r, drawingPoint.X);
             Canvas.SetTop(r, drawingPoint.Y);
 
             canvas.Children.Add(r);
+        }
+
+        private void DrawLine(int x1, int y1, int x2, int y2, Color color)
+        {
+            Point p1 = Scaler.ConvertGridToScreen(x1, y1);
+            Point p2 = Scaler.ConvertGridToScreen(x2, y2);
+
+            Line line = new Line();
+            line.Stroke = new SolidColorBrush(color);
+            line.StrokeThickness = 3;
+            line.X1 = p1.X;
+            line.Y1 = p1.Y;
+            line.X2 = p2.X;
+            line.Y2 = p2.Y;
+
+            canvas.Children.Add(line);
         }
 
         private void StepOne()
@@ -227,15 +231,23 @@ namespace Squigglr
         {
             if (!measureStartingLocationPoint.HasValue)
             {
-                measureStartingLocationPoint = Scaler.Convert(e.GetPosition(canvas));
-                Point p2 = Scaler.Convert(measureStartingLocationPoint.Value);
+                double sx = e.GetPosition(canvas).X;
+                double sy = e.GetPosition(canvas).Y;
+                measureStartingLocationPoint = Scaler.ConvertScreenToGrid(sx, sy);
+
+                int x = measureStartingLocationPoint.Value.X;
+                int y = measureStartingLocationPoint.Value.Y;
+                Point p2 = Scaler.ConvertGridToScreen(x, y);
                 Canvas.SetLeft(MeasureStartingLocationBlock, p2.X);
                 Canvas.SetTop(MeasureStartingLocationBlock, p2.Y);
                 MeasureStartingLocationBlock.Visibility = Visibility.Visible;
             }
             else
             {
-                IntPoint end = Scaler.Convert(e.GetPosition(canvas));
+                double x = e.GetPosition(canvas).X;
+                double y = e.GetPosition(canvas).Y;
+                IntPoint end = Scaler.ConvertScreenToGrid(x, y);
+
                 var sb = new StringBuilder();
                 IntPoint start = measureStartingLocationPoint.Value;
                 sb.AppendLine($"Original point: ({start.X}, {start.Y})");
@@ -269,17 +281,15 @@ namespace Squigglr
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            IntPoint p = Scaler.Convert(e.GetPosition(canvas));
-            Point p2 = Scaler.Convert(p);
-            Canvas.SetLeft(MouseHover, p2.X);
-            Canvas.SetTop(MouseHover, p2.Y);
-            CurrentPosition.Text = $"({p.X}, {p.Y})";
+            double x = e.GetPosition(canvas).X;
+            double y = e.GetPosition(canvas).Y;
+            mousePosition = Scaler.ConvertScreenToGrid(x, y);
+            Render();
         }
 
         private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             Scaler.Zoom(e.Delta > 0);
-            Scaler.ResizeRectangle(MouseHover);
             Render();
         }
 

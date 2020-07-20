@@ -15,19 +15,19 @@ namespace Squigglr
         private static int PanShiftWidth = 0;
         private static int PanShiftHeight = 0;
 
-        public static Point Convert(IntPoint p)
+        public static Point ConvertGridToScreen(double x, double y)
         {
-            return new Point(p.X * Scale + RealWidth / 2 - Scale / 2 + PanShiftWidth * Scale,
-                             p.Y * Scale + RealHeight / 2 - Scale / 2 + PanShiftHeight * Scale);
+            return new Point(x * Scale + RealWidth / 2 - Scale / 2 + PanShiftWidth * Scale,
+                             y * Scale + RealHeight / 2 - Scale / 2 + PanShiftHeight * Scale);
         }
 
-        public static IntPoint Convert(Point p)
+        public static IntPoint ConvertScreenToGrid(double x, double y)
         {
-            return new IntPoint((int)Math.Round((p.X - RealWidth / 2 - PanShiftWidth * Scale) / Scale),
-                                (int)Math.Round((p.Y - RealHeight / 2 - PanShiftHeight * Scale) / Scale));
+            return new IntPoint((int)Math.Round((x - RealWidth / 2 - PanShiftWidth * Scale) / Scale),
+                                (int)Math.Round((y - RealHeight / 2 - PanShiftHeight * Scale) / Scale));
         }
 
-        public static void ResizeRectangle(Rectangle r, long radius = 1)
+        public static void ResizeRectangle(Rectangle r, double radius)
         {
             r.Width = Scale * radius;
             r.Height = Scale * radius;
