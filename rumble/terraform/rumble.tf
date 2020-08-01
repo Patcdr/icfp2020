@@ -9,7 +9,7 @@ variable "region" {
 
 variable "url_auth" {
   type = string
-  default = "dGhlY2F0OmxvbHpsb2x6"
+  default = ""
 }
 
 provider "aws" {
