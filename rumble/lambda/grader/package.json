@@ -5,7 +5,7 @@
   "main": "grader.js",
   "dependencies": {
     "js-beautify": "^1.10.0",
-    "jsdom": "^15.1.1",
+    "jsdom": "^16.5.0",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {},
